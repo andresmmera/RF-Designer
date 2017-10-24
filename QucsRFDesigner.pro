@@ -3,7 +3,6 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     Schematic/symbol.h \
     Schematic/wire.h \
     UI/preferencesdialog.h \
-    UI/TuningBox.h \
     Filtering/CanonicalFilter.h \
     Filtering/Network.h \
     Filtering/EllipticFilter.h \
@@ -21,7 +20,6 @@ SOURCES += main.cpp \
     Schematic/component.cpp \
     Schematic/wire.cpp \
     UI/preferencesdialog.cpp \
-    UI/TuningBox.cpp \
     Filtering/CanonicalFilter.cpp \
     Filtering/EllipticFilter.cpp \
     SPAR/MathOperations.cpp \

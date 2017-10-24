@@ -20,7 +20,6 @@
 #include "Schematic/component.h"
 #include "UI/QucsRFDesignerWindow.h"
 #include "UI/preferencesdialog.h"
-#include "UI/TuningBox.h"
 #include "Filtering/CanonicalFilter.h"
 #include "Filtering/EllipticFilter.h"
 #include "Filtering/DirectCoupledFilters.h"
@@ -59,9 +58,6 @@ private:
 
 private slots://Functions to launch the actions
     void PreferencesWindow();
-    void addTuningPanel(ComponentInfo);
-    void TuningChanged(ComponentInfo);
-    void CloseTuningBox(QString);
     void UpdateDesignParameters();
     void ReceiveSettings(ToolSettings);
     QMap<QString, vector<complex<double> > > loadQucsDataSet(QString);
@@ -111,9 +107,6 @@ private://Actions
     // *********************** ZVEREV DATABASE ***************************
     QSqlDatabase db;
     bool DBservice;
-
-    // *************************** TUNING ******************************
-    QList<TuningBox*> TunableComponents;
 
     // ************************ SIMULATION SETTINGS ********************
     SP_Analysis SPAR_Settings;
