@@ -43,7 +43,7 @@ void CanonicalFilter::synthesize()
     LowpassPrototypeCoeffs LP_coeffs(Specification);
     gi = LP_coeffs.getCoefficients();
 
-    if (Specification.FilterResponse == Chebyshev)
+    if (Specification.FilterResponse == Chebyshev && !Specification.UseZverevTables)
     {//Correct cutoff according to the ripple
         double epsilon = sqrt(pow(10.0, Specification.Ripple/10.0) - 1.0);
         Specification.fc /= cosh(acosh(1.0 / epsilon) / Specification.order);
