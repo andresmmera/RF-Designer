@@ -121,10 +121,6 @@ std::deque<double> LowpassPrototypeCoeffs::calcChebyshev_gi()
     std::deque<double> gi;
     gi.clear();
     int N = Specification.order;
-
-    double epsilon = sqrt(pow(10.0, Specification.Ripple/10.0) - 1.0);
-    Specification.fc /= cosh(acosh(1.0 / epsilon) / N);
-
     double beta = std::log(1/tanh(Specification.Ripple/17.37));
     double gamma = sinh(beta/(2*N));
     std::vector<double> ak, bk;
