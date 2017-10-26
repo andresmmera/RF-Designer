@@ -76,6 +76,7 @@ private://Actions
     void createActions();
     void createMenus();
     void UpdateWindows();
+    QStringList setItemsResponseTypeCombo();
     QToolBar *RFToolBar;
 
     QAction *PreferencesAction, *SmithAction;

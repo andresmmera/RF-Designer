@@ -94,7 +94,6 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
     //*********************************** End of the plot window region
 
     SchematicWidget = new GraphWidget(dock_Schematic);//Schematic window
-    connect(SchematicWidget, SIGNAL(SendTuningSignalToMainWindow(ComponentInfo)), this, SLOT(addTuningPanel(ComponentInfo)));
 
     Smith_plot = new SmithChart();
     // Smith_plot->setMinimumSize(200, 400);
@@ -397,7 +396,7 @@ void QucsRFDesignerWindow::ResposeComboChanged()
 
 // This function catches the events related to the changes in the filter specificatios
 void QucsRFDesignerWindow::UpdateDesignParameters()
-{
+{qDebug() <<"Current response 1: " << FilterResponseTypeCombo->currentText();
     Filter_SP.Implementation = FilterImplementationCombo->currentText();
     //************************** Set filter response *********************************
     if (!FilterResponseTypeCombo->currentText().compare("Chebyshev")) Filter_SP.FilterResponse = Chebyshev;
@@ -467,7 +466,7 @@ void QucsRFDesignerWindow::UpdateDesignParameters()
         FilterClassCombo->setCurrentIndex(2);
         FilterClassCombo->setEnabled(false);
         FilterResponseTypeCombo->clear();
-        QStringList DC_responses = DefaultFilterResponses;
+        QStringList DC_responses = setItemsResponseTypeCombo();
         DC_responses.removeAt(DC_responses.indexOf("Elliptic"));
         DC_responses.removeAt(DC_responses.indexOf("Cauer"));
         FilterResponseTypeCombo->addItems(DC_responses);
@@ -479,13 +478,15 @@ void QucsRFDesignerWindow::UpdateDesignParameters()
         DC_CouplingTypeCombo->hide();
         DC_CouplingLabel->hide();
         FilterClassCombo->setEnabled(true);
-        FilterResponseTypeCombo->blockSignals(true);
+        qDebug() <<"Current response 2: " << FilterResponseTypeCombo->currentText();
         QString CurrentResponse = FilterResponseTypeCombo->currentText();
+        FilterResponseTypeCombo->blockSignals(true);
+        QStringList data = setItemsResponseTypeCombo();
         FilterResponseTypeCombo->clear();
-        FilterResponseTypeCombo->addItems(DefaultFilterResponses);
-        for (int i = 0; i < DefaultFilterResponses.length(); i++)
+        FilterResponseTypeCombo->addItems(data);
+        for (int i = 0; i < data.length(); i++)
         {
-            if (CurrentResponse == DefaultFilterResponses.at(i))
+            if (CurrentResponse == data.at(i))
             {
               FilterResponseTypeCombo->setCurrentIndex(i);
               break;
@@ -668,19 +669,12 @@ void QucsRFDesignerWindow::SwitchZverevTablesMode(bool ZverevMode)
     if (FilterResponseTypeCombo->currentText() == "Elliptic") return;//Zverev mode is only available for canonical responses
     if (ZverevMode)
     {
-        QStringList data;
-        QSqlQuery query;
-        //Fill the response type combobox
-        data.clear();
-        query.exec(QString("SHOW TABLES FROM ZverevTables;"));
-        query.first();
-        do {
-            data.append(query.value(0).toString());
-        }while(query.next());
         QString aux = FilterResponseTypeCombo->currentText();
-        FilterResponseTypeCombo->blockSignals(true);//Avoid calling slots while setting up this widget
+        QStringList data = setItemsResponseTypeCombo();
+        FilterResponseTypeCombo->blockSignals(true);
         FilterResponseTypeCombo->clear();
         FilterResponseTypeCombo->addItems(data);
+        FilterResponseTypeCombo->blockSignals(false);
         //Find the index of the current response type and select it for the Zverev mode
         for (int i = 0; i < FilterResponseTypeCombo->count();i++)
         {
@@ -723,11 +717,12 @@ void QucsRFDesignerWindow::SwitchZverevTablesMode(bool ZverevMode)
                 break;
             }
         }
+        ResposeComboChanged();
         //Update order and ripple
         OrderSpinBox->setValue(OrderCombobox->currentText().toInt());
         RippleSpinbox->setValue(RippleCombobox->currentText().toDouble());
+
     }
-    ResposeComboChanged();
     UpdateDesignParameters();
 }
 
@@ -894,4 +889,26 @@ void QucsRFDesignerWindow::ShowSmithChart()
     {
         Smith_plot->hide();
     }
+}
+
+
+QStringList QucsRFDesignerWindow::setItemsResponseTypeCombo()
+{
+    QStringList data;
+    if (UseZverevTablesCheckBox->isChecked())
+    {
+        QSqlQuery query;
+        //Fill the response type combobox
+        data.clear();
+        query.exec(QString("SHOW TABLES FROM ZverevTables;"));
+        query.first();
+        do {
+            data.append(query.value(0).toString());
+        }while(query.next());
+    }
+    else
+    {//Default data
+       data = DefaultFilterResponses;
+    }
+    return data;
 }
