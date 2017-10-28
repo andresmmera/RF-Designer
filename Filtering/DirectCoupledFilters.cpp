@@ -21,6 +21,10 @@ DirectCoupledFilters::DirectCoupledFilters(FilterSpecifications FS)
     NumberComponents[ConnectionNodes] = 0;
 }
 
+DirectCoupledFilters::~DirectCoupledFilters()
+{
+
+}
 
 
 void DirectCoupledFilters::synthesize()

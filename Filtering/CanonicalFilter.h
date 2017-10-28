@@ -8,6 +8,7 @@ class CanonicalFilter : public Network
 {
 public:
     CanonicalFilter();
+    ~CanonicalFilter();
     CanonicalFilter(FilterSpecifications);
     QList<ComponentInfo> getComponents();
     QList<WireInfo> getWires();

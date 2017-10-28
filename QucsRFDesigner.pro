@@ -13,7 +13,8 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     UI/smithchart.h \
     Filtering/DirectCoupledFilters.h \
     Filtering/LowpassPrototypeCoeffs.h \
-    Filtering/EdgeCoupled.h
+    Filtering/EdgeCoupled.h \
+    UI/FilterDesignTool.h
 
 
 SOURCES += main.cpp \
@@ -27,10 +28,10 @@ SOURCES += main.cpp \
     SPAR/mat.cpp \
     UI/QucsRFDesignerWindow.cpp \
     UI/smithchart.cpp \
-    UI/filterdesigngui.cpp \
     Filtering/DirectCoupledFilters.cpp \
     Filtering/LowpassPrototypeCoeffs.cpp \
-    Filtering/EdgeCoupled.cpp
+    Filtering/EdgeCoupled.cpp \
+    UI/FilterDesignTool.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 

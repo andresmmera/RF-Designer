@@ -21,6 +21,11 @@ CanonicalFilter::CanonicalFilter(FilterSpecifications FS)
     NumberComponents[ConnectionNodes] = 0;
 }
 
+CanonicalFilter::~CanonicalFilter()
+{
+
+}
+
 QList<ComponentInfo> CanonicalFilter::getComponents()
 {
     return Components;

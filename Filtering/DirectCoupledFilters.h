@@ -7,6 +7,7 @@ class DirectCoupledFilters : public Network
 {
 public:
     DirectCoupledFilters();
+    ~DirectCoupledFilters();
     DirectCoupledFilters(FilterSpecifications);
     QList<ComponentInfo> getComponents();
     QList<WireInfo> getWires();

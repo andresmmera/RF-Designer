@@ -66,6 +66,7 @@ public:
     void ModifyComponent(ComponentInfo);
     void setWires(QList<WireInfo>);
     void setNodes(QList<NodeInfo>);
+    void setSchematic(SchematicInfo);
     void clear();
 
 public slots:

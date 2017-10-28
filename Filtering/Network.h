@@ -92,6 +92,15 @@ struct SP_Analysis
     std::vector<double > freq;
 };
 
+struct SchematicInfo
+{
+    struct SP_Analysis SPAR_Settings;
+    QString netlist;
+    QList<ComponentInfo> Comps;
+    QList<WireInfo> Wires;
+    QList<NodeInfo> Nodes;
+};
+
 class Network
 {
 public:

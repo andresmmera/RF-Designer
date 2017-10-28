@@ -2,48 +2,6 @@
 
 QucsRFDesignerWindow::QucsRFDesignerWindow()
 {
-    //Check if the mySQL driver for Qt is installed
-    if (!QSqlDatabase::drivers().contains("QMYSQL"))
-        QMessageBox::critical(this, "Database not loaded", "You need to install the QMYSQL driver to load the Zverev tables");
-
-    // Establish connection with the database
-    db = QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName("localhost");
-    db.setDatabaseName("ZverevTables");
-    db.setUserName("QucsRFdesigner");
-    db.setPassword("");
-    DBservice = db.open();
-
-    if (DBservice)
-    {
-        //Identify data available in the tables to fill the user input widgets
-        QSqlQuery query;
-        QStringList Columns;
-        QStringList TablesID = db.tables();
-        QMap<QString, struct PrototypeTableProperties> TablesProperties;
-        for (int i = 0; i < TablesID.length(); i++)
-        {
-            //Get the columns
-            query.exec(QString("SHOW COLUMNS FROM ZverevTables.%1;").arg(TablesID.at(i)));
-            query.first();
-            Columns.clear();
-            do {
-                Columns.append(query.value(0).toString());
-            }while(query.next());
-
-            //Get order available on each table
-            for (int j = 0; j < Columns.size(); j++)
-            {
-                query.exec(QString("SELECT N FROM ZverevTables.%2;").arg(Columns.at(j)).arg(TablesID.at(i)));
-                query.first();
-                do {
-                    int aux = query.value(0).toInt();
-                    if (std::find(TablesProperties[TablesID.at(i)].N.begin(), TablesProperties[TablesID.at(i)].N.end(), aux) == TablesProperties[TablesID.at(i)].N.end())
-                        TablesProperties[TablesID.at(i)].N.push_back(aux);
-                }while(query.next());
-            }
-        }
-    }
     //************** Dock setup ******************
     QDockWidget *dock_Schematic =  new QDockWidget("Schematic");
     QDockWidget *dock_Setup =  new QDockWidget("");
@@ -59,12 +17,12 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
     TabWidget = new QTabWidget();//Tab widget
     //************* Filter Design tab ************************
 
-    QWidget *FilterDesignWidget = SetupFilterDesignGUI();
+    Filter_Tool = new FilterDesignTool();
     //*********** Impedance Matching tab *********************
     QWidget *MatchingWidget = new QWidget();
     // So far, it is empty...
 
-    TabWidget->addTab(FilterDesignWidget, "Filter design");
+    TabWidget->addTab(Filter_Tool, "Filter design");
     TabWidget->addTab(MatchingWidget, "Matching");
     TabWidget->setMinimumSize(300, 200);
     //*********************************** End of the setup panel
@@ -136,32 +94,14 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
     Tool_Settings.ystep = 5;
     Tool_Settings.FixedAxes = true;
 
-    //Connection functions for updating the network requirements and simulate on the fly
-    connect(FilterImplementationCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateDesignParameters()));
-    connect(CLCRadioButton, SIGNAL(toggled(bool)), this, SLOT(ChangeRL_CLC_LCL_mode()));
-    //connect(LCLRadioButton, SIGNAL(toggled(bool)), this, SLOT(ChangeRL_CLC_LCL_mode()));
-    connect(FilterResponseTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(ResposeComboChanged()));
-    connect(EllipticType, SIGNAL(currentIndexChanged(int)), this, SLOT(EllipticTypeChanged()));
-    connect(FilterClassCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateDesignParameters()));
-    connect(OrderSpinBox, SIGNAL(valueChanged(int)), this, SLOT(UpdateDesignParameters()));
-    connect(FCSpinbox, SIGNAL(valueChanged(double)), this, SLOT(UpdateDesignParameters()));
-    connect(FC_ScaleCombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateDesignParameters()));
-    connect(BWSpinbox, SIGNAL(valueChanged(double)), this, SLOT(UpdateDesignParameters()));
-    connect(BW_ScaleCombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateDesignParameters()));
-    connect(SourceImpedanceLineEdit, SIGNAL(textChanged(QString)), this, SLOT(UpdateDesignParameters()));
-    connect(RippleSpinbox, SIGNAL(valueChanged(double)), this, SLOT(UpdateDesignParameters()));
-    connect(StopbandAttSpinbox, SIGNAL(valueChanged(double)), this, SLOT(UpdateDesignParameters()));
-    connect(EllipticType, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateDesignParameters()));
-    connect(UseZverevTablesCheckBox, SIGNAL(clicked(bool)), this, SLOT(SwitchZverevTablesMode(bool)));
-    connect(OrderCombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateRL_and_Ripple()));
-    connect(RippleCombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateLoad_Impedance(int)));
-    connect(RLCombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateRipple(int)));
-
     PlotWidget->xAxis->setRange(SPAR_Settings.fstart/1e6, SPAR_Settings.fstop/1e6);
     PlotWidget->yAxis->setRange(Tool_Settings.ymin, Tool_Settings.ymax);
 
-    //Update specifications
-    UpdateDesignParameters();
+    connect(Filter_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)), this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
+    connect(PlotWidget, SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(simulate()));
+    connect(PlotWidget, SIGNAL(mouseRelease(QMouseEvent*)), this, SLOT(simulate()));
+
+    Filter_Tool->design();
 }
 
 
@@ -174,23 +114,6 @@ QucsRFDesignerWindow::~QucsRFDesignerWindow()
     delete RFToolBar;
     delete SchematicWidget;
     delete PlotWidget;
-    delete FilterClassCombo;
-    delete FilterResponseTypeCombo;
-    delete FilterImplementationCombo;
-    delete FC_ScaleCombobox;
-    delete BW_ScaleCombobox;
-    delete EllipticType;
-    delete FCSpinbox;
-    delete BWSpinbox;
-    delete RippleSpinbox;
-    delete StopbandAttSpinbox;
-    delete OrderSpinBox;
-    delete SourceImpedanceLineEdit;
-    delete CLCRadioButton;
-    delete LCLRadioButton;
-    delete StopbandAttLabel;
-    delete StopbandAttdBLabel;
-    delete EllipticTypeLabel;
 
     /* delete dock_Schematic;
   delete dock_Setup;
@@ -251,288 +174,8 @@ void QucsRFDesignerWindow::createMenus()
 //This function updates the content of the schematic window and the display
 void QucsRFDesignerWindow::UpdateWindows()
 {
-    SchematicWidget->clear();//Remove the components in the scene
-    QList<ComponentInfo> Comps;
-    QList<WireInfo> Wires;
-    QList<NodeInfo> Nodes;
-    EllipticFilter *EF;
-    CanonicalFilter *CF;
-    DirectCoupledFilters *DCF;
-    netlist.clear();
-
-    //Recalculate network
-    if (FilterImplementationCombo->currentText() == "LC Ladder")
-    {
-        if (FilterResponseTypeCombo->currentText() == "Elliptic")
-        {
-            EF = new EllipticFilter(Filter_SP);
-            EF->synthesize();
-            netlist = EF->getQucsNetlist();
-            Comps = EF->getComponents();
-            Wires = EF->getWires();
-            Nodes = EF->getNodes();
-            delete EF;
-        }
-        else
-        {
-            CF = new CanonicalFilter(Filter_SP);
-            CF->synthesize();
-            netlist = CF->getQucsNetlist();
-            Comps = CF->getComponents();
-            Wires = CF->getWires();
-            Nodes = CF->getNodes();
-            delete CF;
-        }
-     }
-    if (FilterImplementationCombo->currentText() == "LC Direct Coupled")
-    {
-           DCF = new DirectCoupledFilters(Filter_SP);
-           DCF->synthesize();
-           netlist = DCF->getQucsNetlist();
-           Comps = DCF->getComponents();
-           Wires = DCF->getWires();
-           Nodes = DCF->getNodes();
-           delete DCF;
-    }
-    //Write Qucs netlist into file
-    netlist += QString(".SP:SP1 Type=\"lin\" Start=\"%1 Hz\" Stop=\"%2 Hz\" Points=\"%3\"\n").arg(SPAR_Settings.fstart).arg(SPAR_Settings.fstop).arg(SPAR_Settings.n_points);
-    QFile file("netlist");
-    if (file.open(QIODevice::WriteOnly)) {
-        QTextStream stream(&file);
-        stream << netlist << endl;
-    }
-    file.close();
-    system("qucsator -i netlist -o data.dat");
-
-    //Update schematic window
-    SchematicWidget->setComponents(Comps);
-    SchematicWidget->setNodes(Nodes);
-    SchematicWidget->setWires(Wires);
-
-    // Load info from Qucs dataset and update graph
-    QMap<QString, vector<complex<double> > > data = loadQucsDataSet("data.dat");
-    //Update graph
-    vector<complex<double> > freq=data["frequency"];
-    updateGraph(real(freq), data["S[2,1]"], data["S[1,1]"], data["S[2,2]"]);
-
-}
-
-void QucsRFDesignerWindow::ResposeComboChanged()
-{
-    bool ActivateCauer = !FilterResponseTypeCombo->currentText().compare("Elliptic");
-    StopbandAttSpinbox->setVisible(ActivateCauer);
-    StopbandAttLabel->setVisible(ActivateCauer);
-    StopbandAttdBLabel->setVisible(ActivateCauer);
-
-    EllipticType->setVisible(ActivateCauer);
-    EllipticTypeLabel->setVisible(ActivateCauer);
-    OrderSpinBox->setMinimum(1);
-    if (ActivateCauer)
-    {
-        CLCRadioButton->setText("Min L");
-        LCLRadioButton->setText("Min C");
-    }
-    else
-    {
-        CLCRadioButton->setText("CLC");
-        LCLRadioButton->setText("LCL");
-    }
-
-    QString table = FilterResponseTypeCombo->currentText();
-
-    if (UseZverevTablesCheckBox->isChecked())
-    {
-        //When the response type is changed, the values of RL and ripple must be updated according to the content of the Zverev tables
-        QStringList data;
-        QSqlQuery query;
-
-        //Fill order data
-        table = FilterResponseTypeCombo->currentText().trimmed();//Name of the table without whitespaces
-        query.exec(QString("SELECT N FROM ZverevTables.%1;").arg(table));
-        query.first();
-        do {
-            QString aux = query.value(0).toString();
-            if (!data.contains(aux)) data.append(aux);
-        }while(query.next());
-        OrderCombobox->blockSignals(true);
-        OrderCombobox->clear();
-        OrderCombobox->addItems(data);
-        QString aux = OrderCombobox->currentText();
-        OrderCombobox->setCurrentIndex(0);//Set the default selection
-        // ... and try to find the same order in the recently updated data.
-        for (int i = 0; i < OrderCombobox->count(); i++)
-        {
-            if (OrderCombobox->itemText(i) == aux)
-            {
-                OrderCombobox->setCurrentIndex(i);
-                break;
-            }
-        }
-        OrderCombobox->blockSignals(false);
-        UpdateRipple(0);
-        UpdateLoad_Impedance(1);
-    }
 
 
-    if ((table != "Chebyshev") &&(table != "LinearPhase")&&(table != "Gegenbauer"))
-    {
-        (UseZverevTablesCheckBox->isChecked()) ? RippleCombobox->hide() : RippleSpinbox->hide();
-        RippleLabel->hide();
-        RippledBLabel->hide();
-    }
-    else
-    {
-        if (table == "Gegenbauer") RippleLabel->setText("Alpha");
-        if (table == "Chebyshev") RippleLabel->setText("Ripple");
-        if (table == "LinearPhase") RippleLabel->setText("Phase ripple");
-        (UseZverevTablesCheckBox->isChecked()) ? RippleCombobox->show() : RippleSpinbox->show();
-        RippleLabel->show();
-        RippledBLabel->show();
-    }
-
-    UpdateDesignParameters();
-    this->adjustSize();
-}
-
-// This function catches the events related to the changes in the filter specificatios
-void QucsRFDesignerWindow::UpdateDesignParameters()
-{qDebug() <<"Current response 1: " << FilterResponseTypeCombo->currentText();
-    Filter_SP.Implementation = FilterImplementationCombo->currentText();
-    //************************** Set filter response *********************************
-    if (!FilterResponseTypeCombo->currentText().compare("Chebyshev")) Filter_SP.FilterResponse = Chebyshev;
-    if (!FilterResponseTypeCombo->currentText().compare("Butterworth")) Filter_SP.FilterResponse = Butterworth;
-    if (!FilterResponseTypeCombo->currentText().compare("Legendre")) Filter_SP.FilterResponse = Legendre;
-    if (!FilterResponseTypeCombo->currentText().compare("Elliptic"))Filter_SP.FilterResponse = Elliptic;
-    if (!FilterResponseTypeCombo->currentText().compare("Bessel"))Filter_SP.FilterResponse = Bessel;
-    if (!FilterResponseTypeCombo->currentText().compare("Gegenbauer"))Filter_SP.FilterResponse = Gegenbauer;
-    if (!FilterResponseTypeCombo->currentText().compare("LinearPhase"))Filter_SP.FilterResponse = LinearPhaseEqError;
-
-    //**************************** Set filter type **************************************
-    if (FilterImplementationCombo->currentText() == "LC Ladder")
-    {
-       if (!FilterClassCombo->currentText().compare("Lowpass")) Filter_SP.FilterType = Lowpass;
-       if (!FilterClassCombo->currentText().compare("Highpass")) Filter_SP.FilterType = Highpass;
-       if (!FilterClassCombo->currentText().compare("Bandpass")) Filter_SP.FilterType = Bandpass;
-       if (!FilterClassCombo->currentText().compare("Bandstop")) Filter_SP.FilterType = Bandstop;
-    }
-    if (FilterImplementationCombo->currentText() == "LC Direct Coupled")
-    {
-        Filter_SP.FilterType = Bandpass;
-        FilterClassCombo->setCurrentIndex(2);
-    }
-    //**************************** Set coupling ********************************************
-    if (!DC_CouplingTypeCombo->currentText().compare("Capacitative")) Filter_SP.DC_Coupling = Capacitative;
-    if (!DC_CouplingTypeCombo->currentText().compare("Inductive")) Filter_SP.DC_Coupling = Inductive;
-    if (!DC_CouplingTypeCombo->currentText().compare("Magnetic")) Filter_SP.DC_Coupling = Magnetic;
-
-    //Update user input
-    if ((!FilterClassCombo->currentText().compare("Lowpass")) || (!FilterClassCombo->currentText().compare("Highpass")))
-    {
-        BWSpinbox->setEnabled(false);
-        BW_ScaleCombobox->setEnabled(false);
-    }
-    else
-    {
-        BWSpinbox->setEnabled(true);
-        BW_ScaleCombobox->setEnabled(true);
-        if (Filter_SP.bw >= Filter_SP.fc)
-        {
-        BWSpinbox->blockSignals(true);
-        BWSpinbox->setValue(0.1*FCSpinbox->value());//10% BW
-        BW_ScaleCombobox->setCurrentIndex(FC_ScaleCombobox->currentIndex());
-        BWSpinbox->blockSignals(false);
-        }
-    }
-
-    if ((Filter_SP.FilterType == Lowpass) || (Filter_SP.FilterType == Highpass))
-    {
-        SPAR_Settings.fstart = Filter_SP.fc*0.5;
-        SPAR_Settings.fstop = Filter_SP.fc*1.5;
-        SPAR_Settings.n_points = 200;
-    }
-    else
-    {
-        SPAR_Settings.fstart = (Filter_SP.fc-Filter_SP.bw/2)*0.5;
-        SPAR_Settings.fstop = (Filter_SP.fc-Filter_SP.bw/2)*1.5;
-        SPAR_Settings.n_points = 200;
-    }
-
-    if (Filter_SP.Implementation == "LC Direct Coupled")
-    {
-        DC_CouplingTypeCombo->show();
-        DC_CouplingLabel->show();
-        FilterClassCombo->blockSignals(true);
-        FilterResponseTypeCombo->blockSignals(true);
-        FilterClassCombo->setCurrentIndex(2);
-        FilterClassCombo->setEnabled(false);
-        FilterResponseTypeCombo->clear();
-        QStringList DC_responses = setItemsResponseTypeCombo();
-        DC_responses.removeAt(DC_responses.indexOf("Elliptic"));
-        DC_responses.removeAt(DC_responses.indexOf("Cauer"));
-        FilterResponseTypeCombo->addItems(DC_responses);
-        FilterClassCombo->blockSignals(false);
-        FilterResponseTypeCombo->blockSignals(false);
-    }
-    else
-    {
-        DC_CouplingTypeCombo->hide();
-        DC_CouplingLabel->hide();
-        FilterClassCombo->setEnabled(true);
-        qDebug() <<"Current response 2: " << FilterResponseTypeCombo->currentText();
-        QString CurrentResponse = FilterResponseTypeCombo->currentText();
-        FilterResponseTypeCombo->blockSignals(true);
-        QStringList data = setItemsResponseTypeCombo();
-        FilterResponseTypeCombo->clear();
-        FilterResponseTypeCombo->addItems(data);
-        for (int i = 0; i < data.length(); i++)
-        {
-            if (CurrentResponse == data.at(i))
-            {
-              FilterResponseTypeCombo->setCurrentIndex(i);
-              break;
-            }
-        }
-        FilterResponseTypeCombo->blockSignals(false);
-    }
-
-    //Update parameters
-    Filter_SP.bw = BWSpinbox->value()*getScale(BW_ScaleCombobox->currentText());
-    Filter_SP.fc = FCSpinbox->value()*getScale(FC_ScaleCombobox->currentText());
-    Filter_SP.isCLC = CLCRadioButton->isChecked();
-    Filter_SP.ZS = SourceImpedanceLineEdit->text().toDouble();
-    Filter_SP.UseZverevTables = UseZverevTablesCheckBox->isChecked();
-    Filter_SP.Implementation = FilterImplementationCombo->currentText();
-
-    if (!UseZverevTablesCheckBox->isChecked())
-    {
-        Filter_SP.order = OrderSpinBox->value();
-        Filter_SP.Ripple = RippleSpinbox->value();
-        Filter_SP.ZL = Filter_SP.ZS;
-        Filter_SP.as = StopbandAttSpinbox->value();
-        Filter_SP.EllipticType = EllipticType->currentText();
-    }
-    else
-    {//The data comes from comboboxes rather than spinboxes
-        Filter_SP.order = OrderCombobox->currentText().toInt();
-        Filter_SP.Ripple = RippleCombobox->currentText().toDouble();
-        bool ok;
-        Filter_SP.ZL = RLCombobox->currentText().toDouble(&ok);
-        if (!ok) Filter_SP.ZL = 1e8*Filter_SP.ZS;//It is a single ended filter
-    }
-
-
-
-    //Update windows
-    UpdateSparSweep();
-}
-
-// This function returns the scale of the argument
-double QucsRFDesignerWindow::getScale(QString scale)
-{
-    if (!scale.compare("GHz")) return 1e9;
-    if (!scale.compare("MHz")) return 1e6;
-    if (!scale.compare("kHz")) return 1e3;
-    if (!scale.compare("Hz")) return 1;
 }
 
 void QucsRFDesignerWindow::updateGraph(vector<double> freq_, vector<complex<double> > S21_, vector<complex<double> > S11_, vector<complex<double> > S22_)
@@ -642,241 +285,10 @@ QMap<QString, vector<complex<double> > > QucsRFDesignerWindow::loadQucsDataSet(Q
 
 void QucsRFDesignerWindow::UpdateSparSweep()
 {
-    QCPRange xAxisRange = PlotWidget->xAxis->range();
-    (xAxisRange.lower < 0) ? SPAR_Settings.fstart = 0: SPAR_Settings.fstart =xAxisRange.lower*1e6;
-    (xAxisRange.upper < 0) ? SPAR_Settings.fstop = 0: SPAR_Settings.fstop =xAxisRange.upper*1e6;
-    qDebug() << "SPAN: " << xAxisRange.lower*1e6 << "  " << xAxisRange.upper*1e6;
 
-    UpdateWindows();
 }
 
 
-void QucsRFDesignerWindow::EllipticTypeChanged()
-{
-    if (EllipticType->currentText() != "Type S")
-    {
-        OrderSpinBox->setMinimum(2);
-    }
-    else
-    {
-        OrderSpinBox->setMinimum(1);
-    }
-}
-
-
-void QucsRFDesignerWindow::SwitchZverevTablesMode(bool ZverevMode)
-{
-    if (FilterResponseTypeCombo->currentText() == "Elliptic") return;//Zverev mode is only available for canonical responses
-    if (ZverevMode)
-    {
-        QString aux = FilterResponseTypeCombo->currentText();
-        QStringList data = setItemsResponseTypeCombo();
-        FilterResponseTypeCombo->blockSignals(true);
-        FilterResponseTypeCombo->clear();
-        FilterResponseTypeCombo->addItems(data);
-        FilterResponseTypeCombo->blockSignals(false);
-        //Find the index of the current response type and select it for the Zverev mode
-        for (int i = 0; i < FilterResponseTypeCombo->count();i++)
-        {
-            if (FilterResponseTypeCombo->itemText(i) == aux)
-            {
-                FilterResponseTypeCombo->setCurrentIndex(i);
-                break;
-            }
-        }
-        ResposeComboChanged();//Fill the user input widgets with the parameters of the Zverev tables
-
-        OrderSpinBox->hide();
-        OrderCombobox->show();
-        RLlabel->show();
-        RLlabelOhm->show();
-        RLCombobox->show();
-        RippleCombobox->show();
-        RippleSpinbox->hide();
-        FilterResponseTypeCombo->blockSignals(false);
-    }
-    else
-    {//Conventional mode. Restore the default filter responses
-        OrderSpinBox->show();
-        OrderCombobox->hide();
-        OrderCombobox->clear();
-        RLlabel->hide();
-        RLlabelOhm->hide();
-        RLCombobox->hide();
-        RippleCombobox->hide();
-        RippleSpinbox->show();
-
-        QString aux = FilterResponseTypeCombo->currentText();//Last response selected in the Zverev mode
-        FilterResponseTypeCombo->clear();
-        FilterResponseTypeCombo->addItems(DefaultFilterResponses);//Fill the combo with the default option
-        for (int i = 0; i < FilterResponseTypeCombo->count();i++)
-        {//Find the index of the current response type and select it for the conventional mode
-            if (FilterResponseTypeCombo->itemText(i) == aux)
-            {
-                FilterResponseTypeCombo->setCurrentIndex(i);
-                break;
-            }
-        }
-        ResposeComboChanged();
-        //Update order and ripple
-        OrderSpinBox->setValue(OrderCombobox->currentText().toInt());
-        RippleSpinbox->setValue(RippleCombobox->currentText().toDouble());
-
-    }
-    UpdateDesignParameters();
-}
-
-void QucsRFDesignerWindow::ChangeRL_CLC_LCL_mode()
-{
-    RLCombobox->blockSignals(true);
-    RLCombobox->setInsertPolicy(QComboBox::InsertAfterCurrent);
-    if (UseZverevTablesCheckBox->isChecked())
-    {
-        bool mode = CLCRadioButton->isChecked();
-        double ZS = SourceImpedanceLineEdit->text().toDouble();
-        for (int i = 0; i < RLCombobox->count(); i++)
-        {
-            double aux = RLCombobox->itemText(i).toDouble();
-
-            if (mode)
-            {//CLC mode selected, then previously it was LCL
-                aux /= ZS;
-                aux = 1/aux;
-                aux *= ZS;
-            }
-            else
-            {//LCL mode selected, then previously it was CLC
-                aux/= ZS;//Now aux = gi or aux = 1/gi
-                aux = ZS/aux;
-            }
-            RLCombobox->insertItem(i, QString("%1").arg(aux));
-            RLCombobox->removeItem(i+1);
-        }
-    }
-    for (int i = 0; i < RLCombobox->count(); i++) qDebug() << QString("%1").arg(RLCombobox->itemText(i).toDouble());
-    qDebug() << "Current index: " << RLCombobox->currentIndex() << " = " << RLCombobox->currentText().toDouble();
-    RLCombobox->blockSignals(false);
-    UpdateDesignParameters();
-    return;
-}
-
-
-void QucsRFDesignerWindow::UpdateRipple(int refresh = 0)
-{
-    if (OrderCombobox->currentText().isEmpty()) return;
-    double Ripple_CurrentVal = RippleCombobox->currentText().toDouble();
-    double min_dist_err = 1e6;
-    int index = 0, selected_index = 0;
-    QStringList data;
-    QSqlQuery query;
-    QString table = FilterResponseTypeCombo->currentText().trimmed();//Name of the table without whitespaces
-
-    data.clear();
-    QString query_str;
-
-
-    if ((FilterResponseTypeCombo->currentText() == "LinearPhase") || (FilterResponseTypeCombo->currentText() == "Chebyshev")|| (FilterResponseTypeCombo->currentText() == "Gegenbauer"))
-    {
-        //Fill ripple combobox
-        data.clear();
-        query_str = QString("SELECT CASE WHEN N = '%1' THEN Ripple ELSE -1 END as Ripple FROM ZverevTables.%2;").arg(OrderCombobox->currentText()).arg(table);
-        query.exec(query_str);
-        query.first();
-        do {
-            if (query.value(0).toDouble() == -1) continue;
-            double aux = query.value(0).toDouble();
-            if (!data.contains(QString::number(aux)))
-            {
-                data.append(QString::number(aux));
-                if (std::abs(aux-Ripple_CurrentVal) < min_dist_err)
-                {
-                    min_dist_err = std::abs(aux-Ripple_CurrentVal);
-                    selected_index = index;
-                }
-                index++;
-            }
-
-        }while(query.next());
-        RippleCombobox->blockSignals(true);
-        RippleCombobox->clear();
-        RippleCombobox->addItems(data);
-        RippleCombobox->setCurrentIndex(selected_index);
-        RippleCombobox->blockSignals(false);
-    }
-
-    if (refresh>-1)UpdateDesignParameters();
-}
-
-
-void QucsRFDesignerWindow::UpdateLoad_Impedance(int refresh = 0)
-{
-    QStringList data;
-    QSqlQuery query;
-    QString table = FilterResponseTypeCombo->currentText().trimmed();//Name of the table without whitespaces
-    double ZL_CurrentVal = RLCombobox->currentText().toDouble(), min_dist_err = 1e6;
-    int index=0, selected_index=0;
-    data.clear();
-    QString query_str;
-
-    if ((FilterResponseTypeCombo->currentText() == "LinearPhase") || (FilterResponseTypeCombo->currentText() == "Chebyshev")|| (FilterResponseTypeCombo->currentText() == "Gegenbauer"))
-    {
-        query_str = QString("SELECT CASE WHEN N = '%1' AND Ripple = '%3' THEN RL ELSE -1 END as RL FROM ZverevTables.%2;").arg(OrderCombobox->currentText()).arg(table).arg(RippleCombobox->currentText());
-    }
-    else
-    {
-        query_str = QString("SELECT CASE WHEN N = '%1' THEN RL ELSE -1 END as RL FROM ZverevTables.%2;").arg(OrderCombobox->currentText()).arg(table);
-    }
-
-    data.clear();
-    query.exec(query_str);
-    query.first();
-    do {
-        if (query.value(0).toDouble() == -1) continue;
-        double aux = SourceImpedanceLineEdit->text().toDouble();
-        (CLCRadioButton->isChecked()) ? aux *= query.value(0).toDouble(): aux/=query.value(0).toDouble();
-        if (aux < 1e6)
-        {
-            if (!data.contains(QString::number(aux)))
-            {
-                data.append(QString::number(aux));
-                if (std::abs(aux-ZL_CurrentVal) < min_dist_err)
-                {
-                    min_dist_err = std::abs(aux-ZL_CurrentVal);
-                    selected_index = index;
-                }
-                index++;
-            }
-        }
-        else
-        {
-            if (CLCRadioButton->isChecked())
-            {
-                if (!data.contains("inf")) data.append("inf");
-                if (RLCombobox->currentText() == "inf") selected_index = index;
-            }
-            else
-            {
-                if (!data.contains("0")) data.append("0");
-                if (RLCombobox->currentText() == "0") selected_index = index;
-
-            }
-
-        }
-    }while(query.next());
-    RLCombobox->blockSignals(true);
-    RLCombobox->clear();
-    RLCombobox->addItems(data);
-    RLCombobox->setCurrentIndex(selected_index);
-    RLCombobox->blockSignals(false);
-    if (refresh>-1) UpdateDesignParameters();
-}
-
-
-void QucsRFDesignerWindow::UpdateRL_and_Ripple()
-{
-    UpdateRipple(-1);
-    UpdateLoad_Impedance(1);
-}
 
 
 void QucsRFDesignerWindow::ShowSmithChart()
@@ -892,23 +304,43 @@ void QucsRFDesignerWindow::ShowSmithChart()
 }
 
 
-QStringList QucsRFDesignerWindow::setItemsResponseTypeCombo()
+
+void QucsRFDesignerWindow::ReceiveNetworkFromDesignTools(struct SchematicInfo SI)
 {
-    QStringList data;
-    if (UseZverevTablesCheckBox->isChecked())
-    {
-        QSqlQuery query;
-        //Fill the response type combobox
-        data.clear();
-        query.exec(QString("SHOW TABLES FROM ZverevTables;"));
-        query.first();
-        do {
-            data.append(query.value(0).toString());
-        }while(query.next());
+    SchInfo = SI;
+    simulate();
+}
+
+
+void QucsRFDesignerWindow::simulate()
+{
+    QCPRange xAxisRange = PlotWidget->xAxis->range();
+    SPAR_Settings.fstart =xAxisRange.lower*1e6;
+    SPAR_Settings.fstop =xAxisRange.upper*1e6;
+
+    if (SPAR_Settings.fstart < 0) SPAR_Settings.fstart = 0;
+    if (SPAR_Settings.fstop < 0) return;
+
+    qDebug() << "SPAN: " << xAxisRange.lower*1e6 << "  " << xAxisRange.upper*1e6;
+
+    SchematicWidget->clear();//Remove the components in the scene
+
+    netlist = SchInfo.netlist;
+    netlist += QString(".SP:SP1 Type=\"lin\" Start=\"%1 Hz\" Stop=\"%2 Hz\" Points=\"%3\"\n").arg(SPAR_Settings.fstart).arg(SPAR_Settings.fstop).arg(SPAR_Settings.n_points);
+    QFile file("netlist");
+    if (file.open(QIODevice::WriteOnly)) {
+        QTextStream stream(&file);
+        stream << netlist << endl;
     }
-    else
-    {//Default data
-       data = DefaultFilterResponses;
-    }
-    return data;
+    file.close();
+    system("qucsator -i netlist -o data.dat");
+
+    //Update schematic window
+    SchematicWidget->setSchematic(SchInfo);
+
+    // Load info from Qucs dataset and update graph
+    QMap<QString, vector<complex<double> > > data = loadQucsDataSet("data.dat");
+    //Update graph
+    vector<complex<double> > freq=data["frequency"];
+    updateGraph(real(freq), data["S[2,1]"], data["S[1,1]"], data["S[2,2]"]);
 }

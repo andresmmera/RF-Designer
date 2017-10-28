@@ -210,11 +210,11 @@ void GraphWidget::setWires(QList<WireInfo> wrs)
         }
 
         Wire *w = new Wire();
-        OriginIsNode ? w->setSource(Nodes.at(origin),wrs.at(i).PortOrigin) : w->setSource(Components.at(origin), wrs.at(i).PortOrigin);
+        /*OriginIsNode ? w->setSource(Nodes.at(origin),wrs.at(i).PortOrigin) : w->setSource(Components.at(origin), wrs.at(i).PortOrigin);
         DestIsNode ?   w->setDestination(Nodes.at(destination), wrs.at(i).PortDestination) : w->setDestination(Components.at(destination), wrs.at(i).PortDestination);
         Wires.push_back(w);
         scene()->addItem(w);
-        w->paintWire();
+        w->paintWire();*/
     }
 }
 
@@ -229,6 +229,13 @@ void GraphWidget::setNodes(QList<NodeInfo> nds)
       scene()->addItem(nd);
     //  qDebug() << "Node added to the scene: " << NI.ID;
     }
+}
+
+void GraphWidget::setSchematic(SchematicInfo SchInfo)
+{
+    this->setNodes(SchInfo.Nodes);
+    this->setComponents(SchInfo.Comps);
+    this->setWires(SchInfo.Wires);
 }
 
 //Clear the scene
