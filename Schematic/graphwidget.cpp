@@ -130,7 +130,7 @@ void GraphWidget::zoomOut()
 //This function sets the properties of the components such as position, type and value
 void GraphWidget::setComponents(QList<ComponentInfo> cmps)
 {
-  this->clear();
+  this->Components.clear();
   for (int i = 0; i < cmps.length(); i++)
   {
     struct ComponentInfo CI = cmps.at(i);
@@ -158,6 +158,7 @@ void GraphWidget::ModifyComponent(ComponentInfo CI)
 //This function sets the position and the connection properties of the wires
 void GraphWidget::setWires(QList<WireInfo> wrs)
 {
+    this->Wires.clear();
     int origin, destination;
     bool OriginIsNode, DestIsNode;
 
@@ -210,17 +211,18 @@ void GraphWidget::setWires(QList<WireInfo> wrs)
         }
 
         Wire *w = new Wire();
-        /*OriginIsNode ? w->setSource(Nodes.at(origin),wrs.at(i).PortOrigin) : w->setSource(Components.at(origin), wrs.at(i).PortOrigin);
+        OriginIsNode ? w->setSource(Nodes.at(origin),wrs.at(i).PortOrigin) : w->setSource(Components.at(origin), wrs.at(i).PortOrigin);
         DestIsNode ?   w->setDestination(Nodes.at(destination), wrs.at(i).PortDestination) : w->setDestination(Components.at(destination), wrs.at(i).PortDestination);
         Wires.push_back(w);
         scene()->addItem(w);
-        w->paintWire();*/
+        w->paintWire();
     }
 }
 
 //This functions sets the position of the wiring nodes
 void GraphWidget::setNodes(QList<NodeInfo> nds)
 {
+    this->Nodes.clear();
     for (int i = 0; i < nds.length(); i++)
     {
       struct NodeInfo NI = nds.at(i);
