@@ -380,7 +380,6 @@ void FilterDesignTool::ResposeComboChanged()
     }
 
     UpdateDesignParameters();
-    this->adjustSize();
 }
 
 // This function catches the events related to the changes in the filter specificatios
@@ -411,7 +410,7 @@ void FilterDesignTool::UpdateDesignParameters()
     }
     //**************************** Set coupling ********************************************
     if (!DC_CouplingTypeCombo->currentText().compare("Capacitative coupled shunt resonators")) Filter_SP.DC_Coupling = CapacitativeCoupledShuntResonators;
-    if (!DC_CouplingTypeCombo->currentText().compare("Inductive coupled shunt resonators")) Filter_SP.DC_Coupling = InductiveCoupledSeriesResonators;
+    if (!DC_CouplingTypeCombo->currentText().compare("Inductive coupled series resonators")) Filter_SP.DC_Coupling = InductiveCoupledSeriesResonators;
 
     //Update user input
     if ((!FilterClassCombo->currentText().compare("Lowpass")) || (!FilterClassCombo->currentText().compare("Highpass")))
@@ -455,11 +454,20 @@ void FilterDesignTool::UpdateDesignParameters()
         FilterClassCombo->setEnabled(false);
         CLCRadioButton->hide();
         LCLRadioButton->hide();
+        QString CurrentResponse = FilterResponseTypeCombo->currentText();
         FilterResponseTypeCombo->clear();
-        QStringList DC_responses = setItemsResponseTypeCombo();
-        DC_responses.removeAt(DC_responses.indexOf("Elliptic"));
-        DC_responses.removeAt(DC_responses.indexOf("Cauer"));
-        FilterResponseTypeCombo->addItems(DC_responses);
+        QStringList data = setItemsResponseTypeCombo();
+        data.removeAt(data.indexOf("Elliptic"));
+        data.removeAt(data.indexOf("Cauer"));
+        FilterResponseTypeCombo->addItems(data);
+        for (int i = 0; i < data.length(); i++)
+        {
+            if (CurrentResponse == data.at(i))
+            {
+              FilterResponseTypeCombo->setCurrentIndex(i);
+              break;
+            }
+        }
         FilterClassCombo->blockSignals(false);
         FilterResponseTypeCombo->blockSignals(false);
     }
@@ -668,6 +676,10 @@ void FilterDesignTool::UpdateRipple(int refresh = 0)
         RippleCombobox->addItems(data);
         RippleCombobox->setCurrentIndex(selected_index);
         RippleCombobox->blockSignals(false);
+    }
+    else
+    {
+        RippleCombobox->clear();
     }
 
     if (refresh>-1)UpdateDesignParameters();

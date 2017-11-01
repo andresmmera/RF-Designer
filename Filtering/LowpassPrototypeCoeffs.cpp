@@ -61,7 +61,7 @@ std::deque<double> LowpassPrototypeCoeffs::getCoefficients()
         query.exec(query_str);
         query.first();
         data = query.value(0).toString().split(";");
-        if (data.length()<=1) return std::deque<double>(-1);
+        if (data.isEmpty()) return std::deque<double>(-1);
         data.pop_back();//Discard null element caused by the last semicolon
         gi.clear();
         for (int i = 0; i < data.length(); i++)
