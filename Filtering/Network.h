@@ -18,7 +18,7 @@ enum ComponentType {Capacitor, Inductor, Term, GND, ConnectionNodes};
 enum ComponentOrientation {vertical, horizontal};
 enum ResponseType {Butterworth, Chebyshev, Legendre, Elliptic, Blichinkoff, Bessel, LinearPhaseEqError, Gegenbauer};
 enum FilterClass {Lowpass, Highpass, Bandpass, Bandstop};
-enum Coupling {Capacitative, Inductive, Magnetic};
+enum Coupling {CapacitativeCoupledShuntResonators, InductiveCoupledSeriesResonators};
 
 
 struct PrototypeTableProperties

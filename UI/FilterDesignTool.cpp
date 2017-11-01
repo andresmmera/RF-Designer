@@ -80,9 +80,8 @@ FilterDesignTool::FilterDesignTool()
     FilterDesignLayout->addWidget(UseZverevTablesCheckBox,1,2);
     //********** Direct coupled filters - Coupling type *****
     DC_CouplingTypeCombo = new QComboBox();
-    DC_CouplingTypeCombo->addItem("Capacitative");
-    DC_CouplingTypeCombo->addItem("Inductive");
-    DC_CouplingTypeCombo->addItem("Magnetic");
+    DC_CouplingTypeCombo->addItem("Capacitative coupled shunt resonators");
+    DC_CouplingTypeCombo->addItem("Inductive coupled series resonators");
     DC_CouplingLabel = new QLabel("Coupling");
     FilterDesignLayout->addWidget(DC_CouplingLabel,2,0);
     FilterDesignLayout->addWidget(DC_CouplingTypeCombo,2,1);
@@ -221,6 +220,7 @@ FilterDesignTool::FilterDesignTool()
     connect(RippleSpinbox, SIGNAL(valueChanged(double)), this, SLOT(UpdateDesignParameters()));
     connect(StopbandAttSpinbox, SIGNAL(valueChanged(double)), this, SLOT(UpdateDesignParameters()));
     connect(EllipticType, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateDesignParameters()));
+    connect(DC_CouplingTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateDesignParameters()));
     connect(UseZverevTablesCheckBox, SIGNAL(clicked(bool)), this, SLOT(SwitchZverevTablesMode(bool)));
     connect(OrderCombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateRL_and_Ripple()));
     connect(RippleCombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateLoad_Impedance(int)));
@@ -410,9 +410,8 @@ void FilterDesignTool::UpdateDesignParameters()
         FilterClassCombo->setCurrentIndex(2);
     }
     //**************************** Set coupling ********************************************
-    if (!DC_CouplingTypeCombo->currentText().compare("Capacitative")) Filter_SP.DC_Coupling = Capacitative;
-    if (!DC_CouplingTypeCombo->currentText().compare("Inductive")) Filter_SP.DC_Coupling = Inductive;
-    if (!DC_CouplingTypeCombo->currentText().compare("Magnetic")) Filter_SP.DC_Coupling = Magnetic;
+    if (!DC_CouplingTypeCombo->currentText().compare("Capacitative coupled shunt resonators")) Filter_SP.DC_Coupling = CapacitativeCoupledShuntResonators;
+    if (!DC_CouplingTypeCombo->currentText().compare("Inductive coupled shunt resonators")) Filter_SP.DC_Coupling = InductiveCoupledSeriesResonators;
 
     //Update user input
     if ((!FilterClassCombo->currentText().compare("Lowpass")) || (!FilterClassCombo->currentText().compare("Highpass")))
@@ -454,6 +453,8 @@ void FilterDesignTool::UpdateDesignParameters()
         FilterResponseTypeCombo->blockSignals(true);
         FilterClassCombo->setCurrentIndex(2);
         FilterClassCombo->setEnabled(false);
+        CLCRadioButton->hide();
+        LCLRadioButton->hide();
         FilterResponseTypeCombo->clear();
         QStringList DC_responses = setItemsResponseTypeCombo();
         DC_responses.removeAt(DC_responses.indexOf("Elliptic"));
@@ -466,8 +467,9 @@ void FilterDesignTool::UpdateDesignParameters()
     {
         DC_CouplingTypeCombo->hide();
         DC_CouplingLabel->hide();
+        CLCRadioButton->show();
+        LCLRadioButton->show();
         FilterClassCombo->setEnabled(true);
-        qDebug() <<"Current response 2: " << FilterResponseTypeCombo->currentText();
         QString CurrentResponse = FilterResponseTypeCombo->currentText();
         FilterResponseTypeCombo->blockSignals(true);
         QStringList data = setItemsResponseTypeCombo();
