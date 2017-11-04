@@ -25,6 +25,7 @@
 
 //Tools
 #include "UI/FilterDesignTool.h"
+#include "UI/PowerCombiningTool.h"
 
 struct ToolSettings
 {
@@ -73,6 +74,7 @@ private://Actions
     GraphWidget *SchematicWidget;
     QCustomPlot *PlotWidget;
     FilterDesignTool *Filter_Tool;//Widget for filter design
+    PowerCombiningTool *PowerCombining_Tool;//Widget for power combiner design
 
     SmithChart * Smith_plot;
 

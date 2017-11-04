@@ -1,0 +1,46 @@
+#ifndef POWERCOMBINERDESIGNER_H
+#define POWERCOMBINERDESIGNER_H
+#include "Filtering/Network.h"
+
+struct TwoWayWilkinsonParams
+{
+    double Z2;//Branch 2 impedance
+    double Z3;//Branch 3 impedance
+    double R;//Isolation resistor
+    double R2;//Branch 2 terminating impedance
+    double R3;//Branch 3 terminating impedance
+};
+
+
+class PowerCombinerDesigner
+{
+public:
+    PowerCombinerDesigner(PowerCombinerParams);
+    QList<ComponentInfo> getComponents();
+    QList<WireInfo> getWires();
+    QList<NodeInfo> getNodes();
+    void synthesize();
+    QString getQucsNetlist(){return QucsNetlist;};
+
+private:
+    PowerCombinerParams Specs;
+    QList<ComponentInfo> Components;
+    QList<WireInfo> Wires;
+    QList<NodeInfo> Nodes;
+
+    QString QucsNetlist;
+    QMap<ComponentType, int> NumberComponents;//List for assigning IDs to the filter components
+
+
+    //Power combiner design functions
+    void Wilkinson();
+    void MultistageWilkinson();
+    TwoWayWilkinsonParams CalculateWilkinson();
+    void Tee();
+    void Branchline();
+    void DoubleBoxBranchline();
+    void TravellingWave();
+    void Tree();
+};
+
+#endif // POWERCOMBINERDESIGNER_H

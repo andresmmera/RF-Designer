@@ -20,10 +20,12 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
     Filter_Tool = new FilterDesignTool();
     //*********** Impedance Matching tab *********************
     QWidget *MatchingWidget = new QWidget();
-    // So far, it is empty...
+    PowerCombining_Tool = new PowerCombiningTool();
+
 
     TabWidget->addTab(Filter_Tool, "Filter design");
     TabWidget->addTab(MatchingWidget, "Matching");
+    TabWidget->addTab(PowerCombining_Tool, "Power Combining");
     TabWidget->setMinimumSize(300, 200);
     //*********************************** End of the setup panel
 
@@ -98,6 +100,8 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
     PlotWidget->yAxis->setRange(Tool_Settings.ymin, Tool_Settings.ymax);
 
     connect(Filter_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)), this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
+    connect(PowerCombining_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)), this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
+
     connect(PlotWidget, SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(simulate()));
     connect(PlotWidget, SIGNAL(mouseRelease(QMouseEvent*)), this, SLOT(simulate()));
 

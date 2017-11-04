@@ -52,6 +52,9 @@ QRectF Component::boundingRect() const
     QRect R;
     switch(CompType)
     {
+    case Resistor:
+        (Orientation == horizontal) ? R = QRect(-25, -10, 50, 40) : R = QRect(-15, -20, 60, 50);
+        break;
     case Capacitor:
     case Inductor:
         (Orientation == horizontal) ? R = QRect(-25, -10, 50, 40) : R = QRect(-15, -20, 50, 50);
@@ -74,6 +77,9 @@ QPainterPath Component::shape() const
     {
     case Capacitor:
         path.addRect(-2*7, -2*7, 2*15, 2*15);
+        break;
+    case Resistor:
+        (Orientation == horizontal) ? path.addRect(-2*9, -2*5, 2*20, 2*10) : path.addRect(-2*5, -2*9, 2*15, 2*20);
         break;
     case Inductor:
         (Orientation == horizontal) ? path.addRect(-2*9, -2*5, 2*20, 2*10) : path.addRect(-2*5, -2*9, 2*10, 2*20);
@@ -143,6 +149,33 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
         }
         break;
+    case Resistor:
+        if (Orientation == vertical)
+        {
+            int w = 5;
+            painter->drawLine(QPoint(0, -30), QPoint(0, -14));
+
+            painter->drawLine(QPoint(0, -14), QPoint(w, -14+2.5));
+            painter->drawLine(QPoint(w, -14+2.5), QPoint(-w, -14+7.5));
+
+            painter->drawLine(QPoint(-w, -14+7.5), QPoint(w, -14+12.5));
+            painter->drawLine(QPoint(w, -14+12.5), QPoint(-w, -14+17.5));
+
+            painter->drawLine(QPoint(-w, -14+17.5), QPoint(w, -14+22.5));
+            painter->drawLine(QPoint(w, -14+22.5), QPoint(-w, -14+27.5));
+
+            painter->drawLine(QPoint(-w, -14+27.5), QPoint(0, 16));
+
+            painter->drawLine(QPoint(0, 16), QPoint(0, 40));
+            painter->setPen(QPen(Qt::black, 1));
+            painter->drawText(QRect(7,5,100,100), QString("%1").arg(this->ID));
+            painter->drawText(QRect(7,15,100,100), QString("%1 Ohm").arg(num2str(Value["R"])));
+        }
+        else
+        {
+            //NOT IMPLEMENTED YET
+        }
+        break;
     case GND:
             painter->drawLine(QPoint(0, -2*5), QPoint(0,0));
             painter->drawLine(QPoint(-2*5, 0), QPoint(2*5,0));
@@ -180,8 +213,8 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
     }
 
-    //Debug code: Shows the bounding box of the component. This is the region where the selection works
- /*  painter->setPen(QPen(Qt::red, 1));
+ /*   //Debug code: Shows the bounding box of the component. This is the region where the selection works
+   painter->setPen(QPen(Qt::red, 1));
    painter->drawPath(this->shape());//Component box-> This is the area where the component can be selected
    painter->setPen(QPen(Qt::green, 1));
    painter->drawRect(this->boundingRect());//Component bounding box->This is the area where the component can be painted
@@ -236,6 +269,7 @@ QPoint Component::getPortLocation(int port_number)
     QPoint P;
     switch (CompType)
     {
+       case Resistor:
        case Inductor:
        case Capacitor:
         switch (port_number)

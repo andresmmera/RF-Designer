@@ -14,7 +14,7 @@
 #include <QDebug>
 #include <QtSql>
 
-enum ComponentType {Capacitor, Inductor, Term, GND, ConnectionNodes};
+enum ComponentType {Capacitor, Inductor, Term, GND, ConnectionNodes, Resistor, TransmissionLine};
 enum ComponentOrientation {vertical, horizontal};
 enum ResponseType {Butterworth, Chebyshev, Legendre, Elliptic, Blichinkoff, Bessel, LinearPhaseEqError, Gegenbauer};
 enum FilterClass {Lowpass, Highpass, Bandpass, Bandstop};
@@ -99,6 +99,19 @@ struct SchematicInfo
     QList<ComponentInfo> Comps;
     QList<WireInfo> Wires;
     QList<NodeInfo> Nodes;
+};
+
+struct PowerCombinerParams
+{
+    QString Type;//Wilkinson, branchlines, Bagley, etc.
+    int Noutputs;//Number of output branches
+    int Nstages;//Number of combiner stages (broadband Wilkinson)
+    double OutputRatio;
+    QString Implementation;//LC, microstrip, ideal TL
+    double alpha;//Attenuation constant of the ideal TL
+    QString units;//mm, mil, um
+    double freq;//Center freq
+    double Z0;//Reference impedance
 };
 
 class Network

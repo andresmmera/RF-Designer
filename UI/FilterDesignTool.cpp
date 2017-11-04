@@ -47,7 +47,6 @@ FilterDesignTool::FilterDesignTool()
 
 
     //****************************** BUILD THE UI **************************
-   // QWidget *FilterDesignWidget = new QWidget();
     QGridLayout *FilterDesignLayout =  new QGridLayout();
 
     //********** Filter Implementation ***********

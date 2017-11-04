@@ -123,7 +123,7 @@ void CanonicalFilter::SynthesizeLPF()
             Cshunt.Coordinates.push_back(posx);
             Cshunt.Coordinates.push_back(50);
             Components.append(Cshunt);
-            QucsNetlist+=QString("C:C%1 N%2 gnd C=\"%3 F\"\n").arg(NumberComponents[Capacitor]).arg(Ni).arg(gi[k+1]);
+            QucsNetlist+=QString("C:C%1 N%2 gnd C=\"%3 F\"\n").arg(NumberComponents[Capacitor]).arg(Ni).arg(Cshunt.val["C"]);
 
             //GND
             struct ComponentInfo Ground;
