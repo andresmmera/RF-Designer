@@ -99,6 +99,7 @@ struct SchematicInfo
     QList<ComponentInfo> Comps;
     QList<WireInfo> Wires;
     QList<NodeInfo> Nodes;
+    QMap <QString, QPen>displayGraphs;
 };
 
 struct PowerCombinerParams

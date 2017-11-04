@@ -285,7 +285,7 @@ void PowerCombinerDesigner::Wilkinson()
         WI.PortDestination = 1;
         Wires.append(WI);
 
-        if (Specs.OutputRatio != 0)
+        if (Specs.OutputRatio != 1)
         {// An unequal power ratio implies that the load impedance != Z0, so it requires matching
 
           //Upper branch
@@ -524,5 +524,13 @@ void PowerCombinerDesigner::Wilkinson()
     {
 
     }
+
+    //Ideally, the user should be the one which controls the style of the traces as well the traces to be shown
+    //However, in favour of a simpler implementation, it'll be the design code responsible for this... by the moment...
+    displaygraphs.clear();
+    displaygraphs[QString("S[2,1]")] = QPen(Qt::red, 1, Qt::SolidLine);
+    displaygraphs[QString("S[3,1]")] = QPen(Qt::red, 1, Qt::DashLine);
+    displaygraphs[QString("S[1,1]")] = QPen(Qt::blue, 1, Qt::SolidLine);
+    displaygraphs[QString("S[3,2]")] = QPen(Qt::black, 1, Qt::DotLine);
 }
 

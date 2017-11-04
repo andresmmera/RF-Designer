@@ -156,6 +156,7 @@ void PowerCombiningTool::UpdateDesignParameters()
     SchInfo.Comps = PowCombD->getComponents();
     SchInfo.Wires = PowCombD->getWires();
     SchInfo.Nodes = PowCombD->getNodes();
+    SchInfo.displayGraphs = PowCombD->displaygraphs;
     delete PowCombD;
     // EMIT SIGNAL TO SIMULATE
     emit simulateNetwork(SchInfo);

@@ -1,6 +1,7 @@
 #ifndef POWERCOMBINERDESIGNER_H
 #define POWERCOMBINERDESIGNER_H
 #include "Filtering/Network.h"
+#include <QPen>
 
 struct TwoWayWilkinsonParams
 {
@@ -19,6 +20,7 @@ public:
     QList<ComponentInfo> getComponents();
     QList<WireInfo> getWires();
     QList<NodeInfo> getNodes();
+    QMap<QString, QPen> displaygraphs;
     void synthesize();
     QString getQucsNetlist(){return QucsNetlist;};
 

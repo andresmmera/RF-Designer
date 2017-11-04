@@ -3,6 +3,7 @@
 
 #include "Filtering/Network.h"
 #include "Filtering/LowpassPrototypeCoeffs.h"
+#include <QPen>
 
 class CanonicalFilter : public Network
 {
@@ -16,6 +17,7 @@ public:
     void synthesize();
     NetworkInfo getLadder();
     QString getQucsNetlist(){return QucsNetlist;};
+    QMap<QString, QPen> displaygraphs;
 
 private:
     struct FilterSpecifications Specification;

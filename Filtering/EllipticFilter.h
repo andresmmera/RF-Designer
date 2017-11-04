@@ -1,6 +1,7 @@
 #ifndef ELLIPTICFILTER_H
 #define ELLIPTICFILTER_H
 #include "Filtering/Network.h"
+#include <QPen>
 
 class EllipticFilter : public Network
 {
@@ -14,6 +15,7 @@ public:
     void synthesize();
     NetworkInfo getLadder();
     QString getQucsNetlist(){return QucsNetlist;}
+    QMap<QString, QPen> displaygraphs;
 
 private:
     struct FilterSpecifications Specification;

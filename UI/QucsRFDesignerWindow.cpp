@@ -49,8 +49,8 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
     PlotWidget->setMinimumSize(400, 200);
     PlotWidget->yAxis->setLabel("dB");
     PlotWidget->xAxis->setLabel("MHz");
-    connect(PlotWidget, SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(UpdateSparSweep()));
-    connect(PlotWidget, SIGNAL(mouseRelease(QMouseEvent*)), this, SLOT(UpdateSparSweep()));
+    connect(PlotWidget, SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(simulate()));
+    connect(PlotWidget, SIGNAL(mouseRelease(QMouseEvent*)), this, SLOT(simulate()));
     //*********************************** End of the plot window region
 
     SchematicWidget = new GraphWidget(dock_Schematic);//Schematic window
@@ -182,7 +182,7 @@ void QucsRFDesignerWindow::UpdateWindows()
 
 }
 
-void QucsRFDesignerWindow::updateGraph(vector<double> freq_, vector<complex<double> > S21_, vector<complex<double> > S11_, vector<complex<double> > S22_)
+void QucsRFDesignerWindow::updateGraph(vector<double> freq_, QMap<QString, vector<complex<double> > > data)
 {
     PlotWidget->clearGraphs();
 
@@ -190,39 +190,22 @@ void QucsRFDesignerWindow::updateGraph(vector<double> freq_, vector<complex<doub
     freq_=freq_/k;//Convert to MHz
 
     QVector<double> freq = QVector<double>::fromStdVector(freq_);//Get frequency axis
+    QMapIterator<QString, QPen> MapIT(SchInfo.displayGraphs);
 
-    if (Tool_Settings.ShowTraces.at(0))//Show S21
+    while (MapIT.hasNext())
     {
-        std::vector<double> aux = 20*log(abs(S21_));
-        QVector<double> S21 = QVector<double>::fromStdVector(aux);
-        QColor S21Color = Tool_Settings.TraceColor.at(0);
+        MapIT.next();
+        std::vector<double> aux = 20*log(abs(data[MapIT.key()]));
+        QVector<double> trace = QVector<double>::fromStdVector(aux);
         PlotWidget->addGraph();
-        PlotWidget->graph()->setName(QString("S21 (dB)"));
-        PlotWidget->graph()->setPen(QPen(S21Color));
-        PlotWidget->graph()->setData(freq, S21);
-    }
-
-
-    if (Tool_Settings.ShowTraces.at(1))//Show S11
-    {
-        std::vector<double> aux = 20*log(abs(S11_));
-        QVector<double> S11 = QVector<double>::fromStdVector(aux);
-        QColor S11Color = Tool_Settings.TraceColor.at(1);
-        PlotWidget->addGraph();
-        PlotWidget->graph()->setName(QString("S11 (dB)"));
-        PlotWidget->graph()->setPen(QPen(S11Color));
-        PlotWidget->graph()->setData(freq, S11);
-    }
-
-    if (Tool_Settings.ShowTraces.at(2))//Show S22
-    {
-        std::vector<double> aux = 20*log(abs(S22_));
-        QVector<double> S22 = QVector<double>::fromStdVector(aux);
-        QColor S22Color = Tool_Settings.TraceColor.at(2);
-        PlotWidget->addGraph();
-        PlotWidget->graph()->setName(QString("S22 (dB)"));
-        PlotWidget->graph()->setPen(QPen(S22Color));
-        PlotWidget->graph()->setData(freq, S22);
+        QString title = MapIT.key();
+        title.remove('[');
+        title.remove(']');
+        title.remove(',');
+        title.append(QString(" (dB)"));
+        PlotWidget->graph()->setName(title);
+        PlotWidget->graph()->setPen(MapIT.value());
+        PlotWidget->graph()->setData(freq, trace);
     }
 
     //X axis step
@@ -237,13 +220,13 @@ void QucsRFDesignerWindow::updateGraph(vector<double> freq_, vector<complex<doub
     PlotWidget->replot();
 
     //Update Smith Chart
-    std::complex<double> Z;
+  /*  std::complex<double> Z;
     Smith_plot->clear();
     for(unsigned int i = 0; i < S11_.size(); i++)
     {
         Z = ((std::complex<double>(1, 0)+S11_.at(i)))/(std::complex<double>(1, 0)-S11_.at(i));
         Smith_plot->setData(Z.real(),Z.imag());
-    }
+    }*/
 
 
 }
@@ -285,13 +268,6 @@ QMap<QString, vector<complex<double> > > QucsRFDesignerWindow::loadQucsDataSet(Q
     file.close();
     return data;
 }
-
-
-void QucsRFDesignerWindow::UpdateSparSweep()
-{
-
-}
-
 
 
 
@@ -346,5 +322,5 @@ void QucsRFDesignerWindow::simulate()
     QMap<QString, vector<complex<double> > > data = loadQucsDataSet("data.dat");
     //Update graph
     vector<complex<double> > freq=data["frequency"];
-    updateGraph(real(freq), data["S[2,1]"], data["S[1,1]"], data["S[2,2]"]);
+    updateGraph(real(freq), data);
 }

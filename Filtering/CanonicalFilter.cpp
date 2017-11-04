@@ -54,6 +54,12 @@ void CanonicalFilter::synthesize()
         Specification.fc /= cosh(acosh(1.0 / epsilon) / Specification.order);
     }
 
+    //Ideally, the user should be the one which controls the style of the traces as well the traces to be shown
+    //However, in favour of a simpler implementation, it'll be the design code responsible for this... by the moment...
+    displaygraphs.clear();
+    displaygraphs[QString("S[2,1]")] = QPen(Qt::red, 1, Qt::SolidLine);
+    displaygraphs[QString("S[1,1]")] = QPen(Qt::blue, 1, Qt::SolidLine);
+
     switch (Specification.FilterType)
     {
     case Lowpass:
@@ -65,7 +71,6 @@ void CanonicalFilter::synthesize()
     case Bandstop:
         return SynthesizeBSF();
     }
-
 }
 
 

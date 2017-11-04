@@ -46,4 +46,6 @@ QT += svg
 RESOURCES = resources.qrc
 
 DISTFILES += \
-    bitmaps/qucsRFdesigner.png
+    bitmaps/qucsRFdesigner.png \
+    TODO \
+    ZverevTables.sql

@@ -33,6 +33,12 @@ void DirectCoupledFilters::synthesize()
   gi = LP_coeffs.getCoefficients();
   if (Specification.DC_Coupling == CapacitativeCoupledShuntResonators) Synthesize_Capacitative_Coupled_Shunt_Resonators();
   if (Specification.DC_Coupling == InductiveCoupledSeriesResonators) Synthesize_Inductive_Coupled_Series_Resonators();
+
+  //Ideally, the user should be the one which controls the style of the traces as well the traces to be shown
+  //However, in favour of a simpler implementation, it'll be the design code responsible for this... by the moment...
+  displaygraphs.clear();
+  displaygraphs[QString("S[2,1]")] = QPen(Qt::red, 1, Qt::SolidLine);
+  displaygraphs[QString("S[1,1]")] = QPen(Qt::blue, 1, Qt::SolidLine);
 }
 
 

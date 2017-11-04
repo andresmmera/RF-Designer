@@ -61,6 +61,12 @@ QList<NodeInfo> EllipticFilter::getNodes()
 
 void EllipticFilter::synthesize()
 {
+    //Ideally, the user should be the one which controls the style of the traces as well the traces to be shown
+    //However, in favour of a simpler implementation, it'll be the design code responsible for this... by the moment...
+    displaygraphs.clear();
+    displaygraphs[QString("S[2,1]")] = QPen(Qt::red, 1, Qt::SolidLine);
+    displaygraphs[QString("S[1,1]")] = QPen(Qt::blue, 1, Qt::SolidLine);
+
     if (Specification.EllipticType=="Type S")
         EllipticTypeS();
     else
@@ -76,7 +82,6 @@ void EllipticFilter::synthesize()
     case Bandstop:
         return SynthesizeBSF();*/
     }
-
 }
 
 

@@ -56,7 +56,6 @@ private slots://Functions to launch the actions
     void PreferencesWindow();
     void ReceiveSettings(ToolSettings);
     QMap<QString, vector<complex<double> > > loadQucsDataSet(QString);
-    void UpdateSparSweep();
     void ShowSmithChart();
     void ReceiveNetworkFromDesignTools(struct SchematicInfo);//Simulates the network after changing the design goals
     void simulate();//Rerun simulation when the user does some action over the display
@@ -87,7 +86,7 @@ private://Actions
     ToolSettings Tool_Settings;
 
     // ************************ UPDATE GRAPH ***************************
-    void updateGraph(vector<double>, vector<complex<double> > , vector<complex<double> > , vector<complex<double> > );
+    void updateGraph(vector<double>, QMap<QString, vector<complex<double> > >);
 
 
 };
