@@ -280,3 +280,10 @@ void PowerCombiningTool::on_TopoCombo_currentIndexChanged(int index)
 
     UpdateDesignParameters();
 }
+
+
+//The purpose of this function is to trigger a design from the main application
+void PowerCombiningTool::design()
+{
+    UpdateDesignParameters();
+}

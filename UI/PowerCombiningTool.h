@@ -23,6 +23,7 @@ class PowerCombiningTool : public QWidget
 public:
     PowerCombiningTool();
     ~PowerCombiningTool();
+    void design();
 
 private slots:
     void UpdateDesignParameters();

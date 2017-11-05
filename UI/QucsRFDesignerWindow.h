@@ -59,6 +59,7 @@ private slots://Functions to launch the actions
     void ShowSmithChart();
     void ReceiveNetworkFromDesignTools(struct SchematicInfo);//Simulates the network after changing the design goals
     void simulate();//Rerun simulation when the user does some action over the display
+    void SwitchTabs(int);//Whenever the tool tab is changed, this slot forces a new design without the need of modify a design parameter
 
 private://Actions
     void createActions();

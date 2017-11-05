@@ -113,7 +113,7 @@ void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators()
     TermSpar.Orientation = vertical;
     TermSpar.parameter = 0;
     TermSpar.val.clear();
-    TermSpar.val["Z"] = k;
+    TermSpar.val["Z"] = num2str(k, Resistance);
     TermSpar.Coordinates.clear();
     TermSpar.Coordinates.push_back(posx);
     TermSpar.Coordinates.push_back(0);
@@ -130,7 +130,7 @@ void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators()
     Cseries.Orientation = horizontal;
     Cseries.parameter = 0;
     Cseries.val.clear();
-    Cseries.val["C"] = Cs[0];
+    Cseries.val["C"] = num2str(Cs[0], Capacitance);
     Cseries.Coordinates.clear();
     Cseries.Coordinates.push_back(posx);
     Cseries.Coordinates.push_back(0);
@@ -159,7 +159,7 @@ void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators()
         Lshunt.Orientation = vertical;
         Lshunt.parameter = 0;
         Lshunt.val.clear();
-        Lshunt.val["L"] = L[k];
+        Lshunt.val["L"] = num2str(L[k], Capacitance);
         Lshunt.Coordinates.clear();
         Lshunt.Coordinates.push_back(posx);
         Lshunt.Coordinates.push_back(50);
@@ -212,7 +212,7 @@ void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators()
         Cshunt.Orientation = vertical;
         Cshunt.parameter = 0;
         Cshunt.val.clear();
-        Cshunt.val["C"] = Cp[k];
+        Cshunt.val["C"] = num2str(Cp[k], Capacitance);
         Cshunt.Coordinates.clear();
         Cshunt.Coordinates.push_back(posx);
         Cshunt.Coordinates.push_back(50);
@@ -237,7 +237,7 @@ void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators()
         Cseries.Orientation = horizontal;
         Cseries.parameter = 0;
         Cseries.val.clear();
-        Cseries.val["C"] = Cs[k+1];
+        Cseries.val["C"] = num2str(Cs[k+1], Capacitance);
         Cseries.Coordinates.clear();
         Cseries.Coordinates.push_back(posx);
         Cseries.Coordinates.push_back(0);
@@ -276,7 +276,7 @@ void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators()
     TermSpar.Orientation = horizontal;
     TermSpar.parameter = 0;
     TermSpar.val.clear();
-    TermSpar.val["Z"] = Specification.ZL;
+    TermSpar.val["Z"] = num2str(Specification.ZL, Resistance);
     TermSpar.Coordinates.clear();
     TermSpar.Coordinates.push_back(posx);
     TermSpar.Coordinates.push_back(0);
@@ -368,7 +368,7 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators()
     TermSpar.Orientation = vertical;
     TermSpar.parameter = 0;
     TermSpar.val.clear();
-    TermSpar.val["Z"] = k;
+    TermSpar.val["Z"] = num2str(k, Resistance);
     TermSpar.Coordinates.clear();
     TermSpar.Coordinates.push_back(posx);
     TermSpar.Coordinates.push_back(0);
@@ -384,7 +384,7 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators()
     Lseries.Orientation = horizontal;
     Lseries.parameter = 0;
     Lseries.val.clear();
-    Lseries.val["L"] = Ls[0];
+    Lseries.val["L"] = num2str(Ls[0], Inductance);
     Lseries.Coordinates.clear();
     Lseries.Coordinates.push_back(posx);
     Lseries.Coordinates.push_back(0);
@@ -408,7 +408,7 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators()
     Lshunt.Orientation = vertical;
     Lshunt.parameter = 0;
     Lshunt.val.clear();
-    Lshunt.val["L"] = Lp[0];
+    Lshunt.val["L"] = num2str(Lp[0], Inductance);
     Lshunt.Coordinates.clear();
     Lshunt.Coordinates.push_back(posx);
     Lshunt.Coordinates.push_back(50);
@@ -464,7 +464,7 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators()
         Lseries.Orientation = horizontal;
         Lseries.parameter = 0;
         Lseries.val.clear();
-        Lseries.val["L"] = Ls[k+1];
+        Lseries.val["L"] = num2str(Ls[k+1], Inductance);
         Lseries.Coordinates.clear();
         Lseries.Coordinates.push_back(posx);
         Lseries.Coordinates.push_back(0);
@@ -479,7 +479,7 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators()
         Cseries.Orientation = horizontal;
         Cseries.parameter = 0;
         Cseries.val.clear();
-        Cseries.val["C"] = Crk[k];
+        Cseries.val["C"] = num2str(Crk[k], Capacitance);
         Cseries.Coordinates.clear();
         Cseries.Coordinates.push_back(posx);
         Cseries.Coordinates.push_back(0);
@@ -494,7 +494,7 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators()
         Lshunt.Orientation = vertical;
         Lshunt.parameter = 0;
         Lshunt.val.clear();
-        Lshunt.val["L"] = Lp[k+1];
+        Lshunt.val["L"] = num2str(Lp[k+1], Inductance);
         Lshunt.Coordinates.clear();
         Lshunt.Coordinates.push_back(posx);
         Lshunt.Coordinates.push_back(50);
@@ -557,13 +557,12 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators()
 
     posx += 50;
     //Series inductor
-    //Series inductor
     Lseries.ID=QString("L%1").arg(++NumberComponents[Inductor]);
     Lseries.Type = Inductor;
     Lseries.Orientation = horizontal;
     Lseries.parameter = 0;
     Lseries.val.clear();
-    Lseries.val["L"] = Ls[N+1];
+    Lseries.val["L"] = num2str(Ls[N+1], Inductance);
     Lseries.Coordinates.clear();
     Lseries.Coordinates.push_back(posx);
     Lseries.Coordinates.push_back(0);
@@ -583,7 +582,7 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators()
     TermSpar.Orientation = horizontal;
     TermSpar.parameter = 0;
     TermSpar.val.clear();
-    TermSpar.val["Z"] = Specification.ZL;
+    TermSpar.val["Z"] = num2str(Specification.ZL, Resistance);
     TermSpar.Coordinates.clear();
     TermSpar.Coordinates.push_back(posx);
     TermSpar.Coordinates.push_back(0);

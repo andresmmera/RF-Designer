@@ -9,7 +9,7 @@
 #include <qdebug.h>
 
 //! [0]
-Component::Component(GraphWidget *graphWidget, ComponentType comp, ComponentOrientation Or_, std::map<QString,double> val, QString ID_)
+Component::Component(GraphWidget *graphWidget, ComponentType comp, ComponentOrientation Or_, std::map<QString,QString> val, QString ID_)
     : graph(graphWidget)
 {
     ID = ID_;
@@ -52,6 +52,9 @@ QRectF Component::boundingRect() const
     QRect R;
     switch(CompType)
     {
+    case TransmissionLine:
+        (Orientation == horizontal) ? R = QRect(-25, -10, 50, 60) : R = QRect(-15, -20, 60, 50);
+        break;
     case Resistor:
         (Orientation == horizontal) ? R = QRect(-25, -10, 50, 40) : R = QRect(-15, -20, 60, 50);
         break;
@@ -78,6 +81,7 @@ QPainterPath Component::shape() const
     case Capacitor:
         path.addRect(-2*7, -2*7, 2*15, 2*15);
         break;
+    case TransmissionLine:
     case Resistor:
         (Orientation == horizontal) ? path.addRect(-2*9, -2*5, 2*20, 2*10) : path.addRect(-2*5, -2*9, 2*15, 2*20);
         break;
@@ -111,7 +115,7 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->drawLine(QPoint(-2*5, 2*2), QPoint(2*5,2*2));
             painter->setPen(QPen(Qt::black, 1));
             painter->drawText(QRect(2,5,100,100), QString("%1").arg(this->ID));
-            painter->drawText(QRect(2,15,100,100), QString("%1").arg(num2str(Value["C"])));
+            painter->drawText(QRect(2,15,100,100), QString("%1").arg(Value["C"]));
         }
         else
         {
@@ -121,7 +125,7 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->drawLine(QPoint(2*2, -2*5), QPoint(2*2,2*5));
             painter->setPen(QPen(Qt::black, 1));
             painter->drawText(QRect(-10,10,100,100),  QString("%1").arg(this->ID));
-            painter->drawText(QRect(-10,20,100,100),  QString("%1").arg(num2str(Value["C"])));
+            painter->drawText(QRect(-10,20,100,100),  QString("%1").arg(Value["C"]));
         }
         break;
     case Inductor:
@@ -134,7 +138,7 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->drawLine(QPoint(0, 16), QPoint(0, 40));
             painter->setPen(QPen(Qt::black, 1));
             painter->drawText(QRect(7,5,100,100), QString("%1").arg(this->ID));
-            painter->drawText(QRect(7,15,100,100), QString("%1").arg(num2str(Value["L"])));
+            painter->drawText(QRect(7,15,100,100), QString("%1").arg(Value["L"]));
         }
         else
         {
@@ -145,8 +149,40 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->drawLine(QPoint(2*8, 0), QPoint(2*20, 0));
             painter->setPen(QPen(Qt::black, 1));
             painter->drawText(QRect(-10,0,100,100),  QString("%1").arg(this->ID));
-            painter->drawText(QRect(-10,10,100,100),  QString("%1").arg(num2str(Value["L"])));
+            painter->drawText(QRect(-10,10,100,100),  QString("%1").arg(Value["L"]));
 
+        }
+        break;
+    case TransmissionLine:
+
+        if (Orientation == vertical)
+        {
+            int w = 15;
+            painter->drawLine(QPoint(0, -30), QPoint(0, -14));
+            painter->drawLine(QPoint(-0.5*w, -14), QPoint(0.5*w, -14));
+            painter->drawLine(QPoint(-0.5*w, -14), QPoint(0.5*w, -14));
+            painter->drawLine(QPoint(-0.5*w, -14), QPoint(-0.5*w, 16));
+            painter->drawLine(QPoint(0.5*w, -14), QPoint(0.5*w, 16));
+            painter->drawLine(QPoint(-0.5*w, 16), QPoint(0.5*w, 16));
+            painter->drawLine(QPoint(0, 16), QPoint(0, 40));
+            painter->setPen(QPen(Qt::black, 1));
+            painter->drawText(QRect(7,5,100,100), QString("%1").arg(this->ID));
+            painter->drawText(QRect(7,15,100,100), QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
+            painter->drawText(QRect(7,15,100,100), QString("%1").arg(Value["L"]));
+        }
+        else
+        {
+            int w = 15;
+            painter->drawLine(QPoint(-30, 0), QPoint(-14, 0));
+            painter->drawLine(QPoint(-14, -0.5*w), QPoint(-14, 0.5*w));
+            painter->drawLine(QPoint(16, -0.5*w), QPoint(16, 0.5*w));
+            painter->drawLine(QPoint(-14, 0.5*w), QPoint(16, 0.5*w));
+            painter->drawLine(QPoint(-14, -0.5*w), QPoint(16, -0.5*w));
+            painter->drawLine(QPoint(16, 0), QPoint(40, 0));
+            painter->setPen(QPen(Qt::black, 1));
+            painter->drawText(QRect(-15,7,100,100), QString("%1").arg(this->ID));
+            painter->drawText(QRect(-15,13,100,100), QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
+            painter->drawText(QRect(-15,20,100,100), QString("%1").arg(Value["L"]));
         }
         break;
     case Resistor:
@@ -169,7 +205,7 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->drawLine(QPoint(0, 16), QPoint(0, 40));
             painter->setPen(QPen(Qt::black, 1));
             painter->drawText(QRect(7,5,100,100), QString("%1").arg(this->ID));
-            painter->drawText(QRect(7,15,100,100), QString("%1 Ohm").arg(num2str(Value["R"])));
+            painter->drawText(QRect(7,15,100,100), QString("%1").arg(Value["R"].replace("Ohm", QChar(0xa9, 0x03))));
         }
         else
         {
@@ -193,7 +229,7 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
            painter->setPen(QPen(Qt::black, 1));
            QString str = QString("%1%2").arg(75).arg(QChar(0xa9, 0x03));
            painter->drawText(QRect(-30,0,100,100), QString("%1").arg(this->ID));
-           painter->drawText(QRect(-30,10,100,100), QString("%1").arg(num2str(Value["Z"])));
+           painter->drawText(QRect(-30,10,100,100), QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
         }
         else
         {
@@ -207,13 +243,13 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->setPen(QPen(Qt::black, 1));
             QString str = QString("%1%2").arg(75).arg(QChar(0xa9, 0x03));
             painter->drawText(QRect(15,0,100,100), QString("%1").arg(this->ID));
-            painter->drawText(QRect(15,10,100,100), QString("%1").arg(num2str(Value["Z"])));
+            painter->drawText(QRect(15,10,100,100), QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
         }
         break;
 
     }
 
- /*   //Debug code: Shows the bounding box of the component. This is the region where the selection works
+/*    //Debug code: Shows the bounding box of the component. This is the region where the selection works
    painter->setPen(QPen(Qt::red, 1));
    painter->drawPath(this->shape());//Component box-> This is the area where the component can be selected
    painter->setPen(QPen(Qt::green, 1));
@@ -269,6 +305,7 @@ QPoint Component::getPortLocation(int port_number)
     QPoint P;
     switch (CompType)
     {
+       case TransmissionLine:
        case Resistor:
        case Inductor:
        case Capacitor:
@@ -300,12 +337,12 @@ void Component::setOrientation(ComponentOrientation CO)
     Orientation = CO;
 }
 
-void Component::setParameters(std::map<QString, double> val)
+void Component::setParameters(std::map<QString, QString> val)
 {
     Value = val;
 }
 
-std::map<QString, double> Component::getParameters()
+std::map<QString, QString> Component::getParameters()
 {
     return Value;
 }
@@ -320,59 +357,3 @@ ComponentType Component::getComponentType()
     return CompType;
 }
 
-
-QString Component::num2str(double Num)
-{
-  char c = 0;
-  double cal = std::abs(Num);
-  if(cal > 1e-20) {
-    cal = std::log10(cal) / 3.0;
-    if(cal < -0.2)  cal -= 0.98;
-    int Expo = int(cal);
-
-    if(Expo >= -5) if(Expo <= 4)
-      switch(Expo) {
-        case -5: c = 'f'; break;
-        case -4: c = 'p'; break;
-        case -3: c = 'n'; break;
-        case -2: c = 'u'; break;
-        case -1: c = 'm'; break;
-        case  1: c = 'k'; break;
-        case  2: c = 'M'; break;
-        case  3: c = 'G'; break;
-        case  4: c = 'T'; break;
-      }
-
-    if(c)  Num /= pow(10.0, double(3*Expo));
-  }
-
-  QString Str = RoundVariablePrecision(Num);
-  if(c)  Str += c;
-  QString unit;
-  switch (CompType)
-  {
-     case Capacitor:
-                 unit = QString("F");
-                    break;
-     case Inductor:
-                 unit = QString("H");
-                 break;
-     case Term:
-                 unit = QString("%1").arg(QChar(0xa9, 0x03));
-                 break;
-  }
-  Str += unit;
-  return Str;
-}
-
-
-//Rounds a double number using the minimum number of decimal places
-QString Component::RoundVariablePrecision(double val)
-{
-  int sign;
-  (val < 0) ? sign = -1: sign = 1;
-  val = std::abs(val);
-  int precision = 0;//By default, it takes 2 decimal places
-  while (val*pow(10, precision) < 100) precision++;//Adds another decimal place if the conversion is less than 0.1, 0.01, etc
-  return QString::number(sign*val, 'F', precision);// Round to 'precision' decimals.
-}

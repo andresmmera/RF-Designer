@@ -19,7 +19,9 @@ enum ComponentOrientation {vertical, horizontal};
 enum ResponseType {Butterworth, Chebyshev, Legendre, Elliptic, Blichinkoff, Bessel, LinearPhaseEqError, Gegenbauer};
 enum FilterClass {Lowpass, Highpass, Bandpass, Bandstop};
 enum Coupling {CapacitativeCoupledShuntResonators, InductiveCoupledSeriesResonators};
+enum Units{Capacitance, Inductance, Length, Resistance};
 
+static const double SPEED_OF_LIGHT = 299792458.0;//REMOVE THIS WHEN THIS TOOL BECOMES INTEGRATED IN QUCS
 
 struct PrototypeTableProperties
 {
@@ -54,7 +56,7 @@ struct ComponentInfo
 {
     QString ID;
     unsigned int parameter;
-    std::map<QString,double> val;//freq, L1.L, C1.C,...
+    std::map<QString,QString> val;//freq, L1.L, C1.C,...
     QString Net1, Net2;//ID of the nodes where the component is connected
     ComponentOrientation Orientation;
     std::vector<double> Coordinates;

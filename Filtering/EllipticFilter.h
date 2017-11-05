@@ -2,6 +2,7 @@
 #define ELLIPTICFILTER_H
 #include "Filtering/Network.h"
 #include <QPen>
+#include "general.h"
 
 class EllipticFilter : public Network
 {

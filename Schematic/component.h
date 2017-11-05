@@ -10,6 +10,7 @@
 #include "Schematic/wire.h"
 #include "Schematic/graphwidget.h"
 #include "Filtering/Network.h"
+#include "general.h"
 
 class Wire;
 
@@ -17,7 +18,7 @@ class Component : public Symbol
 {
 Q_OBJECT
 public:
-    Component(GraphWidget *graphWidget, ComponentType, ComponentOrientation, std::map<QString, double>, QString ID);
+    Component(GraphWidget *graphWidget, ComponentType, ComponentOrientation, std::map<QString, QString>, QString ID);
     Component(GraphWidget *graphWidget, struct ComponentInfo);
     void addWire(Wire *Wire);
     QList<Wire *> Wires() const;
@@ -32,8 +33,8 @@ public:
     QPoint getPortLocation(int);
     QString getID();
     void setOrientation(ComponentOrientation);
-    void setParameters(std::map<QString,double>);
-    std::map<QString, double> getParameters();
+    void setParameters(std::map<QString,QString>);
+    std::map<QString, QString> getParameters();
     void setComponentType(ComponentType);
     ComponentType getComponentType();
 
@@ -50,10 +51,8 @@ private:
     GraphWidget *graph;
     ComponentType CompType;
     ComponentOrientation Orientation;
-    std::map<QString, double> Value;
+    std::map<QString, QString> Value;
     QString ID;
-    QString num2str(double);
-    QString RoundVariablePrecision(double);
 signals:
     void DoubleClicked(struct ComponentInfo);
 

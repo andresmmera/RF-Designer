@@ -95,7 +95,7 @@ void CanonicalFilter::SynthesizeLPF()
     TermSpar.Orientation = vertical;
     TermSpar.parameter = 0;
     TermSpar.val.clear();
-    TermSpar.val["Z"] = k;
+    TermSpar.val["Z"] = num2str(k, Resistance);
     TermSpar.Coordinates.clear();
     TermSpar.Coordinates.push_back(posx);
     TermSpar.Coordinates.push_back(0);
@@ -123,7 +123,7 @@ void CanonicalFilter::SynthesizeLPF()
             Cshunt.parameter = 0;
             Cshunt.val.clear();
             gi[k+1] *= 1/(2*M_PI*Specification.fc*Specification.ZS);//Lowpass to highpass transformation
-            Cshunt.val["C"] = gi[k+1];
+            Cshunt.val["C"] = num2str(gi[k+1], Capacitance);
             Cshunt.Coordinates.clear();
             Cshunt.Coordinates.push_back(posx);
             Cshunt.Coordinates.push_back(50);
@@ -188,7 +188,7 @@ void CanonicalFilter::SynthesizeLPF()
             Lseries.parameter = 0;
             Lseries.val.clear();
             gi[k+1] *= Specification.ZS/(2*M_PI*Specification.fc);
-            Lseries.val["L"] = gi[k+1];
+            Lseries.val["L"] = num2str(gi[k+1], Inductance);
             Lseries.Coordinates.clear();
             Lseries.Coordinates.push_back(posx);
             Lseries.Coordinates.push_back(0);
@@ -217,7 +217,7 @@ void CanonicalFilter::SynthesizeLPF()
     TermSpar.Orientation = horizontal;
     TermSpar.parameter = 0;
     TermSpar.val.clear();
-    TermSpar.val["Z"] = k;
+    TermSpar.val["Z"] = num2str(k, Resistance);
     TermSpar.Coordinates.clear();
     TermSpar.Coordinates.push_back(posx);
     TermSpar.Coordinates.push_back(0);
@@ -252,7 +252,7 @@ void CanonicalFilter::SynthesizeHPF()
     TermSpar.Orientation = vertical;
     TermSpar.parameter = 0;
     TermSpar.val.clear();
-    TermSpar.val["Z"] = Specification.ZS;
+    TermSpar.val["Z"] = num2str(Specification.ZS, Resistance);
     TermSpar.Coordinates.clear();
     TermSpar.Coordinates.push_back(posx);
     TermSpar.Coordinates.push_back(0);
@@ -275,7 +275,7 @@ void CanonicalFilter::SynthesizeHPF()
             Lshunt.parameter = 0;
             Lshunt.val.clear();
             gi[k+1] = Specification.ZS/(2*M_PI*Specification.fc*gi[k+1]);
-            Lshunt.val["L"] = gi[k+1];
+            Lshunt.val["L"] = num2str(gi[k+1], Inductance);
             Lshunt.Coordinates.clear();
             Lshunt.Coordinates.push_back(posx);
             Lshunt.Coordinates.push_back(50);
@@ -341,7 +341,7 @@ void CanonicalFilter::SynthesizeHPF()
             Cseries.parameter = 0;
             Cseries.val.clear();
             gi[k+1] = 1/(2*M_PI*Specification.fc*gi[k+1]*Specification.ZS);
-            Cseries.val["C"] = gi[k+1];
+            Cseries.val["C"] = num2str(gi[k+1], Capacitance);
             Cseries.Coordinates.clear();
             Cseries.Coordinates.push_back(posx);
             Cseries.Coordinates.push_back(0);
@@ -368,7 +368,7 @@ void CanonicalFilter::SynthesizeHPF()
     TermSpar.Orientation = horizontal;
     TermSpar.parameter = 0;
     TermSpar.val.clear();
-    TermSpar.val["Z"] = k;
+    TermSpar.val["Z"] = num2str(k, Resistance);
     TermSpar.Coordinates.clear();
     TermSpar.Coordinates.push_back(posx);
     TermSpar.Coordinates.push_back(0);
@@ -404,7 +404,7 @@ void CanonicalFilter::SynthesizeBPF()
     TermSpar.Orientation = vertical;
     TermSpar.parameter = 0;
     TermSpar.val.clear();
-    TermSpar.val["Z"] = Specification.ZS;
+    TermSpar.val["Z"] = num2str(Specification.ZS, Resistance);
     TermSpar.Coordinates.clear();
     TermSpar.Coordinates.push_back(posx);
     TermSpar.Coordinates.push_back(0);
@@ -430,7 +430,7 @@ void CanonicalFilter::SynthesizeBPF()
             Cshunt.Orientation = vertical;
             Cshunt.parameter = 0;
             Cshunt.val.clear();
-            Cshunt.val["C"] = gi[k+1]/(delta*Specification.ZS);
+            Cshunt.val["C"] = num2str(gi[k+1]/(delta*Specification.ZS), Capacitance);
             Cshunt.Coordinates.clear();
             Cshunt.Coordinates.push_back(posx-25);
             Cshunt.Coordinates.push_back(50);
@@ -456,7 +456,7 @@ void CanonicalFilter::SynthesizeBPF()
             Lshunt.Orientation = vertical;
             Lshunt.parameter = 0;
             Lshunt.val.clear();
-            Lshunt.val["L"] = Specification.ZS*delta/(w0*w0*gi[k+1]);
+            Lshunt.val["L"] = num2str(Specification.ZS*delta/(w0*w0*gi[k+1]), Inductance);
             Lshunt.Coordinates.clear();
             Lshunt.Coordinates.push_back(posx+25);
             Lshunt.Coordinates.push_back(50);
@@ -537,7 +537,7 @@ void CanonicalFilter::SynthesizeBPF()
             Lseries.Orientation = horizontal;
             Lseries.parameter = 0;
             Lseries.val.clear();
-            Lseries.val["L"] = gi[k+1]*Specification.ZS/(delta);
+            Lseries.val["L"] = num2str(gi[k+1]*Specification.ZS/(delta), Inductance);
             Lseries.Coordinates.clear();
             Lseries.Coordinates.push_back(posx-30);
             Lseries.Coordinates.push_back(0);
@@ -550,7 +550,7 @@ void CanonicalFilter::SynthesizeBPF()
             Cseries.Orientation = horizontal;
             Cseries.parameter = 0;
             Cseries.val.clear();
-            Cseries.val["C"] = delta/(w0*w0*Specification.ZS*gi[k+1]);
+            Cseries.val["C"] = num2str(delta/(w0*w0*Specification.ZS*gi[k+1]), Capacitance);
             Cseries.Coordinates.clear();
             Cseries.Coordinates.push_back(posx+30);
             Cseries.Coordinates.push_back(0);
@@ -585,7 +585,7 @@ void CanonicalFilter::SynthesizeBPF()
     TermSpar.Orientation = horizontal;
     TermSpar.parameter = 0;
     TermSpar.val.clear();
-    TermSpar.val["Z"] = k;
+    TermSpar.val["Z"] = num2str(k, Resistance);
     TermSpar.Coordinates.clear();
     TermSpar.Coordinates.push_back(posx);
     TermSpar.Coordinates.push_back(0);
@@ -622,7 +622,7 @@ void CanonicalFilter::SynthesizeBSF()
     TermSpar.Orientation = vertical;
     TermSpar.parameter = 0;
     TermSpar.val.clear();
-    TermSpar.val["Z"] = Specification.ZS;
+    TermSpar.val["Z"] = num2str(Specification.ZS, Resistance);
     TermSpar.Coordinates.clear();
     TermSpar.Coordinates.push_back(posx);
     TermSpar.Coordinates.push_back(0);
@@ -648,7 +648,7 @@ void CanonicalFilter::SynthesizeBSF()
             Cshunt.Orientation = vertical;
             Cshunt.parameter = 0;
             Cshunt.val.clear();
-            Cshunt.val["C"] = gi[k+1]*delta/(w0*w0*Specification.ZS);
+            Cshunt.val["C"] = num2str(gi[k+1]*delta/(w0*w0*Specification.ZS), Capacitance);
             Cshunt.Coordinates.clear();
             Cshunt.Coordinates.push_back(posx);
             Cshunt.Coordinates.push_back(100);
@@ -674,7 +674,7 @@ void CanonicalFilter::SynthesizeBSF()
             Lshunt.Orientation = vertical;
             Lshunt.parameter = 0;
             Lshunt.val.clear();
-            Lshunt.val["L"] = Specification.ZS/(delta*gi[k+1]);
+            Lshunt.val["L"] = num2str(Specification.ZS/(delta*gi[k+1]), Inductance);
             Lshunt.Coordinates.clear();
             Lshunt.Coordinates.push_back(posx);
             Lshunt.Coordinates.push_back(50);
@@ -746,7 +746,7 @@ void CanonicalFilter::SynthesizeBSF()
             Lseries.Orientation = horizontal;
             Lseries.parameter = 0;
             Lseries.val.clear();
-            Lseries.val["L"] = gi[k+1]*Specification.ZS*delta/(w0*w0);
+            Lseries.val["L"] = num2str(gi[k+1]*Specification.ZS*delta/(w0*w0), Inductance);
             Lseries.Coordinates.clear();
             Lseries.Coordinates.push_back(posx);
             Lseries.Coordinates.push_back(30);
@@ -759,7 +759,7 @@ void CanonicalFilter::SynthesizeBSF()
             Cseries.Orientation = horizontal;
             Cseries.parameter = 0;
             Cseries.val.clear();
-            Cseries.val["C"] = 1/(gi[k+1]*delta*Specification.ZS);
+            Cseries.val["C"] = num2str(1/(gi[k+1]*delta*Specification.ZS), Capacitance);
             Cseries.Coordinates.clear();
             Cseries.Coordinates.push_back(posx);
             Cseries.Coordinates.push_back(-30);
@@ -822,7 +822,7 @@ void CanonicalFilter::SynthesizeBSF()
     TermSpar.Orientation = horizontal;
     TermSpar.parameter = 0;
     TermSpar.val.clear();
-    TermSpar.val["Z"] = k;
+    TermSpar.val["Z"] = num2str(k, Resistance);
     TermSpar.Coordinates.clear();
     TermSpar.Coordinates.push_back(posx);
     TermSpar.Coordinates.push_back(0);

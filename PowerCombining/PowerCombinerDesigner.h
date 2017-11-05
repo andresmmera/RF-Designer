@@ -1,6 +1,7 @@
 #ifndef POWERCOMBINERDESIGNER_H
 #define POWERCOMBINERDESIGNER_H
 #include "Filtering/Network.h"
+#include "general.h"
 #include <QPen>
 
 struct TwoWayWilkinsonParams
@@ -33,6 +34,7 @@ private:
     QString QucsNetlist;
     QMap<ComponentType, int> NumberComponents;//List for assigning IDs to the filter components
 
+    QString ConvertLengthFromM(double);
 
     //Power combiner design functions
     void Wilkinson();

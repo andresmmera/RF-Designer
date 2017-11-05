@@ -4,6 +4,7 @@
 #include "Filtering/Network.h"
 #include "Filtering/LowpassPrototypeCoeffs.h"
 #include <QPen>
+#include "general.h"
 
 class CanonicalFilter : public Network
 {

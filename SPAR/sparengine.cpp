@@ -67,7 +67,7 @@ Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f, QStringList topo
 
     ABCD.eye();
 
-    for (int i = 0, k=0; i < topology.length(); i++, k++)
+/*    for (int i = 0, k=0; i < topology.length(); i++, k++)
     {
         index = options.indexOf(topology.at(i));
         switch(index)
@@ -102,20 +102,20 @@ Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f, QStringList topo
                 ABCD_t(1,0) = sinh(gamma*x.at(k+1))/x.at(k);
                 ABCD_t(1,1) = cosh(gamma*x.at(k+1));
             k++;//It involves two parameters, so we need to skip the next index
-            break;*/
+            break;
         case 5:
-               /* ABCD_t(0,0) = 1.;
+                ABCD_t(0,0) = 1.;
                 ABCD_t(0,1) = 0;
                 ABCD_t(1,0) = (tanh(gamma*x.at(k+1)))/x.at(k);
                 ABCD_t(1,1) = cosh(gamma*x.at(k+1));
             k++;
-            break;*/
+            break;
         case 6:
-               /* ABCD_t(0,0) = 1.;
+                ABCD_t(0,0) = 1.;
                 ABCD_t(0,1) = 0;
                 ABCD_t(1,0) = 1./(x.at(k)*tanh(gamma*x.at(k+1)));
                 ABCD_t(1,1) = 1;
-            k++;*/
+            k++;
             break;
         default: ABCD.eye(); 
                  return ABCD;
@@ -123,7 +123,7 @@ Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f, QStringList topo
 
         ABCD = ABCD*ABCD_t;
     }
-        return ABCD;
+ */       return ABCD;
 }
 
 

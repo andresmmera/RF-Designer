@@ -99,6 +99,7 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
     PlotWidget->xAxis->setRange(SPAR_Settings.fstart/1e6, SPAR_Settings.fstop/1e6);
     PlotWidget->yAxis->setRange(Tool_Settings.ymin, Tool_Settings.ymax);
 
+    connect(TabWidget, SIGNAL(currentChanged(int)), this, SLOT(SwitchTabs(int)));
     connect(Filter_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)), this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
     connect(PowerCombining_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)), this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
 
@@ -323,4 +324,20 @@ void QucsRFDesignerWindow::simulate()
     //Update graph
     vector<complex<double> > freq=data["frequency"];
     updateGraph(real(freq), data);
+}
+
+
+void QucsRFDesignerWindow::SwitchTabs(int tabindex)
+{
+   switch(tabindex)
+   {
+     case 0://Filtering
+       Filter_Tool->design();
+       break;
+     case 1://Matching
+       break;
+     case 2://Power combining
+       PowerCombining_Tool->design();
+       break;
+   }
 }

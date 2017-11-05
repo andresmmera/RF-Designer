@@ -2,6 +2,7 @@
 #define EDGECOUPLED_H
 #include"Filtering/Network.h"
 #include <QPen>
+#include "general.h"
 
 class EdgeCoupled
 {

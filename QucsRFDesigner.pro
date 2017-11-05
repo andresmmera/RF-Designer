@@ -16,7 +16,8 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     Filtering/EdgeCoupled.h \
     UI/FilterDesignTool.h \
     UI/PowerCombiningTool.h \
-    PowerCombining/PowerCombinerDesigner.h
+    PowerCombining/PowerCombinerDesigner.h \
+    general.h
 
 
 SOURCES += main.cpp \
@@ -36,7 +37,8 @@ SOURCES += main.cpp \
     UI/FilterDesignTool.cpp \
     UI/PowerCombiningTool.cpp \
     PowerCombining/PowerCombinerDesigner.cpp \
-    PowerCombining/Wilkinson2way.cpp
+    PowerCombining/Wilkinson2way.cpp \
+    general.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 
