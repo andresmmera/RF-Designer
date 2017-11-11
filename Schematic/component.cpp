@@ -166,9 +166,9 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->drawLine(QPoint(-0.5*w, 16), QPoint(0.5*w, 16));
             painter->drawLine(QPoint(0, 16), QPoint(0, 40));
             painter->setPen(QPen(Qt::black, 1));
-            painter->drawText(QRect(7,5,100,100), QString("%1").arg(this->ID));
-            painter->drawText(QRect(7,15,100,100), QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
-            painter->drawText(QRect(7,15,100,100), QString("%1").arg(Value["L"]));
+            painter->drawText(QRect(7,-5,100,100), QString("%1").arg(this->ID));
+            painter->drawText(QRect(7,5,100,100), QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
+            painter->drawText(QRect(7,12,100,100), QString("%1").arg(Value["L"]));
         }
         else
         {
