@@ -40,7 +40,7 @@ private:
     void Wilkinson();
     void MultistageWilkinson();
     TwoWayWilkinsonParams CalculateWilkinson();
-    void Tee();
+    void TJunction();
     void Branchline();
     void DoubleBoxBranchline();
     void TravellingWave();
