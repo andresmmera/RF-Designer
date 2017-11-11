@@ -45,6 +45,10 @@ private:
     void DoubleBoxBranchline();
     void TravellingWave();
     void Tree();
+
+    std::deque<double> ChebyshevTaper(double, double);
+    std::deque<double> calcMultistageWilkinsonIsolators(std::deque<double>, double, std::complex<double>);
+
 };
 
 #endif // POWERCOMBINERDESIGNER_H

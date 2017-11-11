@@ -38,7 +38,9 @@ SOURCES += main.cpp \
     UI/PowerCombiningTool.cpp \
     PowerCombining/PowerCombinerDesigner.cpp \
     PowerCombining/Wilkinson2way.cpp \
-    general.cpp
+    general.cpp \
+    PowerCombining/MultistageWilkinson.cpp \
+    PowerCombining/ChebyshevTaper.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 

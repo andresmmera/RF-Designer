@@ -191,8 +191,6 @@ double PowerCombiningTool::getScaleFreq()
 // This function changes the window according to the selected topology
 void PowerCombiningTool::on_TopoCombo_currentIndexChanged(int index)
 {
-    bool lumpedImplementation = LumpedElementsradioButton->isChecked();
-
     // Change settings
     if ((index==0)|(index==2)||(index==3))//Wilkinson, Tee, Branchline
     {
@@ -219,18 +217,7 @@ void PowerCombiningTool::on_TopoCombo_currentIndexChanged(int index)
         BranchesCombo->setEditable(false);
     }
 
-    if ((index == 0)||(index==1))//Conventional and multistage Wilkinson
-    {
-        LumpedElementsradioButton->setEnabled(true);
-    }
-    else//Only the Wilkinson combiners support the CLC equivalent of a quarter-wavelength line
-    {
-        if (lumpedImplementation) {
-            // Lumped elements checkbox selected, reset to Ideal TL
-            IdealTLradioButton->setChecked(true);
-        }
-        LumpedElementsradioButton->setEnabled(false);
-    }
+
 
     if (index == 1)//Multistage Wilkinson. So far, it is not possible to implement more than 7 stages
     {

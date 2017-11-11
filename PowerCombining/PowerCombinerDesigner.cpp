@@ -25,8 +25,8 @@ QList<NodeInfo> PowerCombinerDesigner::getNodes()
 void PowerCombinerDesigner::synthesize()
 {
     if (Specs.Type == "Wilkinson")             Wilkinson();
-    /*if (Specs.Type == "Multistage Wilkinson")  MultistageWilkinson();
-    if (Specs.Type == "Tee")                   Tee();
+    if (Specs.Type == "Multistage Wilkinson")  MultistageWilkinson();
+    /*if (Specs.Type == "Tee")                   Tee();
     if (Specs.Type == "Branchline")            Branchline();
     if (Specs.Type == "Double box branchline") DoubleBoxBranchline();
     if (Specs.Type == "Travelling Wave")       TravellingWave();
