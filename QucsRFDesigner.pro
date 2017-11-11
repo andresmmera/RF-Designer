@@ -41,7 +41,8 @@ SOURCES += main.cpp \
     general.cpp \
     PowerCombining/MultistageWilkinson.cpp \
     PowerCombining/ChebyshevTaper.cpp \
-    PowerCombining/TJunction.cpp
+    PowerCombining/TJunction.cpp \
+    PowerCombining/Branchline.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 
