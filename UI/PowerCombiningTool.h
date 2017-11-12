@@ -26,7 +26,7 @@ public:
     virtual State validate ( QString & input, int & pos ) const
     {
         if (input.isEmpty())
-            return Invalid;
+            return Acceptable;
 
         bool b;
         int val = input.toInt(&b);

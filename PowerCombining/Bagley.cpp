@@ -17,7 +17,7 @@ void PowerCombinerDesigner::Bagley()
     TermSpar.val.clear();
     TermSpar.val["Z"] = num2str(Specs.Z0, Resistance);
     TermSpar.Coordinates.clear();
-    TermSpar.Coordinates.push_back(0);
+    TermSpar.Coordinates.push_back((Specs.Noutputs-1)*50);
     TermSpar.Coordinates.push_back(0);
     Components.append(TermSpar);
     QucsNetlist.clear();
@@ -32,8 +32,8 @@ void PowerCombinerDesigner::Bagley()
     TL1.val["Z"] = num2str(Zbranch, Resistance);
     TL1.val["L"] = ConvertLengthFromM(lambda4);
     TL1.Coordinates.clear();
-    TL1.Coordinates.push_back(0);
-    TL1.Coordinates.push_back(-50);
+    TL1.Coordinates.push_back((Specs.Noutputs-1)*100);
+    TL1.Coordinates.push_back(50);
     Components.append(TL1);
     QucsNetlist+=QString("TLIN:Line%1 N0 N%2 Z=\"%3\" L=\"%4 mm\" Alpha=\"0 dB\" Temp=\"26.85\"\n")
             .arg(NumberComponents[TransmissionLine])
@@ -59,16 +59,16 @@ void PowerCombinerDesigner::Bagley()
             .arg(TL2.val["L"])
             .arg(Specs.alpha);
 
-    WI.OriginID = TermSpar.ID;
-    WI.PortOrigin = 0;
-    WI.DestinationID = TL1.ID;
+    WI.OriginID = TL1.ID;
+    WI.PortOrigin = 1;
+    WI.DestinationID = TermSpar.ID;
     WI.PortDestination = 0;
     Wires.append(WI);
 
-    WI.OriginID = TermSpar.ID;
-    WI.PortOrigin = 0;
-    WI.DestinationID = TL2.ID;
-    WI.PortDestination = 1;
+    WI.OriginID = TL2.ID;
+    WI.PortOrigin = 1;
+    WI.DestinationID = TermSpar.ID;
+    WI.PortDestination = 0;
     Wires.append(WI);
 
     TermSpar.ID=QString("T%1").arg(++NumberComponents[Term]);
@@ -140,10 +140,10 @@ void PowerCombinerDesigner::Bagley()
         Wires.append(WI);
     }
 
-    WI.OriginID = TermSpar.ID;
+    WI.OriginID = TL1.ID;
     WI.PortOrigin = 0;
-    WI.DestinationID = TL1.ID;
-    WI.PortDestination = 1;
+    WI.DestinationID = TermSpar.ID;
+    WI.PortDestination = 0;
     Wires.append(WI);
 
     //Ideally, the user should be the one which controls the style of the traces as well the traces to be shown
