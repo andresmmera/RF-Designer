@@ -29,6 +29,8 @@ void PowerCombinerDesigner::synthesize()
     if (Specs.Type == "T-junction")            TJunction();
     if (Specs.Type == "Branchline")            Branchline();
     if (Specs.Type == "Double box branchline") DoubleBoxBranchline();
+    if (Specs.Type == "Bagley")                Bagley();
+    //if (Specs.Type == "Gysel")                 Gysel();
     /*if (Specs.Type == "Travelling Wave")       TravellingWave();
     if (Specs.Type == "Tree")                  Tree();*/
 }

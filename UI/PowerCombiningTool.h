@@ -13,9 +13,33 @@
 #include <QVBoxLayout>
 #include <QtSql>
 #include <QMessageBox>
+#include <QValidator>
 
 #include "Filtering/Network.h"
 #include "PowerCombining/PowerCombinerDesigner.h"
+
+class BagleyValidator : public QValidator
+{
+    Q_OBJECT
+public:
+    BagleyValidator(QObject *parent = 0) : QValidator(parent){};
+    virtual State validate ( QString & input, int & pos ) const
+    {
+        if (input.isEmpty())
+            return Invalid;
+
+        bool b;
+        int val = input.toInt(&b);
+
+        if ((b == true) && (val % 2 != 0))
+        {
+            return Acceptable;
+        }
+        return Invalid;
+    }
+};
+
+
 
 class PowerCombiningTool : public QWidget
 {
@@ -43,8 +67,12 @@ private:
     QString netlist;
     SchematicInfo SchInfo;//Schematic representation
 
+    //Input validation
+    QValidator * Bagley_Validator;
+
 signals:
     void simulateNetwork(struct SchematicInfo);
 };
+
 
 #endif // POWERCOMBININGTOOL_H

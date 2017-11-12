@@ -118,6 +118,7 @@ PowerCombiningTool::PowerCombiningTool()
 
     //Make connection between widgets and handler functions to update the design in real time
     connect(BranchesCombo, SIGNAL(valueChanged(int)), this, SLOT(UpdateDesignParameters()));
+    connect(BranchesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateDesignParameters()));
     connect(RefImpSpinbox, SIGNAL(valueChanged(double)), this, SLOT(UpdateDesignParameters()));
     connect(FreqSpinbox, SIGNAL(valueChanged(double)), this, SLOT(UpdateDesignParameters()));
     connect(FreqScaleCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateDesignParameters()));
@@ -128,6 +129,8 @@ PowerCombiningTool::PowerCombiningTool()
     connect(ImplementationCombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateDesignParameters()));
 
     connect(TopoCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(on_TopoCombo_currentIndexChanged(int)));
+
+    Bagley_Validator = new BagleyValidator(this);
 
 }
 
@@ -243,6 +246,11 @@ void PowerCombiningTool::on_TopoCombo_currentIndexChanged(int index)
         BranchesCombo->addItem("7");
         BranchesCombo->setEditable(true);
         BranchesCombo->setEnabled(true);
+        BranchesCombo->setValidator(Bagley_Validator);
+    }
+    else
+    {
+        BranchesCombo->setValidator(NULL);
     }
 
     if(index == 7)// Travelling wave

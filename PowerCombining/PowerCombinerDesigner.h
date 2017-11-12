@@ -43,6 +43,8 @@ private:
     void TJunction();
     void Branchline();
     void DoubleBoxBranchline();
+    void Bagley();
+    void Gysel();
     void TravellingWave();
     void Tree();
 

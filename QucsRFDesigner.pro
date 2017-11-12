@@ -43,7 +43,8 @@ SOURCES += main.cpp \
     PowerCombining/ChebyshevTaper.cpp \
     PowerCombining/TJunction.cpp \
     PowerCombining/Branchline.cpp \
-    PowerCombining/DoubleBoxBranchline.cpp
+    PowerCombining/DoubleBoxBranchline.cpp \
+    PowerCombining/Bagley.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 
