@@ -2,7 +2,7 @@
 
 void PowerCombinerDesigner::Bagley()
 {
-    struct ComponentInfo TermSpar, Ground;
+    struct ComponentInfo TermSpar;
     struct ComponentInfo TL1, TL2, TL;
     struct WireInfo WI;
 

@@ -44,7 +44,8 @@ SOURCES += main.cpp \
     PowerCombining/TJunction.cpp \
     PowerCombining/Branchline.cpp \
     PowerCombining/DoubleBoxBranchline.cpp \
-    PowerCombining/Bagley.cpp
+    PowerCombining/Bagley.cpp \
+    PowerCombining/Gysel.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 
