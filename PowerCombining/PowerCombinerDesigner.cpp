@@ -31,6 +31,7 @@ void PowerCombinerDesigner::synthesize()
     if (Specs.Type == "Double box branchline") DoubleBoxBranchline();
     if (Specs.Type == "Bagley")                Bagley();
     if (Specs.Type == "Gysel")                 Gysel();
+    if (Specs.Type == "Lim-Eom")               Lim_Eom();
     /*if (Specs.Type == "Travelling Wave")       TravellingWave();
     if (Specs.Type == "Tree")                  Tree();*/
 }
@@ -40,7 +41,7 @@ void PowerCombinerDesigner::synthesize()
 
 TwoWayWilkinsonParams PowerCombinerDesigner::CalculateWilkinson()
 {
-    double K = Specs.OutputRatio;
+    double K = Specs.OutputRatio.at(0);
     TwoWayWilkinsonParams WilkinsonParams;
     // Wilkinson divider design equations
     double K2 =K*K;

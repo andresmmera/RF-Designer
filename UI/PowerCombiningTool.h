@@ -56,7 +56,8 @@ private slots:
 private:
     QLabel *OhmLabel, *K1LabeldB, *NStagesLabel, *K1Label, *FreqLabel, *RefImp, *TopoLabel;
     QLabel *AlphaLabel, *AlphadBLabel, *UnitsLabel;
-    QDoubleSpinBox *RefImpSpinbox, *FreqSpinbox, *K1Spinbox, *AlphaSpinbox;
+    QDoubleSpinBox *RefImpSpinbox, *FreqSpinbox, *AlphaSpinbox;
+    QDoubleSpinBox *K1Spinbox,*K2Spinbox,*K3Spinbox;
     QSpinBox *NStagesSpinbox;
     QComboBox *BranchesCombo;
     QComboBox *TopoCombo, *FreqScaleCombo, *UnitsCombo, *ImplementationCombobox;

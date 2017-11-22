@@ -109,7 +109,7 @@ struct PowerCombinerParams
     QString Type;//Wilkinson, branchlines, Bagley, etc.
     int Noutputs;//Number of output branches
     int Nstages;//Number of combiner stages (broadband Wilkinson)
-    double OutputRatio;
+    std::deque<double> OutputRatio;//Splitting ratio
     QString Implementation;//LC, microstrip, ideal TL
     double alpha;//Attenuation constant of the ideal TL
     QString units;//mm, mil, um

@@ -9,7 +9,7 @@ void PowerCombinerDesigner::DoubleBoxBranchline()
 
     NodeInfo NI1, NI2;
 
-    double K = Specs.OutputRatio;
+    double K = Specs.OutputRatio.at(0);
     double lambda4=SPEED_OF_LIGHT/(4*Specs.freq);
     double r=1;
      double t = sqrt((1+K)*r);

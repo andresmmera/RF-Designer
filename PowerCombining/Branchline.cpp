@@ -7,7 +7,7 @@ void PowerCombinerDesigner::Branchline()
     struct ComponentInfo TL1, TL2, TL3, TL4;
     struct WireInfo WI;
 
-    double K = Specs.OutputRatio;
+    double K = Specs.OutputRatio.at(0);
     double lambda4=SPEED_OF_LIGHT/(4*Specs.freq);
     double ZA = Specs.Z0*sqrt(K/(K+1));
     double ZB = Specs.Z0*sqrt(K);

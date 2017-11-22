@@ -5,7 +5,7 @@ void PowerCombinerDesigner::TJunction()
     struct ComponentInfo TermSpar;
     struct ComponentInfo TL1, TL2, TL3, TL4, TL5;
     struct WireInfo WI;
-    double K = Specs.OutputRatio*Specs.OutputRatio;
+    double K = Specs.OutputRatio.at(0)*Specs.OutputRatio.at(0);
     int index_t2=2, index_t3=3;
     double lambda4=SPEED_OF_LIGHT/(4*Specs.freq);
     int posx = 0;

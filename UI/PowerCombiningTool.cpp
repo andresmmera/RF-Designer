@@ -14,6 +14,7 @@ PowerCombiningTool::PowerCombiningTool()
     TopoCombo->addItem("Double box branchline");
     TopoCombo->addItem("Bagley");
     TopoCombo->addItem("Gysel");
+    TopoCombo->addItem("Lim-Eom");
     TopoCombo->addItem("Travelling Wave");
     TopoCombo->addItem("Tree");
     PowerCombinerDesignLayout->addWidget(TopoLabel,0,0);
@@ -59,16 +60,39 @@ PowerCombiningTool::PowerCombiningTool()
 
     // Output power ratio
     K1Label = new QLabel("Output Power ratio");
+
+    QHBoxLayout *hbox = new QHBoxLayout();
     K1Spinbox=new QDoubleSpinBox();
     K1Spinbox->setValue(0);//Equal split ratio
     K1Spinbox->setMinimum(-20);
     K1Spinbox->setMaximum(20);
     K1Spinbox->setSingleStep(0.1);// 0.1dB step
+
+    K2Spinbox=new QDoubleSpinBox();
+    K2Spinbox->setValue(0);//Equal split ratio
+    K2Spinbox->setMinimum(-20);
+    K2Spinbox->setMaximum(20);
+    K2Spinbox->setSingleStep(0.1);// 0.1dB step
+    K2Spinbox->setVisible(false);
+
+    K3Spinbox=new QDoubleSpinBox();
+    K3Spinbox->setValue(0);//Equal split ratio
+    K3Spinbox->setMinimum(-20);
+    K3Spinbox->setMaximum(20);
+    K3Spinbox->setSingleStep(0.1);// 0.1dB step
+    K3Spinbox->setVisible(false);
+
+
+    hbox->addWidget(K1Spinbox);
+    hbox->addWidget(K2Spinbox);
+    hbox->addWidget(K3Spinbox);
+
     K1LabeldB = new QLabel("dB");
     K1LabeldB->setFixedWidth(20);
     PowerCombinerDesignLayout->addWidget(K1Label,4,0);
-    PowerCombinerDesignLayout->addWidget(K1Spinbox,4,1);
+    PowerCombinerDesignLayout->addLayout(hbox,4,1);
     PowerCombinerDesignLayout->addWidget(K1LabeldB,4,2);
+
 
 
     // Number of stages
@@ -123,6 +147,8 @@ PowerCombiningTool::PowerCombiningTool()
     connect(FreqSpinbox, SIGNAL(valueChanged(double)), this, SLOT(UpdateDesignParameters()));
     connect(FreqScaleCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateDesignParameters()));
     connect(K1Spinbox, SIGNAL(valueChanged(double)), this,SLOT(UpdateDesignParameters()));
+    connect(K2Spinbox, SIGNAL(valueChanged(double)), this,SLOT(UpdateDesignParameters()));
+    connect(K2Spinbox, SIGNAL(valueChanged(double)), this,SLOT(UpdateDesignParameters()));
     connect(NStagesSpinbox, SIGNAL(valueChanged(int)), this, SLOT(UpdateDesignParameters()));
     connect(AlphaSpinbox, SIGNAL(valueChanged(double)), this, SLOT(UpdateDesignParameters()));
     connect(UnitsCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateDesignParameters()));
@@ -145,7 +171,12 @@ void PowerCombiningTool::UpdateDesignParameters()
     PowerCombinerParams Specs;
     Specs.Type = TopoCombo->currentText();
     Specs.Noutputs = BranchesCombo->currentText().toInt();
-    Specs.OutputRatio = pow(10, K1Spinbox->value()/20.);
+    Specs.OutputRatio.push_back(pow(10, K1Spinbox->value()/20.));
+    if (Specs.Type == "Lim-Eom")
+    {//Supports arbitrary 3 way split ratio
+        Specs.OutputRatio.push_back(pow(10, K2Spinbox->value()/20.));
+        Specs.OutputRatio.push_back(pow(10, K3Spinbox->value()/20.));
+    }
     Specs.alpha = AlphaSpinbox->value();
     Specs.units = UnitsCombo->currentText();
     Specs.Implementation = ImplementationCombobox->currentText();
@@ -220,6 +251,19 @@ void PowerCombiningTool::on_TopoCombo_currentIndexChanged(int index)
         BranchesCombo->setEditable(false);
     }
 
+    if (TopoCombo->currentText() == "Lim-Eom")
+    {//The Lim-Eom combiner can handle arbitrary split ratios for the three outputs
+       K1Label->setVisible(true);
+       K1LabeldB->setVisible(true);
+       K1Spinbox->setVisible(true);
+       K2Spinbox->setVisible(true);
+       K3Spinbox->setVisible(true);
+    }
+    else
+    {
+        K2Spinbox->setVisible(false);
+        K3Spinbox->setVisible(false);
+    }
 
 
     if (index == 1)//Multistage Wilkinson. So far, it is not possible to implement more than 7 stages

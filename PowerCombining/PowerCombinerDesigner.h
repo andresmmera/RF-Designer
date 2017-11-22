@@ -45,6 +45,7 @@ private:
     void DoubleBoxBranchline();
     void Bagley();
     void Gysel();
+    void Lim_Eom();
     void TravellingWave();
     void Tree();
 

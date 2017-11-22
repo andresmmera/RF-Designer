@@ -7,7 +7,7 @@ void PowerCombinerDesigner::Wilkinson()
     {//This implementation is based on the quarter wavelength transmission line Pi LC equivalent
         double Z4, Z5, L2, L2_, C2, C2_, L3, L3_, C3, C3_, CC, w, K;
         int posx = 50;
-        K = Specs.OutputRatio;
+        K = Specs.OutputRatio.at(0);
         w = 2*M_PI*Specs.freq;
         L2 = WilkinsonParams.Z2/w;
         C2 = 1./(L2*w*w);
@@ -285,7 +285,7 @@ void PowerCombinerDesigner::Wilkinson()
         WI.PortDestination = 1;
         Wires.append(WI);
 
-        if (Specs.OutputRatio != 1)
+        if (Specs.OutputRatio.at(0) != 1)
         {// An unequal power ratio implies that the load impedance != Z0, so it requires matching
 
           //Upper branch
@@ -686,7 +686,7 @@ void PowerCombinerDesigner::Wilkinson()
         Wires.append(WI);
 
         posx += 50;
-        if (Specs.OutputRatio != 1)
+        if (Specs.OutputRatio.at(0) != 1)
         {// An unequal power ratio implies that the load impedance != Z0, so it requires matching
 
             //Upper branch matching transmission line
