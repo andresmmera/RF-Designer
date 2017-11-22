@@ -46,7 +46,8 @@ SOURCES += main.cpp \
     PowerCombining/DoubleBoxBranchline.cpp \
     PowerCombining/Bagley.cpp \
     PowerCombining/Gysel.cpp \
-    PowerCombining/Lim_Eom.cpp
+    PowerCombining/Lim_Eom.cpp \
+    PowerCombining/Wilkinson3way_ImprovedIsolation.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 

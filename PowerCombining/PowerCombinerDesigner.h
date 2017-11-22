@@ -46,6 +46,7 @@ private:
     void Bagley();
     void Gysel();
     void Lim_Eom();
+    void Wilkinson3Way_ImprovedIsolation();
     void TravellingWave();
     void Tree();
 

@@ -32,6 +32,7 @@ void PowerCombinerDesigner::synthesize()
     if (Specs.Type == "Bagley")                Bagley();
     if (Specs.Type == "Gysel")                 Gysel();
     if (Specs.Type == "Lim-Eom")               Lim_Eom();
+    if (Specs.Type == "3 Way Wilkinson Improved Isolation") Wilkinson3Way_ImprovedIsolation();
     /*if (Specs.Type == "Travelling Wave")       TravellingWave();
     if (Specs.Type == "Tree")                  Tree();*/
 }
