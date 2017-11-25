@@ -47,7 +47,8 @@ SOURCES += main.cpp \
     PowerCombining/Bagley.cpp \
     PowerCombining/Gysel.cpp \
     PowerCombining/Lim_Eom.cpp \
-    PowerCombining/Wilkinson3way_ImprovedIsolation.cpp
+    PowerCombining/Wilkinson3way_ImprovedIsolation.cpp \
+    PowerCombining/Recombinant3WayWilkinson.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 

@@ -24,15 +24,16 @@ QList<NodeInfo> PowerCombinerDesigner::getNodes()
 
 void PowerCombinerDesigner::synthesize()
 {
-    if (Specs.Type == "Wilkinson")             Wilkinson();
-    if (Specs.Type == "Multistage Wilkinson")  MultistageWilkinson();
-    if (Specs.Type == "T-junction")            TJunction();
-    if (Specs.Type == "Branchline")            Branchline();
-    if (Specs.Type == "Double box branchline") DoubleBoxBranchline();
-    if (Specs.Type == "Bagley")                Bagley();
-    if (Specs.Type == "Gysel")                 Gysel();
-    if (Specs.Type == "Lim-Eom")               Lim_Eom();
+    if (Specs.Type == "Wilkinson")                          Wilkinson();
+    if (Specs.Type == "Multistage Wilkinson")               MultistageWilkinson();
+    if (Specs.Type == "T-junction")                         TJunction();
+    if (Specs.Type == "Branchline")                         Branchline();
+    if (Specs.Type == "Double box branchline")              DoubleBoxBranchline();
+    if (Specs.Type == "Bagley")                             Bagley();
+    if (Specs.Type == "Gysel")                              Gysel();
+    if (Specs.Type == "Lim-Eom")                            Lim_Eom();
     if (Specs.Type == "3 Way Wilkinson Improved Isolation") Wilkinson3Way_ImprovedIsolation();
+    if (Specs.Type == "Recombinant 3 Way Wilkinson")        Recombinant3WayWilkinson();
     /*if (Specs.Type == "Travelling Wave")       TravellingWave();
     if (Specs.Type == "Tree")                  Tree();*/
 }

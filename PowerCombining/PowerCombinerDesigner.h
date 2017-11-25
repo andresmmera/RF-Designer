@@ -47,6 +47,7 @@ private:
     void Gysel();
     void Lim_Eom();
     void Wilkinson3Way_ImprovedIsolation();
+    void Recombinant3WayWilkinson();
     void TravellingWave();
     void Tree();
 
