@@ -77,6 +77,7 @@ void CanonicalFilter::synthesize()
 //Synthesis of lowpass filters
 void CanonicalFilter::SynthesizeLPF()
 {
+    WireInfo WI;
     //Synthesize CLC of LCL network
     int N = Specification.order;//Number of elements
     int posx = 0;
@@ -152,27 +153,17 @@ void CanonicalFilter::SynthesizeLPF()
 
             //Wires
             //***** Capacitor to node *****
-            struct WireInfo WI;
-            WI.OriginID = NI.ID;
-            WI.PortOrigin = 1;
-            WI.DestinationID = Cshunt.ID;
-            WI.PortDestination = 1;
+            WI.setParams(NI.ID, 0, Cshunt.ID, 1);
             Wires.append(WI);
 
             //***** GND to capacitor *****
-            WI.OriginID = Ground.ID;
-            WI.PortOrigin = 0;
-            WI.DestinationID = Cshunt.ID;
-            WI.PortDestination = 0;
+            WI.setParams(Ground.ID, 0, Cshunt.ID, 0);
             Wires.append(WI);
 
             //***** Capacitor to the previous Lseries *****
             if (!ConnectionAux.isEmpty())
             {
-                WI.OriginID = ConnectionAux;
-                WI.PortOrigin = 1;
-                WI.DestinationID = NI.ID;
-                WI.PortDestination = 1;
+                WI.setParams(ConnectionAux, 1, NI.ID, 1);
                 Wires.append(WI);
             }
 
@@ -196,11 +187,7 @@ void CanonicalFilter::SynthesizeLPF()
             QucsNetlist+=QString("L:L%1 N%2 N%3 L=\"%4 H\"\n").arg(NumberComponents[Inductor]).arg(Ni).arg(Ni+1).arg(gi[k+1]);
             Ni++;
             //Wiring
-            struct WireInfo WI;
-            WI.OriginID = ConnectionAux;//Node
-            WI.PortOrigin = 0;
-            WI.DestinationID = Lseries.ID;
-            WI.PortDestination = 0;
+            WI.setParams(ConnectionAux, 0, Lseries.ID, 0);
             Wires.append(WI);
             ConnectionAux = Lseries.ID;
 
@@ -225,11 +212,7 @@ void CanonicalFilter::SynthesizeLPF()
     //********************** Network description for simulation ****************************
     QucsNetlist += QString("Pac:P2 N%1 gnd Num=2 Z=\"%2 Ohm\" P=\"0 dBm\" f=\"1 GHz\"\n").arg(Ni).arg(k);
 
-    struct WireInfo WI;
-    WI.OriginID = ConnectionAux;//Node
-    WI.PortOrigin = 1;
-    WI.DestinationID = TermSpar.ID;
-    WI.PortDestination = 0;
+    WI.setParams(ConnectionAux, 1, TermSpar.ID, 0);
     Wires.append(WI);
 }
 
@@ -243,7 +226,7 @@ void CanonicalFilter::SynthesizeHPF()
     QString ConnectionAux = "";
     Components.clear();
 
-    NetworkInfo NWI;
+    WireInfo WI;
 
     //Add Term 1
     struct ComponentInfo TermSpar;
@@ -305,27 +288,17 @@ void CanonicalFilter::SynthesizeHPF()
 
             //Wires
             //***** Capacitor to node *****
-            struct WireInfo WI;
-            WI.OriginID = NI.ID;
-            WI.PortOrigin = 1;
-            WI.DestinationID = Lshunt.ID;
-            WI.PortDestination = 1;
+            WI.setParams(NI.ID, 1, Lshunt.ID, 1);
             Wires.append(WI);
 
             //***** GND to capacitor *****
-            WI.OriginID = Ground.ID;
-            WI.PortOrigin = 0;
-            WI.DestinationID = Lshunt.ID;
-            WI.PortDestination = 0;
+            WI.setParams(Ground.ID, 0, Lshunt.ID, 0);
             Wires.append(WI);
 
             //***** Capacitor to the previous Lseries *****
             if (!ConnectionAux.isEmpty())
             {
-                WI.OriginID = ConnectionAux;
-                WI.PortOrigin = 1;
-                WI.DestinationID = NI.ID;
-                WI.PortDestination = 1;
+                WI.setParams(ConnectionAux, 1, NI.ID, 1);
                 Wires.append(WI);
             }
 
@@ -350,11 +323,7 @@ void CanonicalFilter::SynthesizeHPF()
             Ni++;
 
             //Wiring
-            struct WireInfo WI;
-            WI.OriginID = ConnectionAux;//Node
-            WI.PortOrigin = 0;
-            WI.DestinationID = Cseries.ID;
-            WI.PortDestination = 0;
+            WI.setParams(ConnectionAux, 0, Cseries.ID, 0);
             Wires.append(WI);
             ConnectionAux = Cseries.ID;
         }
@@ -380,17 +349,14 @@ void CanonicalFilter::SynthesizeHPF()
     //***************************************************************************************
     QucsNetlist += QString("Pac:P2 N%1 gnd Num=2 Z=\"%2 Ohm\" P=\"0 dBm\" f=\"1 GHz\"\n").arg(Ni).arg(k);
 
-    struct WireInfo WI;
-    WI.OriginID = ConnectionAux;//Node
-    WI.PortOrigin = 1;
-    WI.DestinationID = TermSpar.ID;
-    WI.PortDestination = 0;
+    WI.setParams(ConnectionAux, 1, TermSpar.ID, 0);
     Wires.append(WI);
 }
 
 //Synthesis of bandpass filters
 void CanonicalFilter::SynthesizeBPF()
 {
+    WireInfo WI;
     //Synthesize CLC of LCL network
     int N = Specification.order;//Number of elements
     int posx = 0;
@@ -488,41 +454,25 @@ void CanonicalFilter::SynthesizeBPF()
 
             //Wires
             //***** Capacitor to node *****
-            struct WireInfo WI;
-            WI.OriginID = NI.ID;
-            WI.PortOrigin = 1;
-            WI.DestinationID = Cshunt.ID;
-            WI.PortDestination = 1;
+            WI.setParams(NI.ID, 1, Cshunt.ID, 1);
             Wires.append(WI);
 
             //***** Inductor to node *****
-            WI.OriginID = NI.ID;
-            WI.PortOrigin = 1;
-            WI.DestinationID = Lshunt.ID;
-            WI.PortDestination = 1;
+            WI.setParams(NI.ID, 1, Lshunt.ID, 1);
             Wires.append(WI);
 
             //***** GND to capacitor *****
-            WI.OriginID = Ground1.ID;
-            WI.PortOrigin = 0;
-            WI.DestinationID = Cshunt.ID;
-            WI.PortDestination = 0;
+            WI.setParams(Ground1.ID, 0, Cshunt.ID, 0);
             Wires.append(WI);
 
             //***** GND to inductor *****
-            WI.OriginID = Ground2.ID;
-            WI.PortOrigin = 0;
-            WI.DestinationID = Lshunt.ID;
-            WI.PortDestination = 0;
+            WI.setParams(Ground2.ID, 0, Lshunt.ID, 0);
             Wires.append(WI);
 
             //***** Capacitor to the previous Lseries *****
             if (!ConnectionAux.isEmpty())
             {
-                WI.OriginID = ConnectionAux;
-                WI.PortOrigin = 1;
-                WI.DestinationID = NI.ID;
-                WI.PortDestination = 1;
+                WI.setParams(ConnectionAux, 1,  NI.ID, 1);
                 Wires.append(WI);
             }
 
@@ -561,17 +511,10 @@ void CanonicalFilter::SynthesizeBPF()
             Ni+=2;
 
             //Wiring
-            struct WireInfo WI;
-            WI.OriginID = ConnectionAux;//Node
-            WI.PortOrigin = 0;
-            WI.DestinationID = Lseries.ID;
-            WI.PortDestination = 0;
+            WI.setParams(ConnectionAux, 0, Lseries.ID, 0);
             Wires.append(WI);
 
-            WI.OriginID = Lseries.ID;//Node
-            WI.PortOrigin = 1;
-            WI.DestinationID = Cseries.ID;
-            WI.PortDestination = 0;
+            WI.setParams(Lseries.ID, 1, Cseries.ID, 0);
             Wires.append(WI);
             ConnectionAux = Cseries.ID;
         }
@@ -597,11 +540,7 @@ void CanonicalFilter::SynthesizeBPF()
     //***************************************************************************************
     QucsNetlist += QString("Pac:P2 N%1 gnd Num=2 Z=\"%2 Ohm\" P=\"0 dBm\" f=\"1 GHz\"\n").arg(Ni).arg(k);
 
-    struct WireInfo WI;
-    WI.OriginID = ConnectionAux;//Node
-    WI.PortOrigin = 1;
-    WI.DestinationID = TermSpar.ID;
-    WI.PortDestination = 0;
+    WI.setParams(ConnectionAux, 1, TermSpar.ID, 0);
     Wires.append(WI);
 
 }
@@ -609,6 +548,7 @@ void CanonicalFilter::SynthesizeBPF()
 //Synthesis of bandstop filters
 void CanonicalFilter::SynthesizeBSF()
 {
+    WireInfo WI;
     //Synthesize CLC of LCL network
     int N = Specification.order;//Number of elements
     int posx = 0;
@@ -693,35 +633,22 @@ void CanonicalFilter::SynthesizeBSF()
 
             //Wires
             //***** Inductor to node *****
-            struct WireInfo WI;
-            WI.OriginID = NI.ID;
-            WI.PortOrigin = 1;
-            WI.DestinationID = Lshunt.ID;
-            WI.PortDestination = 1;
+            WI.setParams(NI.ID, 1, Lshunt.ID, 1);
             Wires.append(WI);
 
-            //***** Capacitor to indutcot *****
-            WI.OriginID = Lshunt.ID;
-            WI.PortOrigin = 0;
-            WI.DestinationID = Cshunt.ID;
-            WI.PortDestination = 1;
+            //***** Capacitor to inductor *****
+            WI.setParams(Lshunt.ID, 0, Cshunt.ID, 1);
             Wires.append(WI);
 
             //***** GND to capacitor *****
-            WI.OriginID = Ground1.ID;
-            WI.PortOrigin = 0;
-            WI.DestinationID = Cshunt.ID;
-            WI.PortDestination = 0;
+            WI.setParams(Ground1.ID, 0, Cshunt.ID, 0);
             Wires.append(WI);
 
 
             //***** Capacitor to the previous Lseries *****
             if (!ConnectionAux.isEmpty())
             {
-                WI.OriginID = ConnectionAux;
-                WI.PortOrigin = 1;
-                WI.DestinationID = NI.ID;
-                WI.PortDestination = 1;
+                WI.setParams(ConnectionAux, 1, NI.ID, 1);
                 Wires.append(WI);
             }
 
@@ -779,36 +706,20 @@ void CanonicalFilter::SynthesizeBSF()
 
 
             //Wiring
-            struct WireInfo WI;
             //Intermediate series inductance => Connect port 0 to the previous Cshunt and port 1 to the next Cshunt
-            WI.OriginID = ConnectionAux;//Node
-            WI.PortOrigin = 0;
-            WI.DestinationID = Node1.ID;
-            WI.PortDestination = 0;
+            WI.setParams(ConnectionAux, 0, Node1.ID, 0);
             Wires.append(WI);
 
-            WI.OriginID = Node1.ID;
-            WI.PortOrigin = 0;
-            WI.DestinationID = Lseries.ID;
-            WI.PortDestination = 0;
+            WI.setParams(Node1.ID, 0, Lseries.ID, 0);
             Wires.append(WI);
 
-            WI.OriginID = Node1.ID;
-            WI.PortOrigin = 0;
-            WI.DestinationID = Cseries.ID;
-            WI.PortDestination = 0;
+            WI.setParams(Node1.ID, 0, Cseries.ID, 0);
             Wires.append(WI);
 
-            WI.OriginID = Node2.ID;
-            WI.PortOrigin = 0;
-            WI.DestinationID = Lseries.ID;
-            WI.PortDestination = 1;
+            WI.setParams(Node2.ID, 0, Lseries.ID, 1);
             Wires.append(WI);
 
-            WI.OriginID = Node2.ID;
-            WI.PortOrigin = 0;
-            WI.DestinationID = Cseries.ID;
-            WI.PortDestination = 1;
+            WI.setParams(Node2.ID, 0, Cseries.ID, 1);
             Wires.append(WI);
             ConnectionAux = Node2.ID;
         }
@@ -836,11 +747,7 @@ void CanonicalFilter::SynthesizeBSF()
     ((Specification.order % 2 == 0) && (Specification.isCLC)) ? last_node = Ni : last_node = Ni-1;
     QucsNetlist += QString("Pac:P2 N%1 gnd Num=2 Z=\"%2 Ohm\" P=\"0 dBm\" f=\"1 GHz\"\n").arg(last_node).arg(k);
 
-    struct WireInfo WI;
-    WI.OriginID = ConnectionAux;//Node
-    WI.PortOrigin = 1;
-    WI.DestinationID = TermSpar.ID;
-    WI.PortDestination = 0;
+    WI.setParams(ConnectionAux, 1, TermSpar.ID, 0);
     Wires.append(WI);
 }
 

@@ -24,18 +24,27 @@ QList<NodeInfo> PowerCombinerDesigner::getNodes()
 
 void PowerCombinerDesigner::synthesize()
 {
-    if (Specs.Type == "Wilkinson")                          Wilkinson();
-    if (Specs.Type == "Multistage Wilkinson")               MultistageWilkinson();
-    if (Specs.Type == "T-junction")                         TJunction();
-    if (Specs.Type == "Branchline")                         Branchline();
-    if (Specs.Type == "Double box branchline")              DoubleBoxBranchline();
-    if (Specs.Type == "Bagley")                             Bagley();
-    if (Specs.Type == "Gysel")                              Gysel();
+    if (Specs.Type == "Wilkinson")                       return;//   Wilkinson();
+    if (Specs.Type == "Multistage Wilkinson")            return;//   MultistageWilkinson();
+    if (Specs.Type == "T-junction")                      return;//   TJunction();
+    if (Specs.Type == "Branchline")                      return;//   Branchline();
+    if (Specs.Type == "Double box branchline")           return;//   DoubleBoxBranchline();
+    if (Specs.Type == "Bagley")                          return;//   Bagley();
+    if (Specs.Type == "Gysel")                           return;//   Gysel();
     if (Specs.Type == "Lim-Eom")                            Lim_Eom();
     if (Specs.Type == "3 Way Wilkinson Improved Isolation") Wilkinson3Way_ImprovedIsolation();
     if (Specs.Type == "Recombinant 3 Way Wilkinson")        Recombinant3WayWilkinson();
     /*if (Specs.Type == "Travelling Wave")       TravellingWave();
     if (Specs.Type == "Tree")                  Tree();*/
+
+    //Build Qucs netlist
+    QucsNetlist.clear();
+    QString codestr;
+    for (int i = 0; i< Components.length(); i++)
+    {
+     codestr = Components[i].getQucs();
+     if (!codestr.isEmpty()) QucsNetlist += codestr;
+    }
 }
 
 

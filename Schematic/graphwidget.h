@@ -63,10 +63,10 @@ public:
 
     void itemMoved();
     void setComponents(QList<struct ComponentInfo>);
-    void ModifyComponent(ComponentInfo);
-    void setWires(QList<WireInfo>);
-    void setNodes(QList<NodeInfo>);
-    void setSchematic(SchematicInfo);
+    void ModifyComponent(struct ComponentInfo);
+    void setWires(QList<struct WireInfo>);
+    void setNodes(QList<struct NodeInfo>);
+    void setSchematic(struct SchematicInfo);
     void clear();
 
 public slots:

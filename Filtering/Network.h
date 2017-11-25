@@ -13,13 +13,12 @@
 
 #include <QDebug>
 #include <QtSql>
+#include "Schematic/component.h"
 
-enum ComponentType {Capacitor, Inductor, Term, GND, ConnectionNodes, Resistor, TransmissionLine};
-enum ComponentOrientation {vertical, horizontal};
 enum ResponseType {Butterworth, Chebyshev, Legendre, Elliptic, Blichinkoff, Bessel, LinearPhaseEqError, Gegenbauer};
 enum FilterClass {Lowpass, Highpass, Bandpass, Bandstop};
 enum Coupling {CapacitativeCoupledShuntResonators, InductiveCoupledSeriesResonators};
-enum Units{Capacitance, Inductance, Length, Resistance};
+
 
 static const double SPEED_OF_LIGHT = 299792458.0;//REMOVE THIS WHEN THIS TOOL BECOMES INTEGRATED IN QUCS
 
@@ -51,40 +50,14 @@ struct FilterSpecifications
 };
 
 
-
-struct ComponentInfo
-{
-    QString ID;
-    unsigned int parameter;
-    std::map<QString,QString> val;//freq, L1.L, C1.C,...
-    QString Net1, Net2;//ID of the nodes where the component is connected
-    ComponentOrientation Orientation;
-    std::vector<double> Coordinates;
-    ComponentType Type;
-};
-
-struct WireInfo
-{
-    QString OriginID;
-    QString DestinationID;
-    int PortOrigin;
-    int PortDestination;
-};
-
-struct NodeInfo
-{
-    QString ID;
-    std::vector<double> Coordinates;
-};
-
-
 struct NetworkInfo
 {
     std::vector<std::complex<double> > ZS;
     std::vector<std::complex<double> > ZL;
     QStringList topology;
-    QList<ComponentInfo> Ladder;//Contains the ID of the components and their properties
+    QList<struct ComponentInfo> Ladder;//Contains the ID of the components and their properties
 };
+
 
 struct SP_Analysis
 {
@@ -98,11 +71,12 @@ struct SchematicInfo
 {
     struct SP_Analysis SPAR_Settings;
     QString netlist;
-    QList<ComponentInfo> Comps;
-    QList<WireInfo> Wires;
-    QList<NodeInfo> Nodes;
+    QList<struct ComponentInfo> Comps;
+    QList<struct WireInfo> Wires;
+    QList<struct NodeInfo> Nodes;
     QMap <QString, QPen>displayGraphs;
 };
+
 
 struct PowerCombinerParams
 {

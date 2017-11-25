@@ -293,7 +293,6 @@ void Component::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     CI.Orientation = this->Orientation;
     CI.Type=this->CompType;
     CI.val=this->Value;
-    CI.parameter=0;//By default it tunes the 1st tunable parameter of the component. Later I'll see how to handle more than one params
     emit DoubleClicked(CI);
     QGraphicsItem::mouseDoubleClickEvent(event);
 }

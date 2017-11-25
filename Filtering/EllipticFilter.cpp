@@ -387,6 +387,7 @@ void EllipticFilter::SynthesizeLPF()
 
 void EllipticFilter::SynthesizeLPF_TypeS_MinL()
 {
+    WireInfo WI;
     //Impedance and frequency scaling
     double RS = Specification.ZS;
     double fc = Specification.fc;
@@ -401,7 +402,6 @@ void EllipticFilter::SynthesizeLPF_TypeS_MinL()
 
     //Synthesize CLC of LCL network
     int posx = 0;//Index used for painting. It indicates the current x position
-    struct WireInfo WI;
     QStringList ConnectionAux;
     Components.clear();
 

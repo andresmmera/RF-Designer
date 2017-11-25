@@ -5,7 +5,7 @@
 #include "Filtering/LowpassPrototypeCoeffs.h"
 #include <QPen>
 #include "general.h"
-
+#include "Schematic/component.h"
 class CanonicalFilter : public Network
 {
 public:
