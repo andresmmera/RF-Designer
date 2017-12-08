@@ -32,6 +32,16 @@ public:
         Coordinates[0] = x;
         Coordinates[1] = y;
     };
+    void setParams(QString ID_, ComponentType Type_,
+                   ComponentOrientation Orientation_,
+                   double x, double y,    //Coordinates
+                   QString N1, QString N2 //Nodes
+                   )
+    {
+       ID = ID_; Type = Type_; Orientation = Orientation_;
+       Coordinates[0] = x; Coordinates[1] = y;
+       Net1 = N1; Net2 = N2;
+    };
     QString getQucs(){
         QString code;
         switch (Type)
@@ -103,6 +113,11 @@ public:
         Coordinates[0] = x;
         Coordinates[1] = y;
         };
+    void setParams(QString ID_, double x, double y)
+    {
+       ID = ID_;
+       Coordinates[0] = x; Coordinates[1] = y;
+    };
     QString ID;
     std::vector<double> Coordinates;
 };
