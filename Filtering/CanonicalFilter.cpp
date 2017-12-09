@@ -48,10 +48,22 @@ void CanonicalFilter::synthesize()
     LowpassPrototypeCoeffs LP_coeffs(Specification);
     gi = LP_coeffs.getCoefficients();
 
-    if (Specification.FilterResponse == Chebyshev && !Specification.UseZverevTables)
+   if ((Specification.FilterResponse == Chebyshev) && (!Specification.UseZverevTables))
     {//Correct cutoff according to the ripple
         double epsilon = sqrt(pow(10.0, Specification.Ripple/10.0) - 1.0);
-        Specification.fc /= cosh(acosh(1.0 / epsilon) / Specification.order);
+
+        switch (Specification.FilterType)
+        {
+         case Lowpass:
+            Specification.fc /= cosh(acosh(1.0 / epsilon) / Specification.order);
+            break;
+         case Highpass:
+            Specification.fc *= cosh(acosh(1.0 / epsilon) / Specification.order);
+            break;
+        case Bandpass:
+        case Bandstop:
+            break;
+        }
     }
 
     //Ideally, the user should be the one which controls the style of the traces as well the traces to be shown
@@ -389,7 +401,7 @@ void CanonicalFilter::SynthesizeBPF()
 //Synthesis of bandstop filters
 void CanonicalFilter::SynthesizeBSF()
 {
-    ComponentInfo Cshunt, Lshunt, Ground1, Ground2;
+    ComponentInfo Cshunt, Lshunt, Ground1, Lseries, Cseries;
     WireInfo WI;
     NodeInfo NI, Node1, Node2;
     //Synthesize CLC of LCL network
@@ -428,7 +440,7 @@ void CanonicalFilter::SynthesizeBSF()
 
             //Shunt inductor
             Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, vertical, posx, 50,
-                             QString().arg("N%1").argNi(), QString("N%1").arg(Ni+1));
+                             QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
             Lshunt.val["L"] = num2str(Specification.ZS/(delta*gi[k+1]), Inductance);
             Components.append(Lshunt);
             Ni++;
@@ -469,41 +481,21 @@ void CanonicalFilter::SynthesizeBSF()
             posx+= 50;
 
             //Series inductor
-            struct ComponentInfo Lseries;
-            Lseries.ID=QString("L%1").arg(++NumberComponents[Inductor]);
-            Lseries.Type = Inductor;
-            Lseries.Orientation = horizontal;
-            Lseries.parameter = 0;
-            Lseries.val.clear();
+            Lseries.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, horizontal, posx, 30,
+                              QString("N%1").arg(Ni-1), QString("N%1").arg(Ni+1));
             Lseries.val["L"] = num2str(gi[k+1]*Specification.ZS*delta/(w0*w0), Inductance);
-            Lseries.Coordinates.clear();
-            Lseries.Coordinates.push_back(posx);
-            Lseries.Coordinates.push_back(30);
             Components.append(Lseries);
 
             //Series capacitor
-            struct ComponentInfo Cseries;
-            Cseries.ID=QString("C%1").arg(++NumberComponents[Capacitor]);
-            Cseries.Type = Capacitor;
-            Cseries.Orientation = horizontal;
-            Cseries.parameter = 0;
-            Cseries.val.clear();
+            Cseries.setParams(QString("C%1").arg(++NumberComponents[Capacitor]),  Capacitor, horizontal, posx, -30,
+                              QString("N%1").arg(Ni-1), QString("N%1").arg(Ni+1));
             Cseries.val["C"] = num2str(1/(gi[k+1]*delta*Specification.ZS), Capacitance);
-            Cseries.Coordinates.clear();
-            Cseries.Coordinates.push_back(posx);
-            Cseries.Coordinates.push_back(-30);
             Components.append(Cseries);
-            QucsNetlist+=QString("C:C%1 N%2 N%3 C=\"%4 F\"\n").arg(NumberComponents[Capacitor]).arg(Ni-1).arg(Ni+1).arg(Cseries.val["C"]);
-            QucsNetlist+=QString("L:L%1 N%2 N%3 L=\"%4 H\"\n").arg(NumberComponents[Inductor]).arg(Ni-1).arg(Ni+1).arg(Lseries.val["L"]);
             Ni++;
 
             //Node
             posx+= 50;
-            NodeInfo Node2;
-            Node2.ID = QString("N%1").arg(++NumberComponents[ConnectionNodes]);
-            Node2.Coordinates.clear();
-            Node2.Coordinates.push_back(posx);
-            Node2.Coordinates.push_back(0);
+            Node2.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), posx, 0);
             Nodes.append(Node2);
 
 
@@ -530,26 +522,14 @@ void CanonicalFilter::SynthesizeBSF()
     //Add Term 2
     double k=Specification.ZL;
     Specification.isCLC ? k /=gi[N+1] : k *=gi[N+1];
-    TermSpar.ID=QString("T%1").arg(++NumberComponents[Term]);
-    TermSpar.Type = Term;
-    TermSpar.Orientation = horizontal;
-    TermSpar.parameter = 0;
-    TermSpar.val.clear();
-    TermSpar.val["Z"] = num2str(k, Resistance);
-    TermSpar.Coordinates.clear();
-    TermSpar.Coordinates.push_back(posx);
-    TermSpar.Coordinates.push_back(0);
-    Components.append(TermSpar);
 
-    //********************** Network description for simulation ****************************
-    k=Specification.ZL;
-    Specification.isCLC ? k /=gi[N+1] : k *=gi[N+1];
-    //***************************************************************************************
     int last_node;
     ((Specification.order % 2 == 0) && (Specification.isCLC)) ? last_node = Ni : last_node = Ni-1;
-    QucsNetlist += QString("Pac:P2 N%1 gnd Num=2 Z=\"%2 Ohm\" P=\"0 dBm\" f=\"1 GHz\"\n").arg(last_node).arg(k);
+    ComponentInfo TermSpar2(QString("T%1").arg(++NumberComponents[Term]), Term, horizontal, posx, 0, QString("N%1").arg(last_node), "gnd");
+    TermSpar2.val["Z"] = num2str(k, Resistance);
+    Components.append(TermSpar2);
 
-    WI.setParams(ConnectionAux, 1, TermSpar.ID, 0);
+    WI.setParams(ConnectionAux, 1, TermSpar2.ID, 0);
     Wires.append(WI);
 }
 
