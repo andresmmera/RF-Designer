@@ -26,6 +26,10 @@
 //Tools
 #include "UI/FilterDesignTool.h"
 #include "UI/PowerCombiningTool.h"
+#include "UI/InterceptPointsTool.h"
+
+//Math operations
+#include "SPAR/MathOperations.h"
 
 struct ToolSettings
 {
@@ -58,7 +62,10 @@ private slots://Functions to launch the actions
     QMap<QString, vector<complex<double> > > loadQucsDataSet(QString);
     void ShowSmithChart();
     void ReceiveNetworkFromDesignTools(struct SchematicInfo);//Simulates the network after changing the design goals
+    void receiveInterceptDiagramData(struct InterceptPointsData);
     void simulate();//Rerun simulation when the user does some action over the display
+    void SimulateSPAR();
+    void SimulateInterceptDiagram();
     void SwitchTabs(int);//Whenever the tool tab is changed, this slot forces a new design without the need of modify a design parameter
 
 private://Actions
@@ -75,6 +82,7 @@ private://Actions
     QCustomPlot *PlotWidget;
     FilterDesignTool *Filter_Tool;//Widget for filter design
     PowerCombiningTool *PowerCombining_Tool;//Widget for power combiner design
+    InterceptPointsTool *IP_Tool;
 
     SmithChart * Smith_plot;
 
@@ -82,12 +90,15 @@ private://Actions
     SP_Analysis SPAR_Settings;
     NetworkInfo NWI;//Synthesized network
     SchematicInfo SchInfo;
+    InterceptPointsData IP_data;
 
     // ************************ TOOL SETTINGS *************************
     ToolSettings Tool_Settings;
 
     // ************************ UPDATE GRAPH ***************************
     void updateGraph(vector<double>, QMap<QString, vector<complex<double> > >);
+    void updateGraph(vector<double>, QMap<QString, vector<double> >, QMap<QString, QPen>, QString, QString );
+    void plotPoints(QString, QMap<QString, QPointF>);
 
 
 };

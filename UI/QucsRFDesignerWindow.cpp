@@ -21,11 +21,12 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
     //*********** Impedance Matching tab *********************
     QWidget *MatchingWidget = new QWidget();
     PowerCombining_Tool = new PowerCombiningTool();
-
+    IP_Tool = new InterceptPointsTool();
 
     TabWidget->addTab(Filter_Tool, "Filter design");
     TabWidget->addTab(MatchingWidget, "Matching");
     TabWidget->addTab(PowerCombining_Tool, "Power Combining");
+    TabWidget->addTab(IP_Tool, "Intercept Points");
     TabWidget->setMinimumSize(300, 200);
     //*********************************** End of the setup panel
 
@@ -102,6 +103,7 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
     connect(TabWidget, SIGNAL(currentChanged(int)), this, SLOT(SwitchTabs(int)));
     connect(Filter_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)), this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
     connect(PowerCombining_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)), this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
+    connect(IP_Tool, SIGNAL(simulateDiagram(InterceptPointsData)), this, SLOT(receiveInterceptDiagramData(InterceptPointsData)));
 
     connect(PlotWidget, SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(simulate()));
     connect(PlotWidget, SIGNAL(mouseRelease(QMouseEvent*)), this, SLOT(simulate()));
@@ -200,10 +202,6 @@ void QucsRFDesignerWindow::updateGraph(vector<double> freq_, QMap<QString, vecto
         QVector<double> trace = QVector<double>::fromStdVector(aux);
         PlotWidget->addGraph();
         QString title = MapIT.key();
-        title.remove('[');
-        title.remove(']');
-        title.remove(',');
-        title.append(QString(" (dB)"));
         PlotWidget->graph()->setName(title);
         PlotWidget->graph()->setPen(MapIT.value());
         PlotWidget->graph()->setData(freq, trace);
@@ -231,6 +229,76 @@ void QucsRFDesignerWindow::updateGraph(vector<double> freq_, QMap<QString, vecto
 
 
 }
+
+
+void QucsRFDesignerWindow::updateGraph(vector<double> Pin_, QMap<QString, vector<double> > data, QMap<QString, QPen>TraceProperties,
+                                       QString xlabel, QString ylabel)
+{
+    PlotWidget->clearGraphs();
+
+    QVector<double> Pin = QVector<double>::fromStdVector(Pin_);//Get frequency axis
+    QMapIterator<QString, vector<double> > MapIT(data);
+
+    while (MapIT.hasNext())
+    {
+        MapIT.next();
+        QVector<double> trace = QVector<double>::fromStdVector(data[MapIT.key()]);
+        PlotWidget->addGraph();
+        QString title = MapIT.key();
+        title.append(QString(" (dBm)"));
+        PlotWidget->graph()->setName(title);
+        PlotWidget->graph()->setPen(TraceProperties[MapIT.key()]);
+        PlotWidget->graph()->setData(Pin, trace);
+    }
+
+    //X axis step
+    QSharedPointer<QCPAxisTickerFixed> fixedTickerX(new QCPAxisTickerFixed);
+    fixedTickerX->setTickStep(5);
+    PlotWidget->xAxis->setTicker(fixedTickerX);
+    PlotWidget->xAxis->setLabel(xlabel);
+    //Y axis step
+    QSharedPointer<QCPAxisTickerFixed> fixedTickerY(new QCPAxisTickerFixed);
+    fixedTickerY->setTickStep(5);
+    PlotWidget->yAxis->setTicker(fixedTickerY);
+    PlotWidget->yAxis->setLabel(ylabel);
+
+    PlotWidget->replot();
+
+}
+
+
+void QucsRFDesignerWindow::plotPoints(QString DiagramID, QMap<QString, QPointF> InterceptPoints)
+{
+    QMapIterator<QString, QPointF > MapIT(InterceptPoints);
+    QVector<QCPItemText *> Label;
+    int i = 0;
+    while (MapIT.hasNext())
+    {
+       MapIT.next();
+       PlotWidget->addGraph();
+       QVector<double> x(1);
+       QVector<double> y(1);
+       x[0] = InterceptPoints[MapIT.key()].x();
+       y[0] = InterceptPoints[MapIT.key()].y();
+       PlotWidget->graph()->setData(x, y);
+       PlotWidget->graph()->setPen(QColor(0, 0, 0));
+       PlotWidget->graph()->setLineStyle(QCPGraph::lsNone);
+       PlotWidget->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 10));
+       PlotWidget->graph()->setName(MapIT.key());
+
+       //Plot label
+     /*  Label.append(new QCPItemText(PlotWidget));
+       Label[i]->setText(MapIT.key());
+       Label[i]->setFont(QFont(font().family(), 10));
+       Label[i]->position->setCoords(x[0]+1, y[0]-1); // lower right corner of axis rect
+       i++;*/
+    }
+    PlotWidget->replot();
+
+   /* for (int i = 0; i < Label.size(); i++)
+    delete Label[i];*/
+}
+
 
 //This function loads the Qucs dataset and converts it into a QMap structure
 QMap<QString, vector<complex<double> > > QucsRFDesignerWindow::loadQucsDataSet(QString dataset_path)
@@ -292,8 +360,20 @@ void QucsRFDesignerWindow::ReceiveNetworkFromDesignTools(struct SchematicInfo SI
     simulate();
 }
 
-
 void QucsRFDesignerWindow::simulate()
+{
+    switch(TabWidget->currentIndex())
+    {
+        case 3://Intercept point simulation
+          SimulateInterceptDiagram();
+          break;
+        default:
+          SimulateSPAR();
+    }
+}
+
+
+void QucsRFDesignerWindow::SimulateSPAR()
 {
     QCPRange xAxisRange = PlotWidget->xAxis->range();
     SPAR_Settings.fstart =xAxisRange.lower*1e6;
@@ -326,6 +406,66 @@ void QucsRFDesignerWindow::simulate()
     updateGraph(real(freq), data);
 }
 
+void QucsRFDesignerWindow::receiveInterceptDiagramData(InterceptPointsData IP_info)
+{
+    IP_data = IP_info;
+    simulate();
+}
+
+void QucsRFDesignerWindow::SimulateInterceptDiagram()
+{
+    QCPRange PinRange = PlotWidget->xAxis->range();
+    QCPRange PoutRange = PlotWidget->yAxis->range();
+    QMap<QString, QPen> TraceProperties;//Trace properties
+
+    //Legend position
+    PlotWidget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignLeft|Qt::AlignTop);
+
+    if ((PinRange.upper > 100))
+    {
+        PlotWidget->xAxis->setRange(IP_data.IP3-IP_data.Gain-40, IP_data.IP3-IP_data.Gain+20);
+        PinRange = PlotWidget->xAxis->range();
+    }
+
+    if ((PoutRange.upper < IP_data.IP3) || (PoutRange.lower > IP_data.IP3))
+    {
+        PlotWidget->yAxis->setRange(IP_data.IP3-40, IP_data.IP3+20);
+    }
+    int npoints = PinRange.upper - PinRange.lower;//1dB/step
+    vector<double> Pin(npoints), Pout(npoints), IM3(npoints), IM2(npoints);
+
+    //Input power
+    Pin[0] = PinRange.lower;
+    for (int i = 1; i < npoints; i++) Pin[i] = Pin[i-1] + 1;
+
+    //Fundamental
+    Pout = IP_data.Gain+Pin;
+    QMap<QString, vector<double> > data;
+    data["Fundamental"] = Pout;
+    TraceProperties["Fundamental"] = QPen(Qt::blue, 3);
+
+
+    //IM3
+    IM3 = - 2*IP_data.IP3 + 3*IP_data.Gain + 3*Pin;
+    data["IM3"] = IM3;
+    TraceProperties["IM3"] = QPen (Qt::red, 3);
+
+    //IM2
+    IM2 = - IP_data.IP2 + 2*IP_data.Gain+ 2*Pin;
+    data["IM2"] = IM2;
+    TraceProperties["IM2"] = QPen (Qt::green, 3);
+
+    QString ylabel("Pout (dBm)");
+    QString xlabel("Pin (dBm)");
+
+    updateGraph(Pin, data, TraceProperties, xlabel, ylabel);
+
+    //Plot IP3 and IP2
+    QMap<QString, QPointF > InterceptPoints;
+    InterceptPoints["IP3"] = QPointF(IP_data.IP3 - IP_data.Gain, IP_data.IP3);
+    InterceptPoints["IP2"] = QPointF(IP_data.IP2 - IP_data.Gain, IP_data.IP2);
+    plotPoints("Display1", InterceptPoints);
+}
 
 void QucsRFDesignerWindow::SwitchTabs(int tabindex)
 {
@@ -339,5 +479,8 @@ void QucsRFDesignerWindow::SwitchTabs(int tabindex)
      case 2://Power combining
        PowerCombining_Tool->design();
        break;
+     case 3://Intercept points tool
+        IP_Tool->CalculateInterceptPoints();
+      break;
    }
 }

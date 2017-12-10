@@ -6,6 +6,14 @@
 #include "Schematic/component.h"
 enum Units{Capacitance, Inductance, Length, Resistance};
 
+
+struct InterceptPointsData
+{
+    double IP3;
+    double IP2;
+    double Gain;
+};
+
 QString RoundVariablePrecision(double);
 QString num2str(double, Units);
 
