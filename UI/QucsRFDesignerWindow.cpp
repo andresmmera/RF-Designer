@@ -530,6 +530,7 @@ void QucsRFDesignerWindow::SimulateInterceptDiagram()
     fixedTickerY->setTickStep(5);
     DisplayWindow[1]->yAxis->setTicker(fixedTickerY);
     DisplayWindow[1]->yAxis->setLabel(ylabel);
+    DisplayWindow[1]->xAxis->setLabel("freq (MHz)");
 
     plotPoints(1, SpectrumTones, "Arrow");
 }
