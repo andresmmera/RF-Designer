@@ -79,12 +79,15 @@ private://Actions
     QString netlist;
     // ************************* Widgets *******************************
     GraphWidget *SchematicWidget;
-    QCustomPlot *PlotWidget;
+    QVector<QCustomPlot*> DisplayWindow;
     FilterDesignTool *Filter_Tool;//Widget for filter design
     PowerCombiningTool *PowerCombining_Tool;//Widget for power combiner design
     InterceptPointsTool *IP_Tool;
 
     SmithChart * Smith_plot;
+
+    // ************************** Docks ********************************
+    QDockWidget *dock_Schematic, *dock_Setup, *dock_DisplayWindow1, *dock_DisplayWindow2;
 
     // ************************ SIMULATION SETTINGS ********************
     SP_Analysis SPAR_Settings;
@@ -96,9 +99,9 @@ private://Actions
     ToolSettings Tool_Settings;
 
     // ************************ UPDATE GRAPH ***************************
-    void updateGraph(vector<double>, QMap<QString, vector<complex<double> > >);
-    void updateGraph(vector<double>, QMap<QString, vector<double> >, QMap<QString, QPen>, QString, QString );
-    void plotPoints(QString, QMap<QString, QPointF>);
+    void updateGraph(int, vector<double>, QMap<QString, vector<complex<double> > >);
+    void updateGraph(int, vector<double>, QMap<QString, vector<double> >, QMap<QString, QPen>, QString, QString );
+    void plotPoints(int, QMap<QString, QPointF>, QString);
 
 
 };

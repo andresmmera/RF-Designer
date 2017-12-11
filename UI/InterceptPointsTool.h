@@ -16,6 +16,7 @@ public:
 private:
 
     QDoubleSpinBox *FundamentalPowerSpinbox, *GainSpinbox, *IM3PowerSpinbox, *IM2PowerSpinbox;
+    QDoubleSpinBox *CenterFreqSpinbox, *deltaSpinBox;
     QDoubleSpinBox *OIP3Spinbox, *OIP2Spinbox;
     QLineEdit *IIP3LineEdit, *IIP2LineEdit;
     QCheckBox *CalculateInterceptPointsCheckbox;
