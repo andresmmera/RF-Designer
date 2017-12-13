@@ -5,8 +5,11 @@
 QString RoundVariablePrecision(double val)
 {
   int precision = 0;//By default, it takes 2 decimal places
+  int sign = 1;
+  if (val < 0) sign = -1;
+  val = abs(val);
   while (val*pow(10, precision) < 100) precision++;//Adds another decimal place if the conversion is less than 0.1, 0.01, etc
-  return QString::number(val, 'F', precision);// Round to 'precision' decimals.
+  return QString::number(sign*val, 'F', precision);// Round to 'precision' decimals.
 }
 
 

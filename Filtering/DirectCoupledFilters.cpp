@@ -34,6 +34,15 @@ void DirectCoupledFilters::synthesize()
   if (Specification.DC_Coupling == CapacitativeCoupledShuntResonators) Synthesize_Capacitative_Coupled_Shunt_Resonators();
   if (Specification.DC_Coupling == InductiveCoupledSeriesResonators) Synthesize_Inductive_Coupled_Series_Resonators();
 
+  //Build Qucs netlist
+  QucsNetlist.clear();
+  QString codestr;
+  for (int i = 0; i< Components.length(); i++)
+  {
+   codestr = Components[i].getQucs();
+   if (!codestr.isEmpty()) QucsNetlist += codestr;
+  }
+
   //Ideally, the user should be the one which controls the style of the traces as well the traces to be shown
   //However, in favour of a simpler implementation, it'll be the design code responsible for this... by the moment...
   displaygraphs.clear();
@@ -47,6 +56,10 @@ void DirectCoupledFilters::synthesize()
 
 void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators()
 {
+    WireInfo WI;
+    ComponentInfo Cseries, Lshunt, Ground, Cshunt;
+    NodeInfo NI;
+
     int N = Specification.order;
     std::deque<double> L(N), Cp(N);
     double r = gi[N+1];
@@ -107,45 +120,23 @@ void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators()
     QString ConnectionAux = "";
     Components.clear();
     double k=Specification.ZS;
-    struct ComponentInfo TermSpar;
-    TermSpar.ID=QString("T%1").arg(++NumberComponents[Term]);
-    TermSpar.Type = Term;
-    TermSpar.Orientation = vertical;
-    TermSpar.parameter = 0;
-    TermSpar.val.clear();
-    TermSpar.val["Z"] = num2str(k, Resistance);
-    TermSpar.Coordinates.clear();
-    TermSpar.Coordinates.push_back(posx);
-    TermSpar.Coordinates.push_back(0);
-    Components.append(TermSpar);
-    ConnectionAux = TermSpar.ID;
-    QucsNetlist.clear();
-    QucsNetlist = QString("Pac:P1 N0 gnd Num=1 Z=\"%1 Ohm\" P=\"0 dBm\" f=\"1 GHz\"\n").arg(k);
+
+    ComponentInfo TermSpar1(QString("T%1").arg(++NumberComponents[Term]), Term, vertical, posx, 0, "N0", "gnd");
+    TermSpar1.val["Z"] = num2str(k, Resistance);
+    Components.append(TermSpar1);
 
     posx += 50;
     //Series capacitor
-    struct ComponentInfo Cseries;
-    Cseries.ID=QString("C%1").arg(++NumberComponents[Capacitor]);
-    Cseries.Type = Capacitor;
-    Cseries.Orientation = horizontal;
-    Cseries.parameter = 0;
-    Cseries.val.clear();
+    Cseries.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, horizontal, posx, 0,
+                      "N0", "N1");
     Cseries.val["C"] = num2str(Cs[0], Capacitance);
-    Cseries.Coordinates.clear();
-    Cseries.Coordinates.push_back(posx);
-    Cseries.Coordinates.push_back(0);
     Components.append(Cseries);
-    QucsNetlist+=QString("C:C%1 N0 N1 C=\"%2 F\"\n").arg(NumberComponents[Capacitor]).arg(Cseries.val["C"]);
     Ni++;
 
 
     //Wires
     //***** Port to capacitor *****
-    struct WireInfo WI;
-    WI.OriginID = TermSpar.ID;
-    WI.PortOrigin = 1;
-    WI.DestinationID = Cseries.ID;
-    WI.PortDestination = 0;
+    WI.setParams(TermSpar1.ID, 0, Cseries.ID, 0);
     Wires.append(WI);
 
     for (int k=0; k<N; k++)
@@ -153,142 +144,68 @@ void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators()
         posx += 50;
        //Shunt resonator
         //Shunt inductor
-        struct ComponentInfo Lshunt;
-        Lshunt.ID=QString("L%1").arg(++NumberComponents[Inductor]);
-        Lshunt.Type = Inductor;
-        Lshunt.Orientation = vertical;
-        Lshunt.parameter = 0;
-        Lshunt.val.clear();
-        Lshunt.val["L"] = num2str(L[k], Capacitance);
-        Lshunt.Coordinates.clear();
-        Lshunt.Coordinates.push_back(posx);
-        Lshunt.Coordinates.push_back(50);
+        Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, vertical, posx, 50, QString("N%1").arg(Ni), "gnd");
+        Lshunt.val["L"] = num2str(L[k], Inductance);
         Components.append(Lshunt);
-        QucsNetlist+=QString("L:L%1 N%2 gnd L=\"%3 H\"\n").arg(NumberComponents[Inductor]).arg(Ni).arg(Lshunt.val["L"]);
-
 
         //GND
-        struct ComponentInfo Ground;
-        Ground.ID=QString("GND%1").arg(++NumberComponents[GND]);
-        Ground.Type = GND;
-        Ground.Orientation = vertical;
-        Ground.parameter = 0;
-        Ground.Coordinates.clear();
-        Ground.Coordinates.push_back(posx);
-        Ground.Coordinates.push_back(100);
-        Ground.val.clear();
+        Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical, posx, 100, "", "");
         Components.append(Ground);
 
-
-        WI.OriginID = Lshunt.ID;
-        WI.PortOrigin = 0;
-        WI.DestinationID = Ground.ID;
-        WI.PortDestination = 0;
+        WI.setParams(Lshunt.ID, 0, Ground.ID, 0);
         Wires.append(WI);
 
-
-
         posx+=25;
+
         //Node
-        NodeInfo NI;
-        NI.ID = QString("N%1").arg(++NumberComponents[ConnectionNodes]);
-        NI.Coordinates.clear();
-        NI.Coordinates.push_back(posx);
-        NI.Coordinates.push_back(0);
+        NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), posx, 0);
         Nodes.append(NI);
 
         //Node to the previous series capacitor
-        WI.OriginID = NI.ID;
-        WI.PortOrigin = 1;
-        WI.DestinationID = Cseries.ID;
-        WI.PortDestination = 1;
+        WI.setParams(NI.ID, 0, Cseries.ID, 1);
         Wires.append(WI);
 
         posx += 25;
         //Shunt capacitor
-        struct ComponentInfo Cshunt;
-        Cshunt.ID=QString("C%1").arg(++NumberComponents[Capacitor]);
-        Cshunt.Type = Capacitor;
-        Cshunt.Orientation = vertical;
-        Cshunt.parameter = 0;
-        Cshunt.val.clear();
+        Cshunt.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, vertical, posx, 50,
+                         QString("N%1").arg(Ni), "gnd");
         Cshunt.val["C"] = num2str(Cp[k], Capacitance);
-        Cshunt.Coordinates.clear();
-        Cshunt.Coordinates.push_back(posx);
-        Cshunt.Coordinates.push_back(50);
         Components.append(Cshunt);
-        QucsNetlist+=QString("C:C%1 N%2 gnd C=\"%3 F\"\n").arg(NumberComponents[Capacitor]).arg(Ni).arg(Cshunt.val["C"]);
 
         //GND
-        Ground.ID=QString("GND%1").arg(++NumberComponents[GND]);
-        Ground.Type = GND;
-        Ground.Orientation = vertical;
-        Ground.parameter = 0;
-        Ground.Coordinates.clear();
-        Ground.Coordinates.push_back(posx);
-        Ground.Coordinates.push_back(100);
-        Ground.val.clear();
+        Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical, posx, 100, "", "");
         Components.append(Ground);
 
         posx += 50;
         //Series capacitor
-        Cseries.ID=QString("C%1").arg(++NumberComponents[Capacitor]);
-        Cseries.Type = Capacitor;
-        Cseries.Orientation = horizontal;
-        Cseries.parameter = 0;
-        Cseries.val.clear();
+        Cseries.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, horizontal, posx, 0,
+                          QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
         Cseries.val["C"] = num2str(Cs[k+1], Capacitance);
-        Cseries.Coordinates.clear();
-        Cseries.Coordinates.push_back(posx);
-        Cseries.Coordinates.push_back(0);
         Components.append(Cseries);
-        QucsNetlist+=QString("C:C%1 N%2 N%3 C=\"%4 F\"\n").arg(NumberComponents[Capacitor]).arg(Ni).arg(Ni+1).arg(Cseries.val["C"]);
         Ni++;
 
-        WI.OriginID = NI.ID;
-        WI.PortOrigin = 1;
-        WI.DestinationID = Lshunt.ID;
-        WI.PortDestination = 1;
+        WI.setParams(NI.ID, 0, Lshunt.ID, 1);
         Wires.append(WI);
 
-        WI.OriginID = NI.ID;
-        WI.PortOrigin = 1;
-        WI.DestinationID = Cshunt.ID;
-        WI.PortDestination = 1;
+        WI.setParams(NI.ID, 0, Cshunt.ID, 1);
         Wires.append(WI);
 
-        WI.OriginID = NI.ID;
-        WI.PortOrigin = 1;
-        WI.DestinationID = Cseries.ID;
-        WI.PortDestination = 0;
+        WI.setParams(NI.ID, 0, Cseries.ID, 0);
         Wires.append(WI);
 
-        WI.OriginID = Cshunt.ID;
-        WI.PortOrigin = 0;
-        WI.DestinationID = Ground.ID;
-        WI.PortDestination = 0;
+        WI.setParams(Cshunt.ID, 0, Ground.ID, 0);
         Wires.append(WI);
     }
 
     posx += 50;
-    TermSpar.ID=QString("T%1").arg(++NumberComponents[Term]);
-    TermSpar.Type = Term;
-    TermSpar.Orientation = horizontal;
-    TermSpar.parameter = 0;
-    TermSpar.val.clear();
-    TermSpar.val["Z"] = num2str(Specification.ZL, Resistance);
-    TermSpar.Coordinates.clear();
-    TermSpar.Coordinates.push_back(posx);
-    TermSpar.Coordinates.push_back(0);
-    Components.append(TermSpar);
-    ConnectionAux = TermSpar.ID;
-    QucsNetlist += QString("Pac:P2 N%1 gnd Num=2 Z=\"%2 Ohm\" P=\"0 dBm\" f=\"1 GHz\"\n").arg(Ni).arg(TermSpar.val["Z"]);
 
+    ComponentInfo TermSpar2(QString("T%1").arg(++NumberComponents[Term]), Term, horizontal, posx, 0,
+                            QString("N%1").arg(Ni), "gnd");
+    TermSpar2.val["Z"] = num2str(Specification.ZL, Resistance);
+    Components.append(TermSpar2);
+    ConnectionAux = TermSpar2.ID;
 
-    WI.OriginID = Cseries.ID;
-    WI.PortOrigin = 1;
-    WI.DestinationID = TermSpar.ID;
-    WI.PortDestination = 0;
+    WI.setParams(Cseries.ID, 1, TermSpar2.ID, 0);
     Wires.append(WI);
 }
 
@@ -362,94 +279,50 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators()
     QString ConnectionAux = "";
     Components.clear();
     double k=Specification.ZS;
-    struct ComponentInfo TermSpar, Lseries, Lshunt, Cseries, Ground;;
-    TermSpar.ID=QString("T%1").arg(++NumberComponents[Term]);
-    TermSpar.Type = Term;
-    TermSpar.Orientation = vertical;
-    TermSpar.parameter = 0;
-    TermSpar.val.clear();
-    TermSpar.val["Z"] = num2str(k, Resistance);
-    TermSpar.Coordinates.clear();
-    TermSpar.Coordinates.push_back(posx);
-    TermSpar.Coordinates.push_back(0);
-    Components.append(TermSpar);
-    ConnectionAux = TermSpar.ID;
-    QucsNetlist.clear();
-    QucsNetlist = QString("Pac:P1 N0 gnd Num=1 Z=\"%1 Ohm\" P=\"0 dBm\" f=\"1 GHz\"\n").arg(k);
+    ComponentInfo Lseries, Lshunt, Cseries, Ground;
+    WireInfo WI;
+    NodeInfo NI;
+
+    ComponentInfo TermSpar1(QString("T%1").arg(++NumberComponents[Term]), Term, vertical, posx, 0,
+                            QString("N%1").arg(Ni), "gnd");
+    TermSpar1.val["Z"] = num2str(k, Resistance);
+    Components.append(TermSpar1);
+    ConnectionAux = TermSpar1.ID;
 
     posx += 50;
     //Series inductor
-    Lseries.ID=QString("L%1").arg(++NumberComponents[Inductor]);
-    Lseries.Type = Inductor;
-    Lseries.Orientation = horizontal;
-    Lseries.parameter = 0;
-    Lseries.val.clear();
+    Lseries.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, horizontal, posx, 0,
+                      "N0", "N1");
     Lseries.val["L"] = num2str(Ls[0], Inductance);
-    Lseries.Coordinates.clear();
-    Lseries.Coordinates.push_back(posx);
-    Lseries.Coordinates.push_back(0);
     Components.append(Lseries);
-    QucsNetlist+=QString("L:L%1 N0 N1 L=\"%2 H\"\n").arg(NumberComponents[Inductor]).arg(Lseries.val["L"]);
     Ni++;
 
     //Wires
     //***** Port to capacitor *****
-    struct WireInfo WI;
-    WI.OriginID = TermSpar.ID;
-    WI.PortOrigin = 1;
-    WI.DestinationID = Lseries.ID;
-    WI.PortDestination = 0;
+    WI.setParams(TermSpar1.ID, 0, Lseries.ID, 0);
     Wires.append(WI);
 
     posx += 50;
     //Shunt inductor
-    Lshunt.ID=QString("L%1").arg(++NumberComponents[Inductor]);
-    Lshunt.Type = Inductor;
-    Lshunt.Orientation = vertical;
-    Lshunt.parameter = 0;
-    Lshunt.val.clear();
+    Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, vertical, posx, 50, QString("N%1").arg(Ni), "gnd");
     Lshunt.val["L"] = num2str(Lp[0], Inductance);
-    Lshunt.Coordinates.clear();
-    Lshunt.Coordinates.push_back(posx);
-    Lshunt.Coordinates.push_back(50);
     Components.append(Lshunt);
-    QucsNetlist+=QString("L:L%1 N%2 gnd L=\"%3 H\"\n").arg(NumberComponents[Inductor]).arg(Ni).arg(Lshunt.val["L"]);
 
     //GND
-    Ground.ID=QString("GND%1").arg(++NumberComponents[GND]);
-    Ground.Type = GND;
-    Ground.Orientation = vertical;
-    Ground.parameter = 0;
-    Ground.Coordinates.clear();
-    Ground.Coordinates.push_back(posx);
-    Ground.Coordinates.push_back(100);
-    Ground.val.clear();
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical, posx, 100, "", "");
     Components.append(Ground);
 
     //Node
-    NodeInfo NI;
-    NI.ID = QString("N%1").arg(++NumberComponents[ConnectionNodes]);
-    NI.Coordinates.clear();
-    NI.Coordinates.push_back(posx);
-    NI.Coordinates.push_back(0);
+    NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), posx, 0);
     Nodes.append(NI);
 
-    WI.OriginID = Lseries.ID;
-    WI.PortOrigin = 1;
-    WI.DestinationID = NI.ID;
-    WI.PortDestination = 1;
+    WI.setParams(Lseries.ID, 1, NI.ID, 0);
     Wires.append(WI);
 
-    WI.OriginID = NI.ID;
-    WI.PortOrigin = 1;
-    WI.DestinationID = Lshunt.ID;
-    WI.PortDestination = 1;
+    WI.setParams(NI.ID, 0, Lshunt.ID, 1);
     Wires.append(WI);
 
-    WI.OriginID = Lshunt.ID;
-    WI.PortOrigin = 0;
-    WI.DestinationID = Ground.ID;
-    WI.PortDestination = 0;
+    WI.setParams(Lshunt.ID, 0, Ground.ID, 0);
     Wires.append(WI);
 
 
@@ -459,147 +332,76 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators()
 
         //Series inductor
         posx += 50;
-        Lseries.ID=QString("L%1").arg(++NumberComponents[Inductor]);
-        Lseries.Type = Inductor;
-        Lseries.Orientation = horizontal;
-        Lseries.parameter = 0;
-        Lseries.val.clear();
+        Lseries.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, horizontal, posx, 0,
+                          QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
         Lseries.val["L"] = num2str(Ls[k+1], Inductance);
-        Lseries.Coordinates.clear();
-        Lseries.Coordinates.push_back(posx);
-        Lseries.Coordinates.push_back(0);
         Components.append(Lseries);
-        QucsNetlist+=QString("L:L%1 N%2 N%3 L=\"%4 H\"\n").arg(NumberComponents[Inductor]).arg(Ni).arg(Ni+1).arg(Lseries.val["L"]);
         Ni++;
 
         //Series capacitor
         posx += 75;
-        Cseries.ID=QString("C%1").arg(++NumberComponents[Capacitor]);
-        Cseries.Type = Capacitor;
-        Cseries.Orientation = horizontal;
-        Cseries.parameter = 0;
-        Cseries.val.clear();
+        Cseries.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, horizontal, posx, 0,
+                          QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
         Cseries.val["C"] = num2str(Crk[k], Capacitance);
-        Cseries.Coordinates.clear();
-        Cseries.Coordinates.push_back(posx);
-        Cseries.Coordinates.push_back(0);
         Components.append(Cseries);
-        QucsNetlist+=QString("C:C%1 N%2 N%3 C=\"%4 F\"\n").arg(NumberComponents[Capacitor]).arg(Ni).arg(Ni+1).arg(Cseries.val["C"]);
         Ni++;
 
         posx += 50;
         //Shunt inductor coupling
-        Lshunt.ID=QString("L%1").arg(++NumberComponents[Inductor]);
-        Lshunt.Type = Inductor;
-        Lshunt.Orientation = vertical;
-        Lshunt.parameter = 0;
-        Lshunt.val.clear();
+        Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, vertical, posx, 50,
+                         QString("N%1").arg(Ni), "gnd");
         Lshunt.val["L"] = num2str(Lp[k+1], Inductance);
-        Lshunt.Coordinates.clear();
-        Lshunt.Coordinates.push_back(posx);
-        Lshunt.Coordinates.push_back(50);
         Components.append(Lshunt);
-        QucsNetlist+=QString("L:L%1 N%2 gnd L=\"%3 H\"\n").arg(NumberComponents[Inductor]).arg(Ni).arg(Lshunt.val["L"]);
 
         //GND
-        Ground.ID=QString("GND%1").arg(++NumberComponents[GND]);
-        Ground.Type = GND;
-        Ground.Orientation = vertical;
-        Ground.parameter = 0;
-        Ground.Coordinates.clear();
-        Ground.Coordinates.push_back(posx);
-        Ground.Coordinates.push_back(100);
-        Ground.val.clear();
+        Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical, posx, 100, "", "");
         Components.append(Ground);
 
         //Series inductor to the previous section
-        WI.OriginID = NI.ID;
-        WI.PortOrigin = 0;
-        WI.DestinationID = Lseries.ID;
-        WI.PortDestination = 0;
+        WI.setParams(NI.ID, 0, Lseries.ID, 0);
         Wires.append(WI);
 
         //Series inductor to the series capacitor
-        WI.OriginID = Lseries.ID;
-        WI.PortOrigin = 1;
-        WI.DestinationID = Cseries.ID;
-        WI.PortDestination = 0;
+        WI.setParams(Lseries.ID, 1, Cseries.ID, 0);
         Wires.append(WI);
 
         //Node to connect the shunt coupling inductor to the series resonator
-        NI.ID = QString("N%1").arg(++NumberComponents[ConnectionNodes]);
-        NI.Coordinates.clear();
-        NI.Coordinates.push_back(posx);
-        NI.Coordinates.push_back(0);
+        NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), posx, 0);
         Nodes.append(NI);
 
         //Series inductor to the previous section
-        WI.OriginID = NI.ID;
-        WI.PortOrigin = 0;
-        WI.DestinationID = Cseries.ID;
-        WI.PortDestination = 1;
+        WI.setParams(NI.ID, 0, Cseries.ID, 1);
         Wires.append(WI);
 
         //Node to the shunt coupling inductor
-        WI.OriginID = NI.ID;
-        WI.PortOrigin = 0;
-        WI.DestinationID = Lshunt.ID;
-        WI.PortDestination = 1;
+        WI.setParams(NI.ID, 0, Lshunt.ID, 1);
         Wires.append(WI);
 
         //Shunt inductor to ground
-        WI.OriginID = Ground.ID;
-        WI.PortOrigin = 0;
-        WI.DestinationID = Lshunt.ID;
-        WI.PortDestination = 0;
+        WI.setParams(Ground.ID, 0, Lshunt.ID, 0);
         Wires.append(WI);
    }
 
     posx += 50;
     //Series inductor
-    Lseries.ID=QString("L%1").arg(++NumberComponents[Inductor]);
-    Lseries.Type = Inductor;
-    Lseries.Orientation = horizontal;
-    Lseries.parameter = 0;
-    Lseries.val.clear();
+    Lseries.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, horizontal, posx, 0,
+                      QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
     Lseries.val["L"] = num2str(Ls[N+1], Inductance);
-    Lseries.Coordinates.clear();
-    Lseries.Coordinates.push_back(posx);
-    Lseries.Coordinates.push_back(0);
     Components.append(Lseries);
-    QucsNetlist+=QString("L:L%1 N%2 N%3 L=\"%4 H\"\n").arg(NumberComponents[Inductor]).arg(Ni).arg(Ni+1).arg(Lseries.val["L"]);
 
     //Last series inductor to the previous node
-    WI.OriginID = NI.ID;
-    WI.PortOrigin = 0;
-    WI.DestinationID = Lseries.ID;
-    WI.PortDestination = 0;
+    WI.setParams(NI.ID, 0, Lseries.ID, 0);
     Wires.append(WI);
 
     posx += 50;
-    TermSpar.ID=QString("T%1").arg(++NumberComponents[Term]);
-    TermSpar.Type = Term;
-    TermSpar.Orientation = horizontal;
-    TermSpar.parameter = 0;
-    TermSpar.val.clear();
-    TermSpar.val["Z"] = num2str(Specification.ZL, Resistance);
-    TermSpar.Coordinates.clear();
-    TermSpar.Coordinates.push_back(posx);
-    TermSpar.Coordinates.push_back(0);
-    Components.append(TermSpar);
+    ComponentInfo TermSpar2(QString("T%1").arg(++NumberComponents[Term]), Term, horizontal, posx, 0,
+                            QString("N%1").arg(Ni+1), "gnd");
+    TermSpar2.val["Z"] = num2str(Specification.ZL, Resistance);
+    Components.append(TermSpar2);
 
     //Last series inductor to the previous node
-    WI.OriginID = TermSpar.ID;
-    WI.PortOrigin = 0;
-    WI.DestinationID = Lseries.ID;
-    WI.PortDestination = 1;
+    WI.setParams(TermSpar2.ID, 0, Lseries.ID, 1);
     Wires.append(WI);
-
-
-
-
-    QucsNetlist += QString("Pac:P2 N%1 gnd Num=2 Z=\"%2 Ohm\" P=\"0 dBm\" f=\"1 GHz\"\n").arg(Ni+1).arg(TermSpar.val["Z"]);
-
 }
 
 QList<ComponentInfo> DirectCoupledFilters::getComponents()
