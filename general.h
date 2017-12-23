@@ -21,6 +21,7 @@ struct InterceptPointsData
 
 QString RoundVariablePrecision(double);
 QString num2str(double, Units);
+QString num2str(double);
 
 
 #endif // GENERAL_H

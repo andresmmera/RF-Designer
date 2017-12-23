@@ -56,3 +56,34 @@ QString num2str(double Num, Units CompType)
   Str += unit;
   return Str;
 }
+
+
+QString num2str(double Num)
+{
+  char c = 0;
+  double cal = std::abs(Num);
+  if(cal > 1e-20) {
+    cal = std::log10(cal) / 3.0;
+    if(cal < -0.2)  cal -= 0.98;
+    int Expo = int(cal);
+
+    if(Expo >= -5) if(Expo <= 4)
+      switch(Expo) {
+        case -5: c = 'f'; break;
+        case -4: c = 'p'; break;
+        case -3: c = 'n'; break;
+        case -2: c = 'u'; break;
+        case -1: c = 'm'; break;
+        case  1: c = 'k'; break;
+        case  2: c = 'M'; break;
+        case  3: c = 'G'; break;
+        case  4: c = 'T'; break;
+      }
+
+    if(c)  Num /= pow(10.0, double(3*Expo));
+  }
+
+  QString Str = RoundVariablePrecision(Num);
+  if(c)  Str += c;
+  return Str;
+}

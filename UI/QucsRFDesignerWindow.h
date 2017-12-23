@@ -27,6 +27,7 @@
 #include "UI/FilterDesignTool.h"
 #include "UI/PowerCombiningTool.h"
 #include "UI/InterceptPointsTool.h"
+#include "UI/SmithChartTool.h"
 
 //Math operations
 #include "SPAR/MathOperations.h"
@@ -83,11 +84,12 @@ private://Actions
     FilterDesignTool *Filter_Tool;//Widget for filter design
     PowerCombiningTool *PowerCombining_Tool;//Widget for power combiner design
     InterceptPointsTool *IP_Tool;
+    SmithChartTool *SmithTool;
 
     SmithChart * Smith_plot;
 
     // ************************** Docks ********************************
-    QDockWidget *dock_Schematic, *dock_Setup, *dock_DisplayWindow1, *dock_DisplayWindow2;
+    QDockWidget *dock_Schematic, *dock_Setup, *dock_DisplayWindow1, *dock_DisplayWindow2, *dock_Smith;
 
     // ************************ SIMULATION SETTINGS ********************
     SP_Analysis SPAR_Settings;

@@ -4,5 +4,14 @@
         <file>bitmaps/SmithChartIcon.png</file>
         <file>bitmaps/capacitor.svg</file>
         <file>bitmaps/qucsRFdesigner.svg</file>
+        <file>bitmaps/SeriesCapacitor.jpg</file>
+        <file>bitmaps/OpenCircuitStub.png</file>
+        <file>bitmaps/SeriesCapacitor.png</file>
+        <file>bitmaps/SeriesInductor.png</file>
+        <file>bitmaps/ShortCircuitStub.png</file>
+        <file>bitmaps/ShuntCapacitor.png</file>
+        <file>bitmaps/ShuntInductor.png</file>
+        <file>bitmaps/TransmissionLine.png</file>
+        <file>bitmaps/RemoveIcon.png</file>
     </qresource>
 </RCC>

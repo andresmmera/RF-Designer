@@ -7,11 +7,13 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
     dock_Setup =  new QDockWidget("");
     dock_DisplayWindow1 =  new QDockWidget("Plot window");
     dock_DisplayWindow2 = new QDockWidget("Plot window");
+    dock_Smith = new QDockWidget("Smith chart");
 
     dock_Schematic->setAllowedAreas(Qt::AllDockWidgetAreas);
     dock_Setup->setAllowedAreas(Qt::AllDockWidgetAreas);
     dock_DisplayWindow1->setAllowedAreas(Qt::AllDockWidgetAreas);
     dock_DisplayWindow2->setAllowedAreas(Qt::AllDockWidgetAreas);
+    dock_Smith->setAllowedAreas(Qt::AllDockWidgetAreas);
     //******************************* End of the dock setup
 
 
@@ -20,16 +22,17 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
     //************* Filter Design tab ************************
 
     Filter_Tool = new FilterDesignTool();
-    //*********** Impedance Matching tab *********************
-    QWidget *MatchingWidget = new QWidget();
+    QWidget *MatchingWidget = new QWidget();//Impedance matching. Not started yet...
     PowerCombining_Tool = new PowerCombiningTool();
     IP_Tool = new InterceptPointsTool();
+    SmithTool = new SmithChartTool();
 
     TabWidget->addTab(Filter_Tool, "Filter design");
     TabWidget->addTab(MatchingWidget, "Matching");
     TabWidget->addTab(PowerCombining_Tool, "Power Combining");
     TabWidget->addTab(IP_Tool, "Intercept Points");
-    TabWidget->setMinimumSize(300, 200);
+    TabWidget->addTab(SmithTool, "Smith chart");
+    TabWidget->setMinimumSize(200, 150);
     //*********************************** End of the setup panel
 
     //******************* Plot window *******************
@@ -55,12 +58,13 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
       connect(DisplayWindow[i], SIGNAL(mouseRelease(QMouseEvent*)), this, SLOT(simulate()));
     }
 
+    Smith_plot = new SmithChart();
+    Smith_plot->showLine(true);
+    Smith_plot->setMinimumSize(200, 350);
     //*********************************** End of the plot window region
 
     SchematicWidget = new GraphWidget(dock_Schematic);//Schematic window
-
-    Smith_plot = new SmithChart();
-    Smith_plot->showLine(true);
+    SchematicWidget->setMinimumSize(200, 150);
 
 
     //************ Set docks and add them to the main window *************
@@ -68,6 +72,7 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
     dock_DisplayWindow1->setWidget(DisplayWindow[0]);
     dock_DisplayWindow2->setWidget(DisplayWindow[1]);
     dock_Schematic->setWidget(SchematicWidget);
+    dock_Smith->setWidget(Smith_plot);
 
     addDockWidget(Qt::LeftDockWidgetArea, dock_Setup);
     addDockWidget(Qt::RightDockWidgetArea, dock_DisplayWindow1);
@@ -107,6 +112,7 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
     connect(Filter_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)), this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
     connect(PowerCombining_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)), this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
     connect(IP_Tool, SIGNAL(simulateDiagram(InterceptPointsData)), this, SLOT(receiveInterceptDiagramData(InterceptPointsData)));
+    connect(SmithTool, SIGNAL(simulateNetwork(struct SchematicInfo)), this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
 
     Filter_Tool->design();
 }
@@ -374,10 +380,6 @@ void QucsRFDesignerWindow::ShowSmithChart()
     {
         Smith_plot->show();
     }
-    else
-    {
-        Smith_plot->hide();
-    }
 }
 
 
@@ -540,16 +542,23 @@ void QucsRFDesignerWindow::SwitchTabs(int tabindex)
    switch(tabindex)
    {
      case 0://Filtering
+       dock_DisplayWindow2->hide();
        Filter_Tool->design();
        break;
      case 1://Matching
+       dock_DisplayWindow2->hide();
        break;
      case 2://Power combining
+       dock_DisplayWindow2->hide();
        PowerCombining_Tool->design();
        break;
      case 3://Intercept points tool
+        dock_Smith->hide();
         addDockWidget(Qt::RightDockWidgetArea, dock_DisplayWindow2);//Add new diagram to display the spectrum of the two-tone test
         IP_Tool->CalculateInterceptPoints();
       break;
+     case 4: //Smith Chart tool
+       addDockWidget(Qt::RightDockWidgetArea, dock_Smith);//Add new diagram to display the spectrum of the two-tone test
+       break;
    }
 }
