@@ -75,6 +75,7 @@ struct SchematicInfo
     QList<struct WireInfo> Wires;
     QList<struct NodeInfo> Nodes;
     QMap <QString, QPen>displayGraphs;
+    QString Description;
 };
 
 

@@ -127,7 +127,6 @@ SmithChartTool::SmithChartTool()
 
     connect(ListOfComponents, SIGNAL(clicked(QModelIndex)), this, SLOT(UpdateComponentPropertiesList()));
     connect(ListOfComponents, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(UpdateComponentPropertiesList()));
-
 }
 
 //This function builds the schematic and emits the corresponding signal to simulate the circuit in the main class
@@ -208,10 +207,15 @@ void SmithChartTool::simulate()
     WI.setParams(last_node, 1, Term2.ID, 0);
     Wires.append(WI);
 
+    QMap <QString, QPen> displaygraphs;
+    displaygraphs[QString("S[2,1]")] = QPen(Qt::red, 1, Qt::SolidLine);
+    displaygraphs[QString("S[1,1]")] = QPen(Qt::blue, 1, Qt::SolidLine);
+
 
     SchInfo.Comps = Components;
     SchInfo.Nodes = Nodes;
     SchInfo.Wires = Wires;
+    SchInfo.displayGraphs = displaygraphs;
 
    // SchInfo.displayGraphs = DCF->displaygraphs;*/
 
@@ -253,6 +257,7 @@ void SmithChartTool::UpdateComponentPropertiesList()
 void SmithChartTool::addSeriesCapacitor()
 {
     ComponentInfo Cseries(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, horizontal, 0, 0, "", "");
+    Cseries.val["C"] = "1pF";
     ListOfComponents->addItem(Cseries.ID);
     Components.append(Cseries);
     simulate();
@@ -262,6 +267,7 @@ void SmithChartTool::addShuntCapacitor()
 {
     ComponentInfo Cshunt(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, vertical, 0, 0, "", "");
     ListOfComponents->addItem(Cshunt.ID);
+    Cshunt.val["C"] = "1pF";
     Components.append(Cshunt);
     ComponentInfo Ground;
     Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical, 0, 0, "", "");
@@ -272,6 +278,7 @@ void SmithChartTool::addShuntCapacitor()
 void SmithChartTool::addSeriesInductor()
 {
     ComponentInfo Lseries(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, horizontal, 0, 0, "", "");
+    Lseries.val["L"] = "10nH";
     ListOfComponents->addItem(Lseries.ID);
     Components.append(Lseries);
     simulate();
@@ -280,6 +287,7 @@ void SmithChartTool::addSeriesInductor()
 void SmithChartTool::addShuntInductor()
 {
     ComponentInfo Lshunt(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, vertical, 0, 0, "", "");
+    Lshunt.val["L"] = "10nH";
     ListOfComponents->addItem(Lshunt.ID);
     Components.append(Lshunt);
     ComponentInfo Ground;
@@ -291,6 +299,8 @@ void SmithChartTool::addShuntInductor()
 void SmithChartTool::addTransmissionLine()
 {
     ComponentInfo TL(QString("TL%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine, horizontal, 0, 0, "", "");
+    TL.val["Z"] = "50Ohm";
+    TL.val["L"] = "10mm";
     ListOfComponents->addItem(TL.ID);
     Components.append(TL);
     simulate();
@@ -299,6 +309,8 @@ void SmithChartTool::addTransmissionLine()
 void SmithChartTool::addOpenCircuitStub()
 {
     ComponentInfo OStub(QString("TL%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine, vertical, 0, 0, "", "");
+    OStub.val["Z"] = "50Ohm";
+    OStub.val["L"] = "10mm";
     ListOfComponents->addItem(OStub.ID);
     Components.append(OStub);
     ComponentInfo Ground;
@@ -310,6 +322,8 @@ void SmithChartTool::addOpenCircuitStub()
 void SmithChartTool::addShortCircuitStub()
 {
     ComponentInfo SStub(QString("TL%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine, vertical, 0, 0, "", "gnd");
+    SStub.val["Z"] = "50Ohm";
+    SStub.val["L"] = "10mm";
     ListOfComponents->addItem(SStub.ID);
     Components.append(SStub);
     ComponentInfo Ground;

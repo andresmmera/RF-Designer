@@ -43,15 +43,14 @@ public:
     Mat getABCDmatrix(QList<ComponentInfo>, double, QStringList);
     void setNetwork(NetworkInfo);
     void setSimulationSettings(SP_Analysis);
+    QMap<QString, vector<complex<double> > > getData();
     void run();
     vector<complex<double> > getSij(int, int);
     vector<double> getFreq();
 private:
     NetworkInfo NI;
     SP_Analysis sim_settings;
-    vector<complex<double> > S11;
-    vector<complex<double> > S21;
-    vector<complex<double> > S22;
+    vector<complex<double> > S11, S22, S21, S12;
 };
 
 #endif // SPARENGINE_H

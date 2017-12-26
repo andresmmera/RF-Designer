@@ -41,21 +41,21 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
 
     for (int i = 0; i < DisplayWindow.size(); i++)
     {
-      DisplayWindow[i]->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes |
-                                QCP::iSelectLegend | QCP::iSelectPlottables);
-      DisplayWindow[i]->setInteraction(QCP::iMultiSelect, true);
-      DisplayWindow[i]->axisRect()->setupFullAxesBox();
-      DisplayWindow[i]->plotLayout()->insertRow(0);
-      DisplayWindow[i]->plotLayout()->addElement(0, 0, new QCPTextElement(DisplayWindow[i]));
-      DisplayWindow[i]->legend->setVisible(true);
-      QFont legendFont;// = font();
-      legendFont.setPointSize(10);
-      DisplayWindow[i]->legend->setFont(legendFont);
-      DisplayWindow[i]->legend->setSelectedFont(legendFont);
-      DisplayWindow[i]->legend->setSelectableParts(QCPLegend::spItems); // legend box shall not be selectable, only legend items
+        DisplayWindow[i]->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes |
+                                          QCP::iSelectLegend | QCP::iSelectPlottables);
+        DisplayWindow[i]->setInteraction(QCP::iMultiSelect, true);
+        DisplayWindow[i]->axisRect()->setupFullAxesBox();
+        DisplayWindow[i]->plotLayout()->insertRow(0);
+        DisplayWindow[i]->plotLayout()->addElement(0, 0, new QCPTextElement(DisplayWindow[i]));
+        DisplayWindow[i]->legend->setVisible(true);
+        QFont legendFont;// = font();
+        legendFont.setPointSize(10);
+        DisplayWindow[i]->legend->setFont(legendFont);
+        DisplayWindow[i]->legend->setSelectedFont(legendFont);
+        DisplayWindow[i]->legend->setSelectableParts(QCPLegend::spItems); // legend box shall not be selectable, only legend items
 
-      connect(DisplayWindow[i], SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(simulate()));
-      connect(DisplayWindow[i], SIGNAL(mouseRelease(QMouseEvent*)), this, SLOT(simulate()));
+        connect(DisplayWindow[i], SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(simulate()));
+        connect(DisplayWindow[i], SIGNAL(mouseRelease(QMouseEvent*)), this, SLOT(simulate()));
     }
 
     Smith_plot = new SmithChart();
@@ -127,7 +127,7 @@ QucsRFDesignerWindow::~QucsRFDesignerWindow()
     delete RFToolBar;
     delete SchematicWidget;
     for (int i =0; i< DisplayWindow.size(); i++)
-    delete DisplayWindow[i];
+        delete DisplayWindow[i];
 
     /* delete dock_Schematic;
   delete dock_Setup;
@@ -226,7 +226,7 @@ void QucsRFDesignerWindow::updateGraph(int DisplayID, vector<double> freq_, QMap
     DisplayWindow[DisplayID]->replot();
 
     //Update Smith Chart
-  /*  std::complex<double> Z;
+    /*  std::complex<double> Z;
     Smith_plot->clear();
     for(unsigned int i = 0; i < S11_.size(); i++)
     {
@@ -285,23 +285,23 @@ void QucsRFDesignerWindow::plotPoints(int DisplayID, QMap<QString, QPointF> Inte
     {
         while (MapIT.hasNext())
         {
-           MapIT.next();
-           DisplayWindow[DisplayID]->addGraph();
-           QVector<double> x(1);
-           QVector<double> y(1);
-           x[0] = InterceptPoints[MapIT.key()].x();
-           y[0] = InterceptPoints[MapIT.key()].y();
-           DisplayWindow[DisplayID]->graph()->setData(x, y);
-           DisplayWindow[DisplayID]->graph()->setPen(QColor(0, 0, 0));
-           DisplayWindow[DisplayID]->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 10));
-           DisplayWindow[DisplayID]->graph()->setName(MapIT.key());
+            MapIT.next();
+            DisplayWindow[DisplayID]->addGraph();
+            QVector<double> x(1);
+            QVector<double> y(1);
+            x[0] = InterceptPoints[MapIT.key()].x();
+            y[0] = InterceptPoints[MapIT.key()].y();
+            DisplayWindow[DisplayID]->graph()->setData(x, y);
+            DisplayWindow[DisplayID]->graph()->setPen(QColor(0, 0, 0));
+            DisplayWindow[DisplayID]->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 10));
+            DisplayWindow[DisplayID]->graph()->setName(MapIT.key());
 
-           //Set label
-           Label.append(new QCPItemText(DisplayWindow[DisplayID]));
-           Label[i]->setText(MapIT.key());
-           Label[i]->setFont(QFont(font().family(), 10));
-           Label[i]->position->setCoords(x[0]+1, y[0]-1); // lower right corner of axis rect
-           i++;
+            //Set label
+            Label.append(new QCPItemText(DisplayWindow[DisplayID]));
+            Label[i]->setText(MapIT.key());
+            Label[i]->setFont(QFont(font().family(), 10));
+            Label[i]->position->setCoords(x[0]+1, y[0]-1); // lower right corner of axis rect
+            i++;
         }
     }
 
@@ -312,23 +312,23 @@ void QucsRFDesignerWindow::plotPoints(int DisplayID, QMap<QString, QPointF> Inte
         DisplayWindow[DisplayID]->addGraph();
         while (MapIT.hasNext())
         {
-           MapIT.next();
+            MapIT.next();
 
-           double x, y;
-           x = InterceptPoints[MapIT.key()].x();
-           y = InterceptPoints[MapIT.key()].y();
+            double x, y;
+            x = InterceptPoints[MapIT.key()].x();
+            y = InterceptPoints[MapIT.key()].y();
 
-           Arrows.append(new QCPItemCurve(DisplayWindow[DisplayID]));
-           Arrows[i]->startDir->setParentAnchor(Arrows[i]->start);
-           Arrows[i]->startDir->setCoords(0, 1); // direction 30 pixels to the left of parent anchor (tracerArrow->start)
-           Arrows[i]->end->setCoords(x, y);
-           Arrows[i]->start->setCoords(x, DisplayWindow[1]->yAxis->range().lower);
-           Arrows[i]->endDir->setParentAnchor(Arrows[i]->end);
-           Arrows[i]->endDir->setCoords(0, 1);
-           Arrows[i]->setHead(QCPLineEnding::esSpikeArrow);
-           DisplayWindow[DisplayID]->graph()->setName(MapIT.key());
-           i++;
-           }
+            Arrows.append(new QCPItemCurve(DisplayWindow[DisplayID]));
+            Arrows[i]->startDir->setParentAnchor(Arrows[i]->start);
+            Arrows[i]->startDir->setCoords(0, 1); // direction 30 pixels to the left of parent anchor (tracerArrow->start)
+            Arrows[i]->end->setCoords(x, y);
+            Arrows[i]->start->setCoords(x, DisplayWindow[1]->yAxis->range().lower);
+            Arrows[i]->endDir->setParentAnchor(Arrows[i]->end);
+            Arrows[i]->endDir->setCoords(0, 1);
+            Arrows[i]->setHead(QCPLineEnding::esSpikeArrow);
+            DisplayWindow[DisplayID]->graph()->setName(MapIT.key());
+            i++;
+        }
     }
     DisplayWindow[DisplayID]->replot();
 }
@@ -394,15 +394,57 @@ void QucsRFDesignerWindow::simulate()
 {
     switch(TabWidget->currentIndex())
     {
-        case 3://Intercept point simulation
-          SimulateInterceptDiagram();
-          break;
-        default:
-          SimulateSPAR();
+    case 3://Intercept point simulation
+        SimulateInterceptDiagram();
+        break;
+    default:
+        if (!SchInfo.Description.contains("NOT LADDER"))
+             SimulateLadderSPAR();
+        else SimulateSPAR();
     }
 }
 
 
+//S-parameter simulation using the built-in ladder SPAR simulator. This is used only for SPAR simulations
+//relying on the input/output port (complex) impedances
+void QucsRFDesignerWindow::SimulateLadderSPAR()
+{
+  QCPRange xAxisRange = DisplayWindow[0]->xAxis->range();
+  SparEngine SPARSim;
+  SP_Analysis SPARSettings;
+  SPARSettings.fstart =xAxisRange.lower*1e6;
+  SPARSettings.fstop =xAxisRange.upper*1e6;
+  SPARSettings.n_points = SPAR_Settings.n_points;
+  SPARSim.setSimulationSettings(SPARSettings);
+
+  NetworkInfo NWI;
+  std::vector<complex<double> > ZS(1), ZL(1);
+  ZS[0] = Str2Complex(SchInfo.Comps[0].val["Z"]);//Port 1 impedance
+  ZL[0] = Str2Complex(SchInfo.Comps[SchInfo.Comps.size()-1].val["Z"]);//Port 2 impedance
+  NWI.ZS = ZS;
+  NWI.ZL = ZL;
+  NWI.Ladder = SchInfo.Comps;
+  SPARSim.setNetwork(NWI);
+  SPARSim.run();
+
+  //Display the result
+  DisplayWindow[0]->yAxis->setLabel("dB");
+  DisplayWindow[0]->xAxis->setLabel("MHz");
+  if (xAxisRange.upper < SPAR_Settings.fstart*1e-6)
+  {//Well, the previous plot wasn't a SPAR simulation
+      DisplayWindow[0]->xAxis->setRangeLower(SPAR_Settings.fstart);
+      DisplayWindow[0]->xAxis->setRangeUpper(SPAR_Settings.fstop);
+      xAxisRange = DisplayWindow[0]->xAxis->range();
+  }
+
+  SchematicWidget->clear();//Remove the components in the scene
+  SchematicWidget->setSchematic(SchInfo);
+
+  QMap<QString, vector<complex<double> > >data = SPARSim.getData();
+  updateGraph(0, SPARSim.getFreq(), data);
+}
+
+//S-parameter simulation using qucsator
 void QucsRFDesignerWindow::SimulateSPAR()
 {
     QCPRange xAxisRange = DisplayWindow[0]->xAxis->range();
@@ -410,9 +452,9 @@ void QucsRFDesignerWindow::SimulateSPAR()
     DisplayWindow[0]->xAxis->setLabel("MHz");
     if (xAxisRange.upper < SPAR_Settings.fstart*1e-6)
     {//Well, the previous plot wasn't a SPAR simulation
-      DisplayWindow[0]->xAxis->setRangeLower(SPAR_Settings.fstart);
-      DisplayWindow[0]->xAxis->setRangeUpper(SPAR_Settings.fstop);
-      xAxisRange = DisplayWindow[0]->xAxis->range();
+        DisplayWindow[0]->xAxis->setRangeLower(SPAR_Settings.fstart);
+        DisplayWindow[0]->xAxis->setRangeUpper(SPAR_Settings.fstop);
+        xAxisRange = DisplayWindow[0]->xAxis->range();
     }
 
     SPAR_Settings.fstart =xAxisRange.lower*1e6;
@@ -522,8 +564,8 @@ void QucsRFDesignerWindow::SimulateInterceptDiagram()
     QCPRange freq = DisplayWindow[1]->xAxis->range();
     if ((freq.upper < IP_data.fc*1e-6) || (freq.lower > 2*IP_data.fc*1e-6))
     {
-      DisplayWindow[1]->xAxis->setRange(f1-2*(f2-f1), f2+2*(f2-f1));
-      DisplayWindow[1]->yAxis->setRange(IP_data.IM3-10, IP_data.Pout+5);
+        DisplayWindow[1]->xAxis->setRange(f1-2*(f2-f1), f2+2*(f2-f1));
+        DisplayWindow[1]->yAxis->setRange(IP_data.IM3-10, IP_data.Pout+5);
     }
     DisplayWindow[1]->legend->setVisible(false);
 
@@ -539,26 +581,26 @@ void QucsRFDesignerWindow::SimulateInterceptDiagram()
 
 void QucsRFDesignerWindow::SwitchTabs(int tabindex)
 {
-   switch(tabindex)
-   {
-     case 0://Filtering
-       dock_DisplayWindow2->hide();
-       Filter_Tool->design();
-       break;
-     case 1://Matching
-       dock_DisplayWindow2->hide();
-       break;
-     case 2://Power combining
-       dock_DisplayWindow2->hide();
-       PowerCombining_Tool->design();
-       break;
-     case 3://Intercept points tool
+    switch(tabindex)
+    {
+    case 0://Filtering
+        dock_DisplayWindow2->hide();
+        Filter_Tool->design();
+        break;
+    case 1://Matching
+        dock_DisplayWindow2->hide();
+        break;
+    case 2://Power combining
+        dock_DisplayWindow2->hide();
+        PowerCombining_Tool->design();
+        break;
+    case 3://Intercept points tool
         dock_Smith->hide();
         addDockWidget(Qt::RightDockWidgetArea, dock_DisplayWindow2);//Add new diagram to display the spectrum of the two-tone test
         IP_Tool->CalculateInterceptPoints();
-      break;
-     case 4: //Smith Chart tool
-       addDockWidget(Qt::RightDockWidgetArea, dock_Smith);//Add new diagram to display the spectrum of the two-tone test
-       break;
-   }
+        break;
+    case 4: //Smith Chart tool
+        addDockWidget(Qt::RightDockWidgetArea, dock_Smith);//Add new diagram to display the spectrum of the two-tone test
+        break;
+    }
 }

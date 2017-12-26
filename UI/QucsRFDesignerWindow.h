@@ -65,9 +65,12 @@ private slots://Functions to launch the actions
     void ReceiveNetworkFromDesignTools(struct SchematicInfo);//Simulates the network after changing the design goals
     void receiveInterceptDiagramData(struct InterceptPointsData);
     void simulate();//Rerun simulation when the user does some action over the display
-    void SimulateSPAR();
-    void SimulateInterceptDiagram();
     void SwitchTabs(int);//Whenever the tool tab is changed, this slot forces a new design without the need of modify a design parameter
+
+    //Simulations
+    void SimulateSPAR();
+    void SimulateLadderSPAR();
+    void SimulateInterceptDiagram();
 
 private://Actions
     void createActions();
