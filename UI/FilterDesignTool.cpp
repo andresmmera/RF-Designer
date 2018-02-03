@@ -266,6 +266,7 @@ void FilterDesignTool::synthesize()
             SchInfo.Wires = EF->getWires();
             SchInfo.Nodes = EF->getNodes();
             SchInfo.displayGraphs = EF->displaygraphs;
+            SchInfo.Description = "NOT DESCRIPTION";
             delete EF;
         }
         else
@@ -277,6 +278,7 @@ void FilterDesignTool::synthesize()
             SchInfo.Wires = CF->getWires();
             SchInfo.Nodes = CF->getNodes();
             SchInfo.displayGraphs = CF->displaygraphs;
+            SchInfo.Description = "";
             delete CF;
         }
      }
@@ -289,6 +291,7 @@ void FilterDesignTool::synthesize()
            SchInfo.Wires = DCF->getWires();
            SchInfo.Nodes = DCF->getNodes();
            SchInfo.displayGraphs = DCF->displaygraphs;
+           SchInfo.Description = "";
            delete DCF;
     }
     SchInfo.SPAR_Settings = SPAR_Settings;

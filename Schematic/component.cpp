@@ -167,8 +167,8 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->drawLine(QPoint(0, 16), QPoint(0, 40));
             painter->setPen(QPen(Qt::black, 1));
             painter->drawText(QRect(7,-5,100,100), QString("%1").arg(this->ID));
-            painter->drawText(QRect(7,5,100,100), QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
-            painter->drawText(QRect(7,12,100,100), QString("%1").arg(Value["L"]));
+            painter->drawText(QRect(7,5,100,100), QString("%1").arg(Value["Z0"].replace("Ohm", QChar(0xa9, 0x03))));
+            painter->drawText(QRect(7,12,100,100), QString("%1").arg(Value["Length"]));
         }
         else
         {
@@ -181,8 +181,8 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->drawLine(QPoint(16, 0), QPoint(40, 0));
             painter->setPen(QPen(Qt::black, 1));
             painter->drawText(QRect(-15,7,100,100), QString("%1").arg(this->ID));
-            painter->drawText(QRect(-15,13,100,100), QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
-            painter->drawText(QRect(-15,20,100,100), QString("%1").arg(Value["L"]));
+            painter->drawText(QRect(-15,13,100,100), QString("%1").arg(Value["Z0"].replace("Ohm", QChar(0xa9, 0x03))));
+            painter->drawText(QRect(-15,20,100,100), QString("%1").arg(Value["Length"]));
         }
         break;
     case Resistor:
@@ -213,23 +213,23 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
         }
         break;
     case GND:
-            painter->drawLine(QPoint(0, -2*5), QPoint(0,0));
-            painter->drawLine(QPoint(-2*5, 0), QPoint(2*5,0));
+        painter->drawLine(QPoint(0, -2*5), QPoint(0,0));
+        painter->drawLine(QPoint(-2*5, 0), QPoint(2*5,0));
         break;
     case Term:
         if (Orientation == vertical)
         {
-           QPainterPath path;
-           path.moveTo (-2*5, -2*3);
-           path.lineTo (0, 0);
-           path.lineTo (-2*5, 2*3);
-           path.lineTo (-2*5, -2*3);
-           painter->setPen (Qt :: NoPen);
-           painter->fillPath (path, QBrush (QColor ("red")));
-           painter->setPen(QPen(Qt::black, 1));
-           QString str = QString("%1%2").arg(75).arg(QChar(0xa9, 0x03));
-           painter->drawText(QRect(-30,0,100,100), QString("%1").arg(this->ID));
-           painter->drawText(QRect(-30,10,100,100), QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
+            QPainterPath path;
+            path.moveTo (-2*5, -2*3);
+            path.lineTo (0, 0);
+            path.lineTo (-2*5, 2*3);
+            path.lineTo (-2*5, -2*3);
+            painter->setPen (Qt :: NoPen);
+            painter->fillPath (path, QBrush (QColor ("red")));
+            painter->setPen(QPen(Qt::black, 1));
+            QString str = QString("%1%2").arg(75).arg(QChar(0xa9, 0x03));
+            painter->drawText(QRect(-30,0,100,100), QString("%1").arg(this->ID));
+            painter->drawText(QRect(-30,10,100,100), QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
         }
         else
         {
@@ -249,7 +249,7 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
     }
 
-/*    //Debug code: Shows the bounding box of the component. This is the region where the selection works
+    /*    //Debug code: Shows the bounding box of the component. This is the region where the selection works
    painter->setPen(QPen(Qt::red, 1));
    painter->drawPath(this->shape());//Component box-> This is the area where the component can be selected
    painter->setPen(QPen(Qt::green, 1));
@@ -304,10 +304,10 @@ QPoint Component::getPortLocation(int port_number)
     QPoint P;
     switch (CompType)
     {
-       case TransmissionLine:
-       case Resistor:
-       case Inductor:
-       case Capacitor:
+    case TransmissionLine:
+    case Resistor:
+    case Inductor:
+    case Capacitor:
         switch (port_number)
         {
         case 1: (Orientation == vertical)? P = QPoint(0, -28) : P = QPoint(25, -8);
@@ -356,3 +356,75 @@ ComponentType Component::getComponentType()
     return CompType;
 }
 
+//Given the property name, this function returns its value in coplex format
+double ComponentInfo::getVal(QString Property)
+{
+    QString val_ = this->val[Property];
+    QString suffix;
+    val_.remove(" ");//Remove blank spaces (if exists)
+    double scale = 1;
+    int index=1;
+    //Find the suffix
+    //Examine each character until finding the first letter, then determine the scale factor
+    for (int i = 0; i < val_.length(); i++)
+    {
+        if (val_.at(i).isLetter())
+        {
+            index = i;
+            suffix = val_.at(i);
+            break;
+        }
+    }
+
+    if (suffix == "f")
+        scale = 1e-15;
+    else{
+        if (suffix == "p")
+            scale = 1e-12;
+        else{
+            if (suffix == "n")
+                scale = 1e-9;
+            else{
+                if (suffix == "u")
+                    scale = 1e-6;
+                else{
+                    if (suffix == "m")
+                        scale = 1e-3;
+                    else{
+                        if (suffix == "K")
+                            scale = 1e3;
+                        else{
+                            if (suffix == "M")
+                                scale = 1e6;
+                            else{
+                                if (suffix == "G")
+                                    scale = 1e9;
+                                else{
+                                    if (suffix == "T")
+                                        scale = 1e12;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //Remove the suffix from the string and convert the property to numerical format
+    QString val = val_.left(index);
+
+    //Now, find out if the number is complex or real
+    /*if (index = val.indexOf("j"))
+    {//Need to separate the real from the imaginary part
+        double sign = 1;
+        if (val[index-1] == '-') sign = -1;
+        double realpart = val.left(index-1).toDouble();//Notice  we have to take into account the sign
+        double imagpart = val.right(index).toDouble();
+        return std::complex<double>(realpart, sign*imagpart);
+    }
+    else
+    {*/
+    return val.toDouble() * scale;
+    //}
+}

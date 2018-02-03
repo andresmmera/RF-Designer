@@ -21,6 +21,8 @@ struct InterceptPointsData
 
 QString RoundVariablePrecision(double);
 QString num2str(double, Units);
+QString num2str(double);
+std::complex<double> Str2Complex(QString);
 
 
 #endif // GENERAL_H

@@ -27,6 +27,7 @@
 #include "UI/FilterDesignTool.h"
 #include "UI/PowerCombiningTool.h"
 #include "UI/InterceptPointsTool.h"
+#include "UI/SmithChartTool.h"
 
 //Math operations
 #include "SPAR/MathOperations.h"
@@ -64,9 +65,14 @@ private slots://Functions to launch the actions
     void ReceiveNetworkFromDesignTools(struct SchematicInfo);//Simulates the network after changing the design goals
     void receiveInterceptDiagramData(struct InterceptPointsData);
     void simulate();//Rerun simulation when the user does some action over the display
-    void SimulateSPAR();
-    void SimulateInterceptDiagram();
     void SwitchTabs(int);//Whenever the tool tab is changed, this slot forces a new design without the need of modify a design parameter
+    void ComponentSelected(ComponentInfo);
+
+    //Simulations
+    void SimulateSPAR();
+    void SimulateLadderSPAR();
+    void SimulateInterceptDiagram();
+    void PlotImpedanceTransformations();
 
 private://Actions
     void createActions();
@@ -83,11 +89,12 @@ private://Actions
     FilterDesignTool *Filter_Tool;//Widget for filter design
     PowerCombiningTool *PowerCombining_Tool;//Widget for power combiner design
     InterceptPointsTool *IP_Tool;
+    SmithChartTool *SmithTool;
 
     SmithChart * Smith_plot;
 
     // ************************** Docks ********************************
-    QDockWidget *dock_Schematic, *dock_Setup, *dock_DisplayWindow1, *dock_DisplayWindow2;
+    QDockWidget *dock_Schematic, *dock_Setup, *dock_DisplayWindow1, *dock_DisplayWindow2, *dock_Smith;
 
     // ************************ SIMULATION SETTINGS ********************
     SP_Analysis SPAR_Settings;
@@ -102,8 +109,6 @@ private://Actions
     void updateGraph(int, vector<double>, QMap<QString, vector<complex<double> > >);
     void updateGraph(int, vector<double>, QMap<QString, vector<double> >, QMap<QString, QPen>, QString, QString );
     void plotPoints(int, QMap<QString, QPointF>, QString);
-
-
 };
 
 #endif // QucsRFDesignerWindow_H

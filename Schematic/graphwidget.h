@@ -73,7 +73,7 @@ public slots:
     void shuffle();
     void zoomIn();
     void zoomOut();
-    void ReceiveTuningSignalFromComponent(struct ComponentInfo);
+    void ComponentSelectionHandler(struct ComponentInfo);
 
 protected:
     void keyPressEvent(QKeyEvent *event);
@@ -88,7 +88,7 @@ private:
     std::deque<Wire*> Wires;
     std::deque<Node*> Nodes;
 signals:
-    void SendTuningSignalToMainWindow(struct ComponentInfo);
+    void SendComponentSelectionToMainFunction(struct ComponentInfo);
 };
 //! [0]
 

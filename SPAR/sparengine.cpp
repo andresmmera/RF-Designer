@@ -1,7 +1,7 @@
 /*
  * sparengine.cpp - S parameter engine class implementation
  *
- * copyright (C) 2016 Andres Martinez-Mera <andresmartinezmera@gmail.com>
+ * copyright (C) 2018 Andres Martinez-Mera <andresmartinezmera@gmail.com>
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,92 +43,134 @@ Mat SparEngine::getSparams(QList<ComponentInfo> x, complex<double> zs, complex<d
 }
 
 
+QMap<QString, vector<complex<double> > > SparEngine::getData()
+{
+   QMap<QString, vector<complex<double> > > data;
+   data["S[2,1]"] = S21;
+   data["S[1,1]"] = S11;
+   data["S[2,2]"] = S22;
+  // data["S12"] = S12;
+   return data;
+}
+
+
 // Returns the ABCD matrix at a given frequency
 Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f, QStringList topology)
 {
-    int index;
     double w = 2*pi*f;
     double beta = w/c0;
     complex<double> gamma = complex<double>(0, beta);
     complex<double> Z, Y, num, den;
 
-    QStringList options;//Available network elements
-    options.append("LS");
-    options.append("CS");
-    options.append("LP");
-    options.append("CP");
-    options.append("TL");
-    options.append("OS");
-    options.append("SS");
-    options.append("MSerR");
-    options.append("MShuR");
-
     Mat ABCD, ABCD_t;
-
     ABCD.eye();
 
-/*    for (int i = 0, k=0; i < topology.length(); i++, k++)
+    for (int i = 0; i < x.size(); i++)
     {
-        index = options.indexOf(topology.at(i));
-        switch(index)
+        switch(x[i].Type)
         {
-        case 0: //Series inductance
+        case GND:
+            continue;
+        case Capacitor:
+            if (x[i].Orientation == horizontal)
+            {//Series
                 ABCD_t(0,0) = 1.;
-                ABCD_t(0,1) = complex<double>(0,w*x.at(i).val.at(0));
+                ABCD_t(0,1) = complex<double>(0,-1./(w*x[i].getVal("C")));
                 ABCD_t(1,0) = 0;
                 ABCD_t(1,1) = 1.;
-            break;
-        case 1: //Series capacitor
+            }
+            else
+            {//Shunt
                 ABCD_t(0,0) = 1.;
-                ABCD_t(0,1) = complex<double>(0,-1/(w*x.at(i).val.at(0)));
+                ABCD_t(0,1) = 0;
+                ABCD_t(1,0) = complex<double>(0, w*x[i].getVal("C"));
+                ABCD_t(1,1) = 1.;
+            }
+            break;
+        case Inductor:
+            if (x[i].Orientation == horizontal)
+            {//Series
+                ABCD_t(0,0) = 1.;
+                ABCD_t(0,1) = complex<double>(0,w*x[i].getVal("L"));
                 ABCD_t(1,0) = 0;
                 ABCD_t(1,1) = 1.;
-            break;
-        case 2: //Parallel inductance
+            }
+            else
+            {//Shunt
                 ABCD_t(0,0) = 1.;
                 ABCD_t(0,1) = 0;
-                ABCD_t(1,0) = complex<double>(0,-1./(w*x.at(i).val.at(0)));
+                ABCD_t(1,0) = complex<double>(0,-1./(w*x[i].getVal("L")));
                 ABCD_t(1,1) = 1.;
+            }
             break;
-        case 3://Parallel capacitor
-                ABCD_t(0,0) = 1.;
-                ABCD_t(0,1) = 0;
-                ABCD_t(1,0) = complex<double>(0, w*x.at(i).val.at(0));
-                ABCD_t(1,1) = 1.;
+        case TransmissionLine:
+            if (x[i].Orientation == horizontal)
+            {//Series
+                ABCD_t(0,0) = cosh(gamma*x[i].getVal("Length"));
+                ABCD_t(0,1) = x[i].getVal("Z0")*sinh(gamma*x[i].getVal("Length"));
+                ABCD_t(1,0) = sinh(gamma*x[i].getVal("Length"))/x[i].getVal("Z0");
+                ABCD_t(1,1) = cosh(gamma*x[i].getVal("Length"));
+            }
+            else
+            {//Shunt. Here we need to determine whether the stub is opened or short circuited
+                if (i == x.size()-1)
+                {//It's the last element of the list, so there's no hypothetical gnd next
+                    ABCD_t(0,0) = 1.;
+                    ABCD_t(0,1) = 0;
+                    ABCD_t(1,0) = (tanh(gamma*x[i].getVal("Length")))/x[i].getVal("Z0");
+                    ABCD_t(1,1) = cosh(gamma*x[i].getVal("Length"));
+                }
+                else
+                {//Check if the next element is a gnd
+                    if (x[i+1].Type == GND)
+                     {
+                        ABCD_t(0,0) = 1.;
+                        ABCD_t(0,1) = 0;
+                        ABCD_t(1,0) = 1./(x[i].getVal("Z0")*tanh(gamma*x[i].getVal("Length")));
+                        ABCD_t(1,1) = 1;
+                     i++;//Increment the index so as to skip the gnd in the next loop iteration
+                     }
+                    else
+                    {//Open circuit stub in the middle of the ladder
+                        ABCD_t(0,0) = 1.;
+                        ABCD_t(0,1) = 0;
+                        ABCD_t(1,0) = (tanh(gamma*x[i].getVal("Length")))/x[i].getVal("Z0");
+                        ABCD_t(1,1) = cosh(gamma*x[i].getVal("Length"));
+                    }
+                }
+            }
             break;
-        case 4://Transmission line
-                /*ABCD_t(0,0) = cosh(gamma*x.at(k+1));
-                ABCD_t(0,1) = x.at(k)*sinh(gamma*x.at(k+1));
-                ABCD_t(1,0) = sinh(gamma*x.at(k+1))/x.at(k);
-                ABCD_t(1,1) = cosh(gamma*x.at(k+1));
-            k++;//It involves two parameters, so we need to skip the next index
-            break;
-        case 5:
-                ABCD_t(0,0) = 1.;
-                ABCD_t(0,1) = 0;
-                ABCD_t(1,0) = (tanh(gamma*x.at(k+1)))/x.at(k);
-                ABCD_t(1,1) = cosh(gamma*x.at(k+1));
-            k++;
-            break;
-        case 6:
-                ABCD_t(0,0) = 1.;
-                ABCD_t(0,1) = 0;
-                ABCD_t(1,0) = 1./(x.at(k)*tanh(gamma*x.at(k+1)));
+        case Resistor:
+            if (x[i].Orientation == horizontal)
+            {//Series
+                ABCD_t(0,0) = 1;
+                ABCD_t(0,1) = x[i].getVal("R");
+                ABCD_t(1,0) = 0;
                 ABCD_t(1,1) = 1;
-            k++;
+            }
+            else
+            {//Shunt
+                ABCD_t(0,0) = 1;
+                ABCD_t(0,1) = 0;
+                ABCD_t(1,0) = 1/x[i].getVal("R");
+                ABCD_t(1,1) = 1;
+            }
             break;
+
         default: ABCD.eye(); 
                  return ABCD;
         }
 
         ABCD = ABCD*ABCD_t;
     }
- */       return ABCD;
+        return ABCD;
 }
 
 
 void SparEngine::setNetwork(NetworkInfo nwi)
 {
+    if (nwi.Ladder[0].Type == Term) nwi.Ladder.pop_front();//Remove port 1
+    if (nwi.Ladder[nwi.Ladder.size()-1].Type == Term) nwi.Ladder.pop_back();//Remove port 2
     NI = nwi;
 }
 
@@ -156,6 +198,7 @@ void SparEngine::run()
        S11.push_back(S(0,0));
        S21.push_back(S(1,0));
        S22.push_back(S(1,1));
+       S12.push_back(S(0,1));
     }
 
 }
@@ -166,6 +209,7 @@ vector<complex<double> > SparEngine::getSij(int i, int j)
     if ((i == 1) && ( j == 1 )) return S11;
     if ((i == 2) && ( j == 1 )) return S21;
     if ((i == 2) && ( j == 2 )) return S22;
+    if ((i == 1) && ( j == 2 )) return S12;
     return vector<complex<double> > (0,0);
 }
 

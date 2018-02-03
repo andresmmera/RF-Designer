@@ -70,9 +70,9 @@ void GraphWidget::itemMoved()
 }
 
 
-void GraphWidget::ReceiveTuningSignalFromComponent(struct ComponentInfo CI)
+void GraphWidget::ComponentSelectionHandler(struct ComponentInfo CI)
 {
-   emit this->SendTuningSignalToMainWindow(CI);
+   emit this->SendComponentSelectionToMainFunction(CI);
 }
 
 
@@ -137,7 +137,7 @@ void GraphWidget::setComponents(QList<ComponentInfo> cmps)
     Component * comp = new Component(this, CI);
     Components.push_back(comp);
     scene()->addItem(comp);
-    connect(comp, SIGNAL(DoubleClicked(struct ComponentInfo)),this, SLOT(ReceiveTuningSignalFromComponent(struct ComponentInfo)));
+    connect(comp, SIGNAL(DoubleClicked(struct ComponentInfo)),this, SLOT(ComponentSelectionHandler(struct ComponentInfo)));
   //  qDebug() << "Component added to the scene: " << CI.ID << " at (" << CI.Coordinates.at(0) << ", " << CI.Coordinates.at(1) << ")";
   }
 
