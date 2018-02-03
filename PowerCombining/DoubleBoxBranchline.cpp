@@ -12,15 +12,15 @@ void PowerCombinerDesigner::DoubleBoxBranchline()
     double ZB = Specs.Z0*sqrt(r-(r*r)/(t*t));
 
     ComponentInfo TermSpar1(QString("T%1").arg(++NumberComponents[Term]), Term, vertical, 0, -50, "N0", "gnd");
-    TermSpar1.val["Z"] = num2str(Specs.Z0, Resistance);
+    TermSpar1.val["Z0"] = num2str(Specs.Z0, Resistance);
     Components.append(TermSpar1);
 
     ComponentInfo TermSpar2(QString("T%1").arg(++NumberComponents[Term]), Term, horizontal, 200, -50, "N2", "gnd");
-    TermSpar2.val["Z"] = num2str(Specs.Z0, Resistance);
+    TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
     Components.append(TermSpar2);
 
     ComponentInfo TermSpar3(QString("T%1").arg(++NumberComponents[Term]), Term, horizontal, 200, 50, "N3", "gnd");
-    TermSpar3.val["Z"] = num2str(Specs.Z0, Resistance);
+    TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
     Components.append(TermSpar3);
 
     ComponentInfo Riso(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, vertical, 0, 75, "N5", "gnd");
@@ -31,8 +31,8 @@ void PowerCombinerDesigner::DoubleBoxBranchline()
     Components.append(Ground);
 
     ComponentInfo TL1(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine, horizontal, 50, -50, "N0", "N1");
-    TL1.val["Z"] = num2str(ZB, Resistance);
-    TL1.val["L"] = ConvertLengthFromM(lambda4);
+    TL1.val["Z0"] = num2str(ZB, Resistance);
+    TL1.val["Length"] = ConvertLengthFromM(lambda4);
     Components.append(TL1);
 
     //Node
@@ -40,8 +40,8 @@ void PowerCombinerDesigner::DoubleBoxBranchline()
     Nodes.append(N1);
 
     ComponentInfo TL2(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine, horizontal, 50, 50, "N4", "N5");
-    TL2.val["Z"] = num2str(ZB, Resistance);
-    TL2.val["L"] = ConvertLengthFromM(lambda4);
+    TL2.val["Z0"] = num2str(ZB, Resistance);
+    TL2.val["Length"] = ConvertLengthFromM(lambda4);
     Components.append(TL2);
 
 
@@ -50,28 +50,28 @@ void PowerCombinerDesigner::DoubleBoxBranchline()
     Nodes.append(N2);
 
     ComponentInfo TL3(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine, vertical, 0, 0, "N0", "N5");
-    TL3.val["Z"] = num2str(ZA, Resistance);
-    TL3.val["L"] = ConvertLengthFromM(lambda4);
+    TL3.val["Z0"] = num2str(ZA, Resistance);
+    TL3.val["Length"] = ConvertLengthFromM(lambda4);
     Components.append(TL3);
 
     ComponentInfo TL4(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine, vertical, 100, 0, "N1", "N4");
-    TL4.val["Z"] = num2str(ZB, Resistance);
-    TL4.val["L"] = ConvertLengthFromM(lambda4);
+    TL4.val["Z0"] = num2str(ZB, Resistance);
+    TL4.val["Length"] = ConvertLengthFromM(lambda4);
     Components.append(TL4);
 
     ComponentInfo TL5(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine, horizontal, 150, -50, "N1", "N2");
-    TL5.val["Z"] = num2str(ZB, Resistance);
-    TL5.val["L"] = ConvertLengthFromM(lambda4);
+    TL5.val["Z0"] = num2str(ZB, Resistance);
+    TL5.val["Length"] = ConvertLengthFromM(lambda4);
     Components.append(TL5);
 
     ComponentInfo TL6(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine, horizontal, 150, 50, "N3", "N4");
-    TL6.val["Z"] = num2str(ZB, Resistance);
-    TL6.val["L"] = ConvertLengthFromM(lambda4);
+    TL6.val["Z0"] = num2str(ZB, Resistance);
+    TL6.val["Length"] = ConvertLengthFromM(lambda4);
     Components.append(TL6);
 
     ComponentInfo TL7(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine, vertical, 200, 0, "N2", "N3");
-    TL7.val["Z"] = num2str(ZD, Resistance);
-    TL7.val["L"] = ConvertLengthFromM(lambda4);
+    TL7.val["Z0"] = num2str(ZD, Resistance);
+    TL7.val["Length"] = ConvertLengthFromM(lambda4);
     Components.append(TL7);
 
     WireInfo WI(TermSpar1.ID, 0, TL1.ID, 0);

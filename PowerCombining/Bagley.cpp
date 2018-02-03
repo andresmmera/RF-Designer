@@ -8,18 +8,18 @@ void PowerCombinerDesigner::Bagley()
     double Zbranch = 2*Specs.Z0/sqrt(Specs.Noutputs);
 
     ComponentInfo TermSpar(QString("T%1").arg(++NumberComponents[Term]), Term, vertical, (Specs.Noutputs-1)*50, 0, "N0", "gnd");
-    TermSpar.val["Z"] = num2str(Specs.Z0, Resistance);
+    TermSpar.val["Z0"] = num2str(Specs.Z0, Resistance);
     Components.append(TermSpar);
 
     ComponentInfo TL1(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine,
                       vertical, (Specs.Noutputs-1)*100, 50, "N0", QString("N%1").arg(Specs.Noutputs));
-    TL1.val["Z"] = num2str(Zbranch, Resistance);
-    TL1.val["L"] = ConvertLengthFromM(lambda4);
+    TL1.val["Z0"] = num2str(Zbranch, Resistance);
+    TL1.val["Length"] = ConvertLengthFromM(lambda4);
     Components.append(TL1);
 
     ComponentInfo TL2(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine, vertical, 0, 50, "N0", "N1");
-    TL2.val["Z"] = num2str(Zbranch, Resistance);
-    TL2.val["L"] = ConvertLengthFromM(lambda4);
+    TL2.val["Z0"] = num2str(Zbranch, Resistance);
+    TL2.val["Length"] = ConvertLengthFromM(lambda4);
     Components.append(TL2);
 
     WireInfo WI(TL1.ID, 1, TermSpar.ID, 0);
@@ -29,7 +29,7 @@ void PowerCombinerDesigner::Bagley()
     Wires.append(WI);
 
     TermSpar.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, vertical, 0, 100, "N1", "gnd");
-    TermSpar.val["Z"] = num2str(Specs.Z0, Resistance);
+    TermSpar.val["Z0"] = num2str(Specs.Z0, Resistance);
     Components.append(TermSpar);
 
     WI.setParams(TermSpar.ID, 0, TL2.ID, 0);
@@ -42,8 +42,8 @@ void PowerCombinerDesigner::Bagley()
         posx+=100;
         TL.setParams(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine,
                      horizontal, posx, 100, QString("N%1").arg(i), QString("N%1").arg(i+1));
-        TL.val["Z"] = num2str(Zbranch, Resistance);
-        TL.val["L"] = ConvertLengthFromM(lambda2);
+        TL.val["Z0"] = num2str(Zbranch, Resistance);
+        TL.val["Length"] = ConvertLengthFromM(lambda2);
         Components.append(TL);
 
         WI.setParams(TermSpar.ID, 0, TL.ID, 0);
@@ -51,7 +51,7 @@ void PowerCombinerDesigner::Bagley()
 
         TermSpar.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, vertical,
                            posx + 50, 100, QString("N%1").arg(i+1), "gnd");
-        TermSpar.val["Z"] = num2str(Specs.Z0, Resistance);
+        TermSpar.val["Z0"] = num2str(Specs.Z0, Resistance);
         Components.append(TermSpar);
 
         WI.setParams(TermSpar.ID, 0, TL.ID, 1);

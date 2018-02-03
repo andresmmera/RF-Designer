@@ -33,7 +33,7 @@ void PowerCombinerDesigner::Wilkinson()
 
         //Build the circuit and the netlist
         TermSpar1.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, vertical, 50, 0, "N0", "gnd");
-        TermSpar1.val["Z"] = num2str(Specs.Z0, Resistance);
+        TermSpar1.val["Z0"] = num2str(Specs.Z0, Resistance);
         Components.append(TermSpar1);
 
         //Shunt capacitor
@@ -165,7 +165,7 @@ void PowerCombinerDesigner::Wilkinson()
             Wires.append(WI);
 
             TermSpar2.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, vertical, 370, -50, "N3", "gnd");
-            TermSpar2.val["Z"] = num2str(Specs.Z0, Resistance);
+            TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
             Components.append(TermSpar2);
 
             WI.setParams(N4.ID, 0, TermSpar2.ID, 0);
@@ -200,7 +200,7 @@ void PowerCombinerDesigner::Wilkinson()
             Wires.append(WI);
 
             TermSpar3.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, vertical, 370, 75, "N4", "gnd");
-            TermSpar3.val["Z"] = num2str(Specs.Z0, Resistance);
+            TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
             Components.append(TermSpar3);
 
             WI.setParams(N5.ID, 0, TermSpar3.ID, 0);
@@ -209,14 +209,14 @@ void PowerCombinerDesigner::Wilkinson()
         else
         {//Just put the output terms
             TermSpar2.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, vertical, 280, -75, "N1", "gnd");
-            TermSpar2.val["Z"] = num2str(Specs.Z0, Resistance);
+            TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
             Components.append(TermSpar2);
 
             WI.setParams(TermSpar2.ID, 0, N2.ID, 0);
             Wires.append(WI);
 
             TermSpar3.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, vertical, 280, 75, "N2", "gnd");
-            TermSpar3.val["Z"] = num2str(Specs.Z0, Resistance);
+            TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
             Components.append(TermSpar3);
 
 
@@ -228,14 +228,14 @@ void PowerCombinerDesigner::Wilkinson()
     if (Specs.Implementation == "Ideal TL")
     {
         TermSpar1.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, vertical, 0, 0, "N0", "gnd");
-        TermSpar1.val["Z"] = num2str(Specs.Z0, Resistance);
+        TermSpar1.val["Z0"] = num2str(Specs.Z0, Resistance);
         Components.append(TermSpar1);
 
         //1st transmission line
         ComponentInfo TL1(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine,
                           horizontal, 50, 0, "N0", "N1");
-        TL1.val["Z"] = num2str(Specs.Z0, Resistance);
-        TL1.val["L"] = ConvertLengthFromM(lambda4);
+        TL1.val["Z0"] = num2str(Specs.Z0, Resistance);
+        TL1.val["Length"] = ConvertLengthFromM(lambda4);
         Components.append(TL1);
 
         WireInfo WI(TermSpar1.ID, 0, TL1.ID, 0);
@@ -252,8 +252,8 @@ void PowerCombinerDesigner::Wilkinson()
         //1st transmission line
         ComponentInfo TL2(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine,
                           horizontal, 135, -50, "N1", "N2");
-        TL2.val["Z"] = num2str(WilkinsonParams.Z2, Resistance);
-        TL2.val["L"] = ConvertLengthFromM(lambda4);
+        TL2.val["Z0"] = num2str(WilkinsonParams.Z2, Resistance);
+        TL2.val["Length"] = ConvertLengthFromM(lambda4);
         Components.append(TL2);
 
         WI.setParams(TL2.ID, 0, N1.ID, 0);
@@ -269,8 +269,8 @@ void PowerCombinerDesigner::Wilkinson()
         //1st transmission line
         ComponentInfo TL3(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine,
                           horizontal, 135, 50, "N1", "N3");
-        TL3.val["Z"] = num2str(WilkinsonParams.Z3, Resistance);
-        TL3.val["L"] = ConvertLengthFromM(lambda4);
+        TL3.val["Z0"] = num2str(WilkinsonParams.Z3, Resistance);
+        TL3.val["Length"] = ConvertLengthFromM(lambda4);
         Components.append(TL3);
 
         WI.setParams(TL3.ID, 0, N1.ID, 0);
@@ -300,13 +300,13 @@ void PowerCombinerDesigner::Wilkinson()
             //Upper branch matching transmission line
             ComponentInfo TL4(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine,
                               horizontal, 275, -50, "N2", "N4");
-            TL4.val["Z"] = num2str(sqrt(Specs.Z0*WilkinsonParams.R2), Resistance);
-            TL4.val["L"] = ConvertLengthFromM(lambda4);
+            TL4.val["Z0"] = num2str(sqrt(Specs.Z0*WilkinsonParams.R2), Resistance);
+            TL4.val["Length"] = ConvertLengthFromM(lambda4);
             Components.append(TL4);
 
             //Upper branch term
             TermSpar2.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, horizontal, 325, -50, "N4", "gnd");
-            TermSpar2.val["Z"] = num2str(Specs.Z0, Resistance);
+            TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
             Components.append(TermSpar2);
 
             WI.setParams(TL4.ID, 0, N2.ID, 0);
@@ -318,14 +318,14 @@ void PowerCombinerDesigner::Wilkinson()
             //Lower branch matching transmission line
             ComponentInfo TL5(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine,
                               horizontal, 275, 50, "N3", "N5");
-            TL5.val["Z"] = num2str(sqrt(Specs.Z0*WilkinsonParams.R3), Resistance);
-            TL5.val["L"] = ConvertLengthFromM(lambda4);
+            TL5.val["Z0"] = num2str(sqrt(Specs.Z0*WilkinsonParams.R3), Resistance);
+            TL5.val["Length"] = ConvertLengthFromM(lambda4);
             Components.append(TL5);
 
 
             //Lower branch term
             TermSpar3.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, horizontal, 325, 50, "N5", "gnd");
-            TermSpar3.val["Z"] = num2str(Specs.Z0, Resistance);
+            TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
             Components.append(TermSpar3);
 
             WI.setParams(TL5.ID, 0, N3.ID, 0);
@@ -338,7 +338,7 @@ void PowerCombinerDesigner::Wilkinson()
         {//Just put the output terms
             //Upper branch term
             TermSpar2.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, horizontal, 250, -50, "N2", "gnd");
-            TermSpar2.val["Z"] = num2str(Specs.Z0, Resistance);
+            TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
             Components.append(TermSpar2);
 
             WI.setParams(TL2.ID, 1, TermSpar2.ID, 0);
@@ -346,7 +346,7 @@ void PowerCombinerDesigner::Wilkinson()
 
             //Lower branch term
             TermSpar3.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, horizontal, 250, 50, "N3", "gnd");
-            TermSpar3.val["Z"] = num2str(Specs.Z0, Resistance);
+            TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
             Components.append(TermSpar3);
 
             WI.setParams(TL3.ID, 1, TermSpar3.ID, 0);

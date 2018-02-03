@@ -37,7 +37,7 @@ void PowerCombinerDesigner::MultistageWilkinson()
     (Specs.Implementation == "Lumped LC") ? posy = 75 : posy = 50;
 
     TermSpar1.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, vertical, posx, 0, "N0", "gnd");
-    TermSpar1.val["Z"] = num2str(Specs.Z0, Resistance);
+    TermSpar1.val["Z0"] = num2str(Specs.Z0, Resistance);
     Components.append(TermSpar1);
 
     posx += 50;
@@ -70,8 +70,8 @@ void PowerCombinerDesigner::MultistageWilkinson()
         //1st transmission line
         TL.setParams(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine,
                           horizontal, posx, 0, "N0", "N1");
-        TL.val["Z"] = num2str(Specs.Z0, Resistance);
-        TL.val["L"] = ConvertLengthFromM(lambda4);
+        TL.val["Z0"] = num2str(Specs.Z0, Resistance);
+        TL.val["Length"] = ConvertLengthFromM(lambda4);
         Components.append(TL);
 
         //Node
@@ -201,8 +201,8 @@ void PowerCombinerDesigner::MultistageWilkinson()
 
             TL_Upper.setParams(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine,
                                horizontal, posx+15, -50, QString("%1").arg(PreviousNode), QString("Nupper%1").arg(i));
-            TL_Upper.val["Z"] = num2str(Zlines[i], Resistance);
-            TL_Upper.val["L"] = ConvertLengthFromM(lambda4);
+            TL_Upper.val["Z0"] = num2str(Zlines[i], Resistance);
+            TL_Upper.val["Length"] = ConvertLengthFromM(lambda4);
             Components.append(TL_Upper);
 
             if (i > 0)
@@ -224,8 +224,8 @@ void PowerCombinerDesigner::MultistageWilkinson()
             (i==0) ? PreviousNode = "N1" : PreviousNode = QString("Nlower%1").arg(i-1);
             TL_Lower.setParams(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), TransmissionLine,
                                horizontal, posx+15, 50, QString("%1").arg(PreviousNode), QString("Nlower%1").arg(i));
-            TL_Lower.val["Z"] = num2str(Zlines[i], Resistance);
-            TL_Lower.val["L"] = ConvertLengthFromM(lambda4);
+            TL_Lower.val["Z0"] = num2str(Zlines[i], Resistance);
+            TL_Lower.val["Length"] = ConvertLengthFromM(lambda4);
             Components.append(TL_Lower);
 
             if (i > 0)
@@ -275,7 +275,7 @@ void PowerCombinerDesigner::MultistageWilkinson()
     //Upper branch term
     TermSpar2.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, horizontal, posx, -posy,
                         QString("Nupper%1").arg(Specs.Nstages-1), "gnd");
-    TermSpar2.val["Z"] = num2str(Specs.Z0, Resistance);
+    TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
     Components.append(TermSpar2);
 
     WI.setParams(TermSpar2.ID, 0, Nupper.ID, 0);
@@ -284,7 +284,7 @@ void PowerCombinerDesigner::MultistageWilkinson()
     //Lower branch term
     TermSpar3.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, horizontal, posx, posy,
                         QString("Nlower%1").arg(Specs.Nstages-1), "gnd");
-    TermSpar3.val["Z"] = num2str(Specs.Z0, Resistance);
+    TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
     Components.append(TermSpar3);
 
     WI.setParams(TermSpar3.ID, 0, Nlower.ID, 0);
