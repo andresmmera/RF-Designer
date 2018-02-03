@@ -106,10 +106,10 @@ Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f, QStringList topo
         case TransmissionLine:
             if (x[i].Orientation == horizontal)
             {//Series
-                ABCD_t(0,0) = cosh(gamma*x[i].getVal("L"));
-                ABCD_t(0,1) = x[i].getVal("Z")*sinh(gamma*x[i].getVal("L"));
-                ABCD_t(1,0) = sinh(gamma*x[i].getVal("L"))/x[i].getVal("Z");
-                ABCD_t(1,1) = cosh(gamma*x[i].getVal("L"));
+                ABCD_t(0,0) = cosh(gamma*x[i].getVal("Length"));
+                ABCD_t(0,1) = x[i].getVal("Z0")*sinh(gamma*x[i].getVal("Length"));
+                ABCD_t(1,0) = sinh(gamma*x[i].getVal("Length"))/x[i].getVal("Z0");
+                ABCD_t(1,1) = cosh(gamma*x[i].getVal("Length"));
             }
             else
             {//Shunt. Here we need to determine whether the stub is opened or short circuited
@@ -117,8 +117,8 @@ Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f, QStringList topo
                 {//It's the last element of the list, so there's no hypothetical gnd next
                     ABCD_t(0,0) = 1.;
                     ABCD_t(0,1) = 0;
-                    ABCD_t(1,0) = (tanh(gamma*x[i].getVal("L")))/x[i].getVal("Z");
-                    ABCD_t(1,1) = cosh(gamma*x[i].getVal("L"));
+                    ABCD_t(1,0) = (tanh(gamma*x[i].getVal("Length")))/x[i].getVal("Z0");
+                    ABCD_t(1,1) = cosh(gamma*x[i].getVal("Length"));
                 }
                 else
                 {//Check if the next element is a gnd
@@ -126,7 +126,7 @@ Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f, QStringList topo
                      {
                         ABCD_t(0,0) = 1.;
                         ABCD_t(0,1) = 0;
-                        ABCD_t(1,0) = 1./(x[i].getVal("Z")*tanh(gamma*x[i].getVal("L")));
+                        ABCD_t(1,0) = 1./(x[i].getVal("Z0")*tanh(gamma*x[i].getVal("Length")));
                         ABCD_t(1,1) = 1;
                      i++;//Increment the index so as to skip the gnd in the next loop iteration
                      }
@@ -134,21 +134,26 @@ Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f, QStringList topo
                     {//Open circuit stub in the middle of the ladder
                         ABCD_t(0,0) = 1.;
                         ABCD_t(0,1) = 0;
-                        ABCD_t(1,0) = (tanh(gamma*x[i].getVal("L")))/x[i].getVal("Z");
-                        ABCD_t(1,1) = cosh(gamma*x[i].getVal("L"));
+                        ABCD_t(1,0) = (tanh(gamma*x[i].getVal("Length")))/x[i].getVal("Z0");
+                        ABCD_t(1,1) = cosh(gamma*x[i].getVal("Length"));
                     }
-
                 }
             }
             break;
         case Resistor:
             if (x[i].Orientation == horizontal)
             {//Series
-
+                ABCD_t(0,0) = 1;
+                ABCD_t(0,1) = x[i].getVal("R");
+                ABCD_t(1,0) = 0;
+                ABCD_t(1,1) = 1;
             }
             else
             {//Shunt
-
+                ABCD_t(0,0) = 1;
+                ABCD_t(0,1) = 0;
+                ABCD_t(1,0) = 1/x[i].getVal("R");
+                ABCD_t(1,1) = 1;
             }
             break;
 

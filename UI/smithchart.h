@@ -118,6 +118,7 @@ private:
 	QPainterPath thinArcsPath;
 	/// Path for the thick arcs
 	QPainterPath thickArcsPath;
+    bool drawPoints;
 
 };
 

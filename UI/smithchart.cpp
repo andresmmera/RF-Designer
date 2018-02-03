@@ -59,6 +59,7 @@ SmithChart::SmithChart(QWidget * parent) : QWidget(parent)
 	textPen = QPen(palette().foreground(), 0.25);
 	pointDataPen = QPen(QColor("red"), 4.0, Qt::SolidLine, Qt::RoundCap);
 	lineDataPen = QPen(QColor("blue"), 1.0);
+    drawPoints = false;
 }
 
 SmithChart::~SmithChart()
@@ -84,9 +85,9 @@ void SmithChart::draw(QPainter * painter)
 	painter->drawArc(rectangle, 0, 5760);
 
 	// Inner thin circle, wavelengths toward generator
-	rectangle.adjust(16, 16, -16, -16);
+    rectangle.adjust(16, 16, -16, -16);
     painter->setPen(thinPen);
-	painter->drawArc(rectangle, 0, 5760);
+    painter->drawArc(rectangle, 0, 5760);
 
 	// Inner thick circle, wavelengths toward load
 	rectangle.adjust(16, 16, -16, -16);
@@ -112,7 +113,7 @@ void SmithChart::draw(QPainter * painter)
 		So, i has to advance while i < 250
 		Thick marcs: 0.002 * 5 = 0.01 (each time i % 5 == 0)
 	*/
-	for(int i=0; i< 250; i++)
+    for(int i=0; i< 250; i++)
 	{
 		// We keep the transformation matrix
 		painter->save();
@@ -129,15 +130,15 @@ void SmithChart::draw(QPainter * painter)
 			painter->drawLine(493, 0, 499, 0);
 		}
 		painter->restore();
-	}
+    }
 
 	/*
 		Ticks in the angle of reflection coefficient scale
 		This scale goes (-180º,180º], in steps of two degrees.
 		So for a half circle we have:
 		180º/2[º/tick] = 90 [tick]
-	*/
-	for(int i=90; i > -90; i--)
+    */
+    for(int i=90; i > -90; i--)
 	{
 		// We keep the transformation matrix
 		painter->save();
@@ -154,7 +155,7 @@ void SmithChart::draw(QPainter * painter)
 			painter->drawLine(464, 0, 468, 0);
 		}
 		painter->restore();
-	}
+    }
 
 	/*
 		The numbers in the wavelengths scales
@@ -261,8 +262,8 @@ void SmithChart::draw(QPainter * painter)
 
 
 	// The resistance or conductance component
-	painter->setPen(thickPen);
-	painter->drawLine(448, 0, -448, 0);
+    painter->setPen(thickPen);
+    painter->drawLine(448, 0, -448, 0);
 
 	// Zero impedance scale
 	painter->save();
@@ -273,13 +274,16 @@ void SmithChart::draw(QPainter * painter)
 	painter->restore();
 
 	// Finally we draw
-	painter->strokePath(thickArcsPath, thickPen);
-	painter->strokePath(thinArcsPath, thinPen);
+    painter->strokePath(thickArcsPath, thickPen);
+    painter->strokePath(thinArcsPath, thinPen);
 
 	// Draw the data
+    if (drawPoints)
+    {
     painter->setPen(QPen(Qt::red, 10, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin));
 	for(int i=0; i < dataVector.size(); i++)
 		painter->drawPoint(dataVector.at(i));
+    }
 
 	if(showInterpolatedLine)
 	{

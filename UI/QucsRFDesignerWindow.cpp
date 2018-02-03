@@ -65,6 +65,7 @@ QucsRFDesignerWindow::QucsRFDesignerWindow()
 
     SchematicWidget = new GraphWidget(dock_Schematic);//Schematic window
     SchematicWidget->setMinimumSize(200, 150);
+    connect(SchematicWidget, SIGNAL(SendComponentSelectionToMainFunction(ComponentInfo)), this, SLOT(ComponentSelected(ComponentInfo)));
 
 
     //************ Set docks and add them to the main window *************
@@ -397,12 +398,26 @@ void QucsRFDesignerWindow::simulate()
     case 3://Intercept point simulation
         SimulateInterceptDiagram();
         break;
+    case 4://Smith chart
+         //Reproduce the impedance movements in the Smith chart
+         PlotImpedanceTransformations();
+         //Calculate the S parameters
+         SimulateLadderSPAR();
+        break;
     default:
         if (!SchInfo.Description.contains("NOT LADDER"))
              SimulateLadderSPAR();
         else SimulateSPAR();
     }
 }
+
+
+void QucsRFDesignerWindow::PlotImpedanceTransformations()
+{
+   Smith_plot->clear();
+   Smith_plot->setData(SchInfo.ImpedanceTrace);
+}
+
 
 
 //S-parameter simulation using the built-in ladder SPAR simulator. This is used only for SPAR simulations
@@ -602,5 +617,16 @@ void QucsRFDesignerWindow::SwitchTabs(int tabindex)
     case 4: //Smith Chart tool
         addDockWidget(Qt::RightDockWidgetArea, dock_Smith);//Add new diagram to display the spectrum of the two-tone test
         break;
+    }
+}
+
+// Whenever a component is selected in the schematic widget, it emits a signal that is firstly catched by the GraphWidget and
+// then is retransmitted to the main class. This function is the one that handles such signals so it must take into account
+// the current tool.
+void QucsRFDesignerWindow::ComponentSelected(ComponentInfo CI)
+{
+    if (TabWidget->currentIndex() == 4)//Smith chart
+    {
+      SmithTool->SelectComponent(CI);
     }
 }

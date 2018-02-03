@@ -66,11 +66,13 @@ private slots://Functions to launch the actions
     void receiveInterceptDiagramData(struct InterceptPointsData);
     void simulate();//Rerun simulation when the user does some action over the display
     void SwitchTabs(int);//Whenever the tool tab is changed, this slot forces a new design without the need of modify a design parameter
+    void ComponentSelected(ComponentInfo);
 
     //Simulations
     void SimulateSPAR();
     void SimulateLadderSPAR();
     void SimulateInterceptDiagram();
+    void PlotImpedanceTransformations();
 
 private://Actions
     void createActions();
@@ -107,8 +109,6 @@ private://Actions
     void updateGraph(int, vector<double>, QMap<QString, vector<complex<double> > >);
     void updateGraph(int, vector<double>, QMap<QString, vector<double> >, QMap<QString, QPen>, QString, QString );
     void plotPoints(int, QMap<QString, QPointF>, QString);
-
-
 };
 
 #endif // QucsRFDesignerWindow_H

@@ -22,6 +22,7 @@ public:
     SmithChartTool();
     QString getQucsNetlist();
     SchematicInfo getSchematic();
+    void SelectComponent(ComponentInfo);
 private:
     QList<ComponentInfo> Components;
     QList<WireInfo> Wires;
@@ -30,7 +31,7 @@ private:
     QString QucsNetlist;
     QMap<ComponentType, int> NumberComponents;//List for assigning IDs to the filter components
 
-    QDoubleSpinBox *FC_Spinbox, *SourceImpedanceReal, *SourceImpedanceImag, *LoadImpedanceReal, *LoadImpedanceImag;
+    QDoubleSpinBox *FC_Spinbox, *SourceImpedanceReal, *SourceImpedanceImag, *LoadImpedanceReal, *LoadImpedanceImag, *Z0_Spinbox;
     QComboBox *freq_scale_Combobox;
     QPushButton *CsButton, *CpButton, *LsButton, *LpButton, *TLButton,
                 *SCStubButton, *OCStubButton, *RemovePartButton;
@@ -42,7 +43,12 @@ private:
     QString netlist;
     SchematicInfo SchInfo;//Schematic representation
 
+    QStringList CapacitanceUnits, InductanceUnits, ResistanceUnits, LengthUnits;
     void simulate();
+    void CalcImpedanceTrace();
+    double getFrequency();
+    QPointF getZS();
+    double Z0;//Chart reference impedance
 
 signals:
     void simulateNetwork(struct SchematicInfo);
@@ -57,6 +63,8 @@ private slots:
     void addShortCircuitStub();
     void RemovePart();
     void UpdateComponentPropertiesList();
+    void UpdatePropertyValue();
+    void UpdateValueUnits(QString);
 };
 
 #endif // SMITHCHARTTOOL_H

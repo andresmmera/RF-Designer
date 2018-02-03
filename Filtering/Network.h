@@ -76,6 +76,7 @@ struct SchematicInfo
     QList<struct NodeInfo> Nodes;
     QMap <QString, QPen>displayGraphs;
     QString Description;
+    QVector<QPointF> ImpedanceTrace;
 };
 
 

@@ -167,8 +167,8 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->drawLine(QPoint(0, 16), QPoint(0, 40));
             painter->setPen(QPen(Qt::black, 1));
             painter->drawText(QRect(7,-5,100,100), QString("%1").arg(this->ID));
-            painter->drawText(QRect(7,5,100,100), QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
-            painter->drawText(QRect(7,12,100,100), QString("%1").arg(Value["L"]));
+            painter->drawText(QRect(7,5,100,100), QString("%1").arg(Value["Z0"].replace("Ohm", QChar(0xa9, 0x03))));
+            painter->drawText(QRect(7,12,100,100), QString("%1").arg(Value["Length"]));
         }
         else
         {
@@ -181,8 +181,8 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->drawLine(QPoint(16, 0), QPoint(40, 0));
             painter->setPen(QPen(Qt::black, 1));
             painter->drawText(QRect(-15,7,100,100), QString("%1").arg(this->ID));
-            painter->drawText(QRect(-15,13,100,100), QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
-            painter->drawText(QRect(-15,20,100,100), QString("%1").arg(Value["L"]));
+            painter->drawText(QRect(-15,13,100,100), QString("%1").arg(Value["Z0"].replace("Ohm", QChar(0xa9, 0x03))));
+            painter->drawText(QRect(-15,20,100,100), QString("%1").arg(Value["Length"]));
         }
         break;
     case Resistor:
@@ -360,44 +360,47 @@ ComponentType Component::getComponentType()
 double ComponentInfo::getVal(QString Property)
 {
     QString val_ = this->val[Property];
+    QString suffix;
     val_.remove(" ");//Remove blank spaces (if exists)
     double scale = 1;
     int index=1;
     //Find the suffix
-    index=val_.indexOf('f');
-    if (index != -1)
+    //Examine each character until finding the first letter, then determine the scale factor
+    for (int i = 0; i < val_.length(); i++)
+    {
+        if (val_.at(i).isLetter())
+        {
+            index = i;
+            suffix = val_.at(i);
+            break;
+        }
+    }
+
+    if (suffix == "f")
         scale = 1e-15;
     else{
-        index=val_.indexOf('p', Qt::CaseSensitive);
-        if (index != -1)
+        if (suffix == "p")
             scale = 1e-12;
         else{
-            index = val_.indexOf('n', Qt::CaseSensitive);
-            if (index != -1)
+            if (suffix == "n")
                 scale = 1e-9;
             else{
-                index = val_.indexOf('u', Qt::CaseSensitive);
-                if (index != -1)
+                if (suffix == "u")
                     scale = 1e-6;
                 else{
-                    index = val_.indexOf('m', Qt::CaseSensitive);
-                    if (index != -1)
+                    if (suffix == "m")
                         scale = 1e-3;
                     else{
-                        index = val_.indexOf('K', Qt::CaseSensitive);
-                        if (index != -1)
+                        if (suffix == "K")
                             scale = 1e3;
                         else{
-                            index = val_.indexOf('M', Qt::CaseSensitive);
-                            if (index != -1)
+                            if (suffix == "M")
                                 scale = 1e6;
                             else{
-                                index = val_.indexOf('G', Qt::CaseSensitive);
-                                if (index != -1)
+                                if (suffix == "G")
                                     scale = 1e9;
                                 else{
-                                    index = val_.indexOf('T', Qt::CaseSensitive);
-                                    if (index != -1)
+                                    if (suffix == "T")
                                         scale = 1e12;
                                 }
                             }
