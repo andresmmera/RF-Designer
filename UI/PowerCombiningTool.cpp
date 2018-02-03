@@ -193,6 +193,7 @@ void PowerCombiningTool::UpdateDesignParameters()
     SchInfo.Wires = PowCombD->getWires();
     SchInfo.Nodes = PowCombD->getNodes();
     SchInfo.displayGraphs = PowCombD->displaygraphs;
+    SchInfo.Description = "NOT LADDER";
     delete PowCombD;
     // EMIT SIGNAL TO SIMULATE
     emit simulateNetwork(SchInfo);
