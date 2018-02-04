@@ -425,6 +425,13 @@ void QucsRFDesignerWindow::PlotImpedanceTransformations()
 void QucsRFDesignerWindow::SimulateLadderSPAR()
 {
   QCPRange xAxisRange = DisplayWindow[0]->xAxis->range();
+  DisplayWindow[0]->yAxis->setLabel("dB");
+  DisplayWindow[0]->xAxis->setLabel("MHz");
+  if (xAxisRange.upper < SPAR_Settings.fstart*1e-6)
+  {//Well, the previous plot wasn't a SPAR simulation
+      DisplayWindow[0]->xAxis->setRange(SPAR_Settings.fstart*1e-6, SPAR_Settings.fstop*1e-6);
+      xAxisRange = DisplayWindow[0]->xAxis->range();
+  }
   SparEngine SPARSim;
   SP_Analysis SPARSettings;
   SPARSettings.fstart =xAxisRange.lower*1e6;
@@ -467,8 +474,7 @@ void QucsRFDesignerWindow::SimulateSPAR()
     DisplayWindow[0]->xAxis->setLabel("MHz");
     if (xAxisRange.upper < SPAR_Settings.fstart*1e-6)
     {//Well, the previous plot wasn't a SPAR simulation
-        DisplayWindow[0]->xAxis->setRangeLower(SPAR_Settings.fstart);
-        DisplayWindow[0]->xAxis->setRangeUpper(SPAR_Settings.fstop);
+        DisplayWindow[0]->xAxis->setRange(SPAR_Settings.fstart*1e-6, SPAR_Settings.fstop*1e-6);
         xAxisRange = DisplayWindow[0]->xAxis->range();
     }
 
@@ -615,6 +621,7 @@ void QucsRFDesignerWindow::SwitchTabs(int tabindex)
         IP_Tool->CalculateInterceptPoints();
         break;
     case 4: //Smith Chart tool
+        dock_DisplayWindow2->hide();
         addDockWidget(Qt::RightDockWidgetArea, dock_Smith);//Add new diagram to display the spectrum of the two-tone test
         break;
     }
