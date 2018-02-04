@@ -69,9 +69,27 @@ public:
         }
         code += QString(":%1 %2 %3").arg(ID).arg(Net1).arg(Net2);
         std::map<QString, QString>::iterator it = val.begin();
+        QString prop;//Temporal variable to translate the internal property names to Qucs property names
         while (it != val.end())
         {
-            code += QString(" %1=\"%2\"").arg(it->first).arg(it->second);
+            switch (Type)
+            {
+            case TransmissionLine:
+                prop =it->first;
+                if (prop == "Length") prop = "L";
+                if (prop == "Z0") prop = "Z";
+                code += QString(" %1=\"%2\"").arg(prop).arg(it->second);
+                break;
+
+            case Term:
+                prop = it->first;
+                if (prop == "Z0") prop = "Z";
+                code += QString(" %1=\"%2\"").arg(prop).arg(it->second);
+                break;
+            default:
+                code += QString(" %1=\"%2\"").arg(it->first).arg(it->second);
+
+            }
             it++;
         }
         code += "\n";
