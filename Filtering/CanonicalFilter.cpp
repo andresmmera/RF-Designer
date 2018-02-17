@@ -132,7 +132,6 @@ void CanonicalFilter::SynthesizeLPF()
         if (((Specification.isCLC) && (k % 2 == Kcontrol)) || ((!Specification.isCLC) && (k % 2 != Kcontrol)))
         {
             //Shunt capacitor
-            //Shunt capacitor
             Cshunt.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, vertical,
                                  posx, 50, QString("N%1").arg(Ni), "gnd");
             gi[k+1] *= 1/(2*M_PI*Specification.fc*Specification.ZS);//Lowpass to highpass transformation

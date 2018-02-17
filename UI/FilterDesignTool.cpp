@@ -266,7 +266,7 @@ void FilterDesignTool::synthesize()
             SchInfo.Wires = EF->getWires();
             SchInfo.Nodes = EF->getNodes();
             SchInfo.displayGraphs = EF->displaygraphs;
-            SchInfo.Description = "NOT DESCRIPTION";
+            SchInfo.Description = "NOT LADDER";
             delete EF;
         }
         else
@@ -368,7 +368,7 @@ void FilterDesignTool::ResposeComboChanged()
     }
 
 
-    if ((table != "Chebyshev") &&(table != "LinearPhase")&&(table != "Gegenbauer"))
+    if ((table != "Chebyshev") &&(table != "LinearPhase")&&(table != "Gegenbauer")&&(table != "Elliptic"))
     {
         (UseZverevTablesCheckBox->isChecked()) ? RippleCombobox->hide() : RippleSpinbox->hide();
         RippleLabel->hide();
@@ -377,7 +377,7 @@ void FilterDesignTool::ResposeComboChanged()
     else
     {
         if (table == "Gegenbauer") RippleLabel->setText("Alpha");
-        if (table == "Chebyshev") RippleLabel->setText("Ripple");
+        if ((table == "Chebyshev")&&(table == "Elliptic")) RippleLabel->setText("Ripple");
         if (table == "LinearPhase") RippleLabel->setText("Phase ripple");
         (UseZverevTablesCheckBox->isChecked()) ? RippleCombobox->show() : RippleSpinbox->show();
         RippleLabel->show();
