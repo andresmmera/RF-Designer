@@ -46,6 +46,10 @@ private:
 
     void SynthesizeHPF_TypeS_MinL();
     void SynthesizeHPF_TypesABC_MinL();
+    void SynthesizeHPF_TypeS_MinC();
+    void SynthesizeHPF_TypesABC_MinC();
+
+
     void SynthesizeBPF();//Bandpass
     void SynthesizeBSF();//Bandstop
 };
