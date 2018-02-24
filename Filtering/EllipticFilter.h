@@ -39,13 +39,12 @@ private:
     std::complex<double> Sn(double, std::complex<double>);
 
     //***********  Schematic synthesis ********************
-    void SynthesizeLPF();//Lowpass
     void SynthesizeLPF_TypeS_MinL();
     void SynthesizeLPF_TypeS_MinC();
     void SynthesizeLPF_TypesABC_MinL();
     void SynthesizeLPF_TypesABC_MinC();
 
-    void SynthesizeHPF();//Highpass
+    void SynthesizeHPF_TypeS_MinL();
     void SynthesizeBPF();//Bandpass
     void SynthesizeBSF();//Bandstop
 };
