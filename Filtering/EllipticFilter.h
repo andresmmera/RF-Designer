@@ -39,6 +39,11 @@ private:
     std::complex<double> Sn(double, std::complex<double>);
 
     //***********  Schematic synthesis ********************
+    void Synthesize_TypeS();
+    void InsertEllipticSection_TypeS(int &, int &, QStringList &, int, bool, bool);
+
+
+
     void SynthesizeLPF_TypeS_MinL();
     void SynthesizeLPF_TypeS_MinC();
     void SynthesizeLPF_TypesABC_MinL();
