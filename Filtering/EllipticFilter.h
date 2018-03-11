@@ -39,18 +39,9 @@ private:
     std::complex<double> Sn(double, std::complex<double>);
 
     //***********  Schematic synthesis ********************
-    void SynthesizeLPF_TypeS_MinL();
-    void SynthesizeLPF_TypeS_MinC();
-    void SynthesizeLPF_TypesABC_MinL();
-    void SynthesizeLPF_TypesABC_MinC();
+    void SynthesizeEllipticFilter();
+    void InsertEllipticSection(int &, int &, QStringList &, int, bool, bool);
 
-    void SynthesizeHPF_TypeS_MinL();
-    void SynthesizeHPF_TypesABC_MinL();
-    void SynthesizeHPF_TypeS_MinC();
-    void SynthesizeHPF_TypesABC_MinC();
-
-
-    void SynthesizeBPF();//Bandpass
-    void SynthesizeBSF();//Bandstop
+    void Insert_LowpassMinL_Section(int &, int &, QStringList &, int, bool, bool);
 };
 #endif
