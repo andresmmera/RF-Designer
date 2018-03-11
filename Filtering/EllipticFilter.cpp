@@ -465,11 +465,9 @@ void EllipticFilter::SynthesizeEllipticFilter()
 // This function just handles the type of elliptic section to implement. That could be done at SynthesizeEllipticFilter() but that'd be a complete mesh
 void EllipticFilter::InsertEllipticSection(int &posx, int &Ni, QStringList &ConnectionAux, int j, bool flip, bool CentralSection)
 {
-    if (Specification.FilterType == Lowpass && Specification.isCLC) Insert_LowpassMinL_Section(posx, Ni, ConnectionAux, j, flip, CentralSection);
+    if (Specification.FilterType == Lowpass  && Specification.isCLC)     Insert_LowpassMinL_Section(posx, Ni, ConnectionAux, j, flip, CentralSection);
+    if (Specification.FilterType == Highpass && !Specification.isCLC)    Insert_HighpassMinC_Section(posx, Ni, ConnectionAux, j, flip, CentralSection);
 
-    if (Specification.FilterType == Highpass && !Specification.isCLC)//Highpass Min C
-    {
-    }
 }
 
 
@@ -624,6 +622,163 @@ void EllipticFilter::Insert_LowpassMinL_Section(int &posx, int &Ni, QStringList 
             WI.setParams(ConnectionAux.at(0), 1, Cseries.ID, 1);
             Wires.append(WI);
         }
+        ConnectionAux.clear();//Remove previous section elements
+        ConnectionAux.append(NI.ID);
+
+        posx -= 50;
+    }
+}
+
+
+// Draw and generate the netlist of a lowpass min L elliptic section
+void EllipticFilter::Insert_HighpassMinC_Section(int &posx, int &Ni, QStringList &ConnectionAux, int j, bool flip, bool CentralSection)
+{
+    ComponentInfo Lshunt, Ground, Lseries, Cseries;
+    NodeInfo NI;
+    WireInfo WI;
+
+    double Kl = Specification.ZS/(2*M_PI*Specification.fc);
+    double Kc = 1/(2*M_PI*Specification.fc*Specification.ZS);
+
+    if (CentralSection)
+    {
+        Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, vertical,
+                         posx+50, 50, QString("N%1").arg(Ni), "gnd");
+        Lshunt.val["L"] = num2str(Kl/Cshunt_LP->at(j), Inductance);
+        Components.append(Lshunt);
+
+        //GND
+        Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical, posx+50, 100, "", "");
+        Components.append(Ground);
+
+        //***** GND to capacitor *****
+        WI.setParams(Ground.ID, 0, Lshunt.ID, 0);
+        Wires.append(WI);
+
+        ConnectionAux.append(Lshunt.ID);
+        return;
+    }
+    //Scale lowpass prototype values
+    double Lshunt_HP  = Kl/Cshunt_LP->at(j);
+    double Cseries_HP = Kc/Lseries_LP->at(j);
+    double Lseries_HP = Kl/Cseries_LP->at(j);
+
+    //Shunt capacitor
+    (flip) ? posx+= 50 : posx+=50;
+    if (!flip) Ni++;
+
+    if (Cshunt_LP->at(j) != 0)
+    {
+        Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, vertical,
+                         posx, 50, QString("N%1").arg(Ni), "gnd");
+        Lshunt.val["L"] = num2str(Lshunt_HP, Inductance);
+        Components.append(Lshunt);
+
+        //GND
+        Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical, posx, 100, "", "");
+        Components.append(Ground);
+    }
+    //Node
+    NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), posx, 0);
+    Nodes.append(NI);
+
+    //********************************************************************************
+
+    (flip) ? posx-= 50 : posx+=50;
+
+    if (!flip)  Ni-=1;
+
+
+    //Series inductor
+    if (Cshunt_LP->at(j) != 0)
+    {
+        Lseries.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, horizontal,
+                          posx, -80, QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
+        Lseries.val["L"] = num2str(Lseries_HP, Inductance);
+        Components.append(Lseries);
+    }
+
+    //Series capacitor
+    Cseries.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, horizontal, posx, 0,
+                      QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
+    Cseries.val["C"] = num2str(Cseries_HP, Capacitance);
+    Components.append(Cseries);
+
+    if (flip)
+    {
+        //Wires
+        if (Cshunt_LP->at(j) != 0)
+        {
+            //***** Capacitor to node *****
+            WI.setParams(NI.ID, 0, Lshunt.ID, 1);
+            Wires.append(WI);
+
+            //***** GND to shunt cap *****
+            WI.setParams(Ground.ID, 0, Lshunt.ID, 0);
+            Wires.append(WI);
+
+            //***** Inductor to node *****
+            WI.setParams(NI.ID, 0, Lseries.ID, 1);
+            Wires.append(WI);
+        }
+
+        //***** Series cap to node *****
+        WI.setParams(NI.ID, 0, Cseries.ID, 1);
+        Wires.append(WI);
+
+    }
+    else
+    {
+        //Wires
+        if (Cshunt_LP->at(j) != 0)
+        {
+            //***** Capacitor to node *****
+            WI.setParams(NI.ID, 0, Lshunt.ID, 1);
+            Wires.append(WI);
+
+            //***** GND to shunt cap *****
+            WI.setParams(Ground.ID, 0, Lshunt.ID, 0);
+            Wires.append(WI);
+
+            //***** Series cap to node *****
+            WI.setParams(NI.ID, 0, Lseries.ID, 0);
+            Wires.append(WI);
+        }
+
+        //***** Inductor to node *****
+        WI.setParams(NI.ID, 0, Cseries.ID, 0);
+        Wires.append(WI);
+
+    }
+    //***** Connect components from the previous section *****
+    if (flip)
+    {
+        //***** Inductor to node *****
+        WI.setParams(NI.ID, 1, ConnectionAux.at(0), 0);
+        Wires.append(WI);
+
+        if (ConnectionAux.size() == 2)
+        {
+            //***** Series cap to node *****
+            WI.setParams(NI.ID, 1, ConnectionAux.at(1), 0);
+            Wires.append(WI);
+        }
+        posx += 50;
+
+        ConnectionAux.clear();
+        if (Cshunt_LP->at(j) != 0) ConnectionAux.append(Lseries.ID);
+        ConnectionAux.append(Cseries.ID);
+    }
+    else
+    {
+        if (Cseries_LP->at(j) != 0)
+        {
+            WI.setParams(ConnectionAux.at(0), 1, Lseries.ID, 1);
+            Wires.append(WI);
+        }
+        WI.setParams(ConnectionAux.at(0), 1, Cseries.ID, 1);
+        Wires.append(WI);
+
         ConnectionAux.clear();//Remove previous section elements
         ConnectionAux.append(NI.ID);
 
