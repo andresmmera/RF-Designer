@@ -45,5 +45,7 @@ private:
     void Insert_LowpassMinL_Section(int &, int &, QStringList &, int, bool, bool);
     void Insert_HighpassMinC_Section(int &, int &, QStringList &, int, bool, bool);
 
+    void Insert_LowpassMinC_Section(int &, int &, QStringList &, int, bool, bool);
+
 };
 #endif
