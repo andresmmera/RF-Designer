@@ -31,6 +31,8 @@ public:
         Coordinates(2){
         Coordinates[0] = x;
         Coordinates[1] = y;
+        Connections.append(N1);
+        Connections.append(N2);
     };
     void setParams(QString ID_, ComponentType Type_,
                    ComponentOrientation Orientation_,
@@ -40,8 +42,9 @@ public:
     {
         ID = ID_; Type = Type_; Orientation = Orientation_;
         Coordinates[0] = x; Coordinates[1] = y;
-        Net1 = N1; Net2 = N2;
+        Connections.append(N1); Connections.append(N2);
     };
+    QStringList Connections;
     QString getQucs(){
         QString code;
         switch (Type)
@@ -67,7 +70,8 @@ public:
             code = "R";
             break;
         }
-        code += QString(":%1 %2 %3").arg(ID).arg(Net1).arg(Net2);
+        code += QString(":%1").arg(ID);
+        for (int i = 0; i < Connections.size(); i++) code += QString(" %1").arg(Connections[i]);
         std::map<QString, QString>::iterator it = val.begin();
         QString prop;//Temporal variable to translate the internal property names to Qucs property names
         while (it != val.end())
