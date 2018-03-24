@@ -393,7 +393,8 @@ void EllipticFilter::SynthesizeEllipticFilter()
     double l = (0.5*(N+1))*2.;
     int K = M-l-N%2-1;
 
-    posx = N*50;
+    if ((Specification.FilterType == Lowpass) || (Specification.FilterType == Highpass)) posx = N*50;
+    else posx = N*300;
 
     if (Specification.EllipticType == "Type S") RL = Specification.ZS;
 
@@ -415,7 +416,9 @@ void EllipticFilter::SynthesizeEllipticFilter()
     {
         InsertEllipticSection(posx, Ni, ConnectionAux, j, true, false);
         Ni++;
-        posx -= 150;
+
+        if ((Specification.FilterType == Lowpass) || (Specification.FilterType == Highpass)) posx -= 150;
+        else posx -= 300;
     }
 
     //Central shunt capacitor
@@ -427,7 +430,9 @@ void EllipticFilter::SynthesizeEllipticFilter()
         InsertEllipticSection(posx, Ni, ConnectionAux, K, false, false);
         K = K-2;
         Ni++;
-        posx-=150;
+
+        if ((Specification.FilterType == Lowpass) || (Specification.FilterType == Highpass)) posx -= 150;
+        else posx -= 300;
     }
 
     posx+=100;
@@ -449,6 +454,7 @@ void EllipticFilter::InsertEllipticSection(int &posx, int &Ni, QStringList &Conn
     if (Specification.FilterType == Highpass && !Specification.isCLC)    Insert_HighpassMinC_Section(posx, Ni, ConnectionAux, j, flip, CentralSection);
     if (Specification.FilterType == Lowpass  && !Specification.isCLC)    Insert_LowpassMinC_Section(posx, Ni, ConnectionAux, j, flip, CentralSection);
     if (Specification.FilterType == Highpass  && Specification.isCLC)    Insert_HighpassMinL_Section(posx, Ni, ConnectionAux, j, flip, CentralSection);
+    if (Specification.FilterType == Bandpass  && Specification.isCLC)    Insert_Bandpass_1_Section(posx, Ni, ConnectionAux, j, flip, CentralSection);
 
 }
 
@@ -892,7 +898,7 @@ void EllipticFilter::Insert_LowpassMinC_Section(int &posx, int &Ni, QStringList 
     {
         Ni--;
         Cshunt.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, vertical, posx, 100,
-                      QString("N%1").arg(Ni+corr), "gnd");
+                         QString("N%1").arg(Ni+corr), "gnd");
     }
     Cshunt.val["C"] = num2str(Cshunt_LP_MINC, Capacitance);
     Components.append(Cshunt);
@@ -1021,8 +1027,8 @@ void EllipticFilter::Insert_HighpassMinL_Section(int &posx, int &Ni, QStringList
     //Series capacitor
     if (Cseries_LP->at(j) != 0)
     {
-    Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, vertical,
-                     posx, 30, QString("N%1").arg(Ni+corr), QString("N%1R").arg(Ni+corr));
+        Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, vertical,
+                         posx, 30, QString("N%1").arg(Ni+corr), QString("N%1R").arg(Ni+corr));
     }
     else
     {
@@ -1104,5 +1110,199 @@ void EllipticFilter::Insert_HighpassMinL_Section(int &posx, int &Ni, QStringList
         if (j == Specification.order)Ni--;
         posx -= 50;
 
+    }
+}
+
+
+void EllipticFilter::Insert_Bandpass_1_Section(int &posx, int &Ni, QStringList &ConnectionAux, int j, bool flip, bool CentralSection)
+{
+    ComponentInfo Lshunt, Ground, Cseries1, Cseries2, Lseries1, Lseries2, Cshunt;
+    NodeInfo NI;
+    WireInfo WI;
+
+    double Kl = Specification.ZS/(2*M_PI*Specification.fc);
+    double Kc = 1/(2*M_PI*Specification.fc*Specification.ZS);
+    int corr = 1;
+
+    if (CentralSection)
+    {
+        //Shunt resonator
+        Cshunt.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, vertical,
+                         posx+50, 50, QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
+        Cshunt.val["C"] = num2str(Kc/Cshunt_LP->at(j), Capacitance);
+        Components.append(Cshunt);
+
+        //GND
+        Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical, posx+50, 100, "", "");
+        Components.append(Ground);
+
+        WI.setParams(Cshunt.ID, 0, Ground.ID, 0);
+        Wires.append(WI);
+
+        Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, vertical,
+                         posx, 50, QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
+        Lshunt.val["L"] = num2str(Kc/Cshunt_LP->at(j), Inductance);
+        Components.append(Lshunt);
+
+        //GND
+        Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical, posx, 100, "", "");
+        Components.append(Ground);
+
+        //Node
+        NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), posx+25, 0);
+        Nodes.append(NI);
+
+        WI.setParams(Lshunt.ID, 0, Ground.ID, 0);
+        Wires.append(WI);
+
+        WI.setParams(Lshunt.ID, 1, NI.ID, 0);
+        Wires.append(WI);
+
+        WI.setParams(Cshunt.ID, 1, NI.ID, 0);
+        Wires.append(WI);
+
+        for (int i =0; i < ConnectionAux.size(); i++)
+        {
+            WI.setParams(NI.ID, 0, ConnectionAux.at(i), 0);
+            Wires.append(WI);
+        }
+
+        ConnectionAux.clear();//Remove previous section elements
+        ConnectionAux.append(NI.ID);
+        posx -= 200;
+        Ni++;
+
+        return;
+    }
+
+    //Scale lowpass prototype values
+    double Lshunt_HP_MINL  = Kl/Lseries_LP->at(j);
+    double Cshunt_HP_MINL  = Kc/Cseries_LP->at(j);
+    double Cseries_HP_MINL = Kc/Cshunt_LP->at(j);
+
+    //Shunt capacitor
+    (flip) ? posx+= 50 : posx+=50;
+    //Shunt resonator
+    Cshunt.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, vertical,
+                     posx-50, 50, QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
+    Cshunt.val["C"] = num2str(Kc/Cshunt_LP->at(j), Capacitance);
+    Components.append(Cshunt);
+
+    //GND
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical, posx-50, 100, "", "");
+    Components.append(Ground);
+
+    WI.setParams(Cshunt.ID, 0, Ground.ID, 0);
+    Wires.append(WI);
+
+
+    Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, vertical,
+                     posx, 50, QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
+    Lshunt.val["L"] = num2str(Kc/Cshunt_LP->at(j), Inductance);
+    Components.append(Lshunt);
+
+    //GND
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical, posx, 100, "", "");
+    Components.append(Ground);
+
+    WI.setParams(Lshunt.ID, 0, Ground.ID, 0);
+    Wires.append(WI);
+
+    //Node
+    NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), posx-25, 0);
+    Nodes.append(NI);
+
+    WI.setParams(Lshunt.ID, 1, NI.ID, 0);
+    Wires.append(WI);
+
+    WI.setParams(Cshunt.ID, 1, NI.ID, 0);
+    Wires.append(WI);
+
+    //********************************************************************************
+
+    if(flip) posx-= 200;
+
+    if (!flip) corr = 0;
+    else corr = 1;
+
+
+    Cseries1.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, horizontal,
+                       posx+75, -50, QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
+    Cseries1.val["C"] = num2str(Kc/Cshunt_LP->at(j), Capacitance);
+    Components.append(Cseries1);
+
+    Lseries1.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, horizontal,
+                       posx+75, -100, QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
+    Lseries1.val["L"] = num2str(Kc/Cshunt_LP->at(j), Inductance);
+    Components.append(Lseries1);
+
+    Cseries2.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, horizontal,
+                       posx+40, 0, QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
+    Cseries2.val["C"] = num2str(Kc/Cshunt_LP->at(j), Capacitance);
+    Components.append(Cseries2);
+
+    Lseries2.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, horizontal,
+                       posx+110, 0, QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
+    Lseries2.val["L"] = num2str(Kc/Cshunt_LP->at(j), Inductance);
+    Components.append(Lseries2);
+
+
+    //***** Connect components from the previous section *****
+    if (flip)
+    {
+        for (int i =0; i < ConnectionAux.size(); i++)
+        {
+            WI.setParams(NI.ID, 0, ConnectionAux.at(i), 0);
+            Wires.append(WI);
+        }
+        posx += 250;
+    }
+    else
+    {   //Here it connects all the two resonators to the previous noe
+        WI.setParams(ConnectionAux.at(0), 0, Lseries1.ID, 1);
+        Wires.append(WI);
+        WI.setParams(ConnectionAux.at(0), 0, Lseries2.ID, 1);
+        Wires.append(WI);
+        WI.setParams(ConnectionAux.at(0), 0, Cseries1.ID, 1);
+        Wires.append(WI);
+        posx += 50;
+
+    }
+
+    if (flip)
+    {
+        WI.setParams(Lseries2.ID, 0, Cseries2.ID, 1);
+        Wires.append(WI);
+
+        WI.setParams(NI.ID, 1, Lseries1.ID, 1);
+        Wires.append(WI);
+
+        WI.setParams(NI.ID, 1, Cseries1.ID, 1);
+        Wires.append(WI);
+
+        WI.setParams(NI.ID, 1, Lseries2.ID, 1);
+        Wires.append(WI);
+
+        ConnectionAux.clear();
+        ConnectionAux.append(Cseries1.ID);
+        ConnectionAux.append(Lseries1.ID);
+        ConnectionAux.append(Cseries2.ID);
+    }
+    else
+    {
+        WI.setParams(Lseries2.ID, 0, Cseries2.ID, 1);
+        Wires.append(WI);
+
+        WI.setParams(NI.ID, 1, Lseries1.ID, 0);
+        Wires.append(WI);
+
+        WI.setParams(NI.ID, 1, Cseries1.ID, 0);
+        Wires.append(WI);
+
+        WI.setParams(NI.ID, 1, Cseries2.ID, 0);
+        Wires.append(WI);
+
+        ConnectionAux.clear();
+        ConnectionAux.append(NI.ID);
     }
 }

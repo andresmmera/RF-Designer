@@ -48,5 +48,7 @@ private:
     void Insert_LowpassMinC_Section(int &, int &, QStringList &, int, bool, bool);
     void Insert_HighpassMinL_Section(int &, int &, QStringList &, int, bool, bool);
 
+    void Insert_Bandpass_1_Section(int &, int &, QStringList &, int, bool, bool);
+
 };
 #endif
