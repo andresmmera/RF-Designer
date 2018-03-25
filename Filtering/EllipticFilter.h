@@ -51,6 +51,7 @@ private:
     void Insert_Bandpass_1_Section(int &, int &, QStringList &, int, bool, bool);
     void Insert_Bandpass_2_Section(int &, int &, QStringList &, int, bool, bool);
 
+    void Insert_Bandstop_1_Section(int &, int &, QStringList &, int, bool, bool);
     void Insert_Bandstop_2_Section(int &, int &, QStringList &, int, bool, bool);
 
 };
