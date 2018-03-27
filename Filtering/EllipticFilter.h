@@ -31,6 +31,7 @@ private:
     double RL;//Load resistance
     std::vector<std::complex<double> > Poles;
     std::vector<std::complex<double> > Zeros;
+    unsigned int virtual_nodes;
 
     //Lowpass prototype
     void EllipticTypeS();
