@@ -278,21 +278,28 @@ void FilterDesignTool::synthesize()
             SchInfo.Wires = CF->getWires();
             SchInfo.Nodes = CF->getNodes();
             SchInfo.displayGraphs = CF->displaygraphs;
-            SchInfo.Description = "";
+            if (FilterClassCombo->currentText() == "Bandstop")
+            {//The bandstop configuration contains a shunt resonator which cannot be handled with the internal simulator
+                SchInfo.Description = "NOT LADDER";
+            }
+            else
+            {
+                SchInfo.Description = "";
+            }
             delete CF;
         }
-     }
+    }
     if (FilterImplementationCombo->currentText() == "LC Direct Coupled")
     {
-           DCF = new DirectCoupledFilters(Filter_SP);
-           DCF->synthesize();
-           SchInfo.netlist = DCF->getQucsNetlist();
-           SchInfo.Comps = DCF->getComponents();
-           SchInfo.Wires = DCF->getWires();
-           SchInfo.Nodes = DCF->getNodes();
-           SchInfo.displayGraphs = DCF->displaygraphs;
-           SchInfo.Description = "";
-           delete DCF;
+        DCF = new DirectCoupledFilters(Filter_SP);
+        DCF->synthesize();
+        SchInfo.netlist = DCF->getQucsNetlist();
+        SchInfo.Comps = DCF->getComponents();
+        SchInfo.Wires = DCF->getWires();
+        SchInfo.Nodes = DCF->getNodes();
+        SchInfo.displayGraphs = DCF->displaygraphs;
+        SchInfo.Description = "";
+        delete DCF;
     }
     SchInfo.SPAR_Settings = SPAR_Settings;
 }
@@ -403,10 +410,10 @@ void FilterDesignTool::UpdateDesignParameters()
     //**************************** Set filter type **************************************
     if (FilterImplementationCombo->currentText() == "LC Ladder")
     {
-       if (!FilterClassCombo->currentText().compare("Lowpass")) Filter_SP.FilterType = Lowpass;
-       if (!FilterClassCombo->currentText().compare("Highpass")) Filter_SP.FilterType = Highpass;
-       if (!FilterClassCombo->currentText().compare("Bandpass")) Filter_SP.FilterType = Bandpass;
-       if (!FilterClassCombo->currentText().compare("Bandstop")) Filter_SP.FilterType = Bandstop;
+        if (!FilterClassCombo->currentText().compare("Lowpass")) Filter_SP.FilterType = Lowpass;
+        if (!FilterClassCombo->currentText().compare("Highpass")) Filter_SP.FilterType = Highpass;
+        if (!FilterClassCombo->currentText().compare("Bandpass")) Filter_SP.FilterType = Bandpass;
+        if (!FilterClassCombo->currentText().compare("Bandstop")) Filter_SP.FilterType = Bandstop;
     }
     if (FilterImplementationCombo->currentText() == "LC Direct Coupled")
     {
@@ -429,10 +436,10 @@ void FilterDesignTool::UpdateDesignParameters()
         BW_ScaleCombobox->setEnabled(true);
         if (Filter_SP.bw >= Filter_SP.fc)
         {
-        BWSpinbox->blockSignals(true);
-        BWSpinbox->setValue(0.1*FCSpinbox->value());//10% BW
-        BW_ScaleCombobox->setCurrentIndex(FC_ScaleCombobox->currentIndex());
-        BWSpinbox->blockSignals(false);
+            BWSpinbox->blockSignals(true);
+            BWSpinbox->setValue(0.1*FCSpinbox->value());//10% BW
+            BW_ScaleCombobox->setCurrentIndex(FC_ScaleCombobox->currentIndex());
+            BWSpinbox->blockSignals(false);
         }
     }
 
@@ -469,8 +476,8 @@ void FilterDesignTool::UpdateDesignParameters()
         {
             if (CurrentResponse == data.at(i))
             {
-              FilterResponseTypeCombo->setCurrentIndex(i);
-              break;
+                FilterResponseTypeCombo->setCurrentIndex(i);
+                break;
             }
         }
         FilterClassCombo->blockSignals(false);
@@ -492,8 +499,8 @@ void FilterDesignTool::UpdateDesignParameters()
         {
             if (CurrentResponse == data.at(i))
             {
-              FilterResponseTypeCombo->setCurrentIndex(i);
-              break;
+                FilterResponseTypeCombo->setCurrentIndex(i);
+                break;
             }
         }
         FilterResponseTypeCombo->blockSignals(false);
@@ -779,7 +786,7 @@ QStringList FilterDesignTool::setItemsResponseTypeCombo()
     }
     else
     {//Default data
-       data = DefaultFilterResponses;
+        data = DefaultFilterResponses;
     }
     return data;
 }
