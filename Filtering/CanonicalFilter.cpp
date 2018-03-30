@@ -132,6 +132,7 @@ void CanonicalFilter::SynthesizeLPF()
         if (((Specification.isCLC) && (k % 2 == Kcontrol)) || ((!Specification.isCLC) && (k % 2 != Kcontrol)))
         {
             //Shunt capacitor
+            Cshunt.Connections.clear();
             Cshunt.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, vertical,
                                  posx, 50, QString("N%1").arg(Ni), "gnd");
             gi[k+1] *= 1/(2*M_PI*Specification.fc*Specification.ZS);//Lowpass to highpass transformation
@@ -164,6 +165,7 @@ void CanonicalFilter::SynthesizeLPF()
         else
         {
             //Series inductor
+            Lseries.Connections.clear();
             Lseries.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, horizontal,
                                    posx, 0, QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
             gi[k+1] *= Specification.ZS/(2*M_PI*Specification.fc);
@@ -220,6 +222,7 @@ void CanonicalFilter::SynthesizeHPF()
         if (((Specification.isCLC) && (k % 2 == 0)) || ((!Specification.isCLC) && (k % 2 != 0)))
         {
             //Shunt inductor
+            Lshunt.Connections.clear();
             Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, vertical, posx, 50,
                              QString("N%1").arg(Ni), "gnd");
             gi[k+1] = Specification.ZS/(2*M_PI*Specification.fc*gi[k+1]);
@@ -253,6 +256,7 @@ void CanonicalFilter::SynthesizeHPF()
         else
         {
             //Series capacitor
+            Cseries.Connections.clear();
             Cseries.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, horizontal, posx, 0,
                               QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
             gi[k+1] = 1/(2*M_PI*Specification.fc*gi[k+1]*Specification.ZS);
@@ -311,6 +315,7 @@ void CanonicalFilter::SynthesizeBPF()
         if (((Specification.isCLC) && (k % 2 == 0)) || ((!Specification.isCLC) && (k % 2 != 0)))
         {
             //Shunt capacitor
+            Cshunt.Connections.clear();
             Cshunt.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, vertical, posx-25, 50,
                               QString("N%1").arg(Ni), "gnd");
             Cshunt.val["C"] = num2str(gi[k+1]/(delta*Specification.ZS), Capacitance);
@@ -321,6 +326,7 @@ void CanonicalFilter::SynthesizeBPF()
             Components.append(Ground1);
 
             //Shunt inductor
+            Lshunt.Connections.clear();
             Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, vertical, posx+25, 50,
                              QString("N%1").arg(Ni), "gnd");
             Lshunt.val["L"] = num2str(Specification.ZS*delta/(w0*w0*gi[k+1]), Inductance);
@@ -361,12 +367,14 @@ void CanonicalFilter::SynthesizeBPF()
         else
         {   if (k==0) posx+=50;//First element
             //Series inductor
+            Lseries.Connections.clear();
             Lseries.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor, horizontal, posx-30, 0,
                               QString("N%1").arg(Ni), QString("N%1").arg(Ni+1));
             Lseries.val["L"] = num2str(gi[k+1]*Specification.ZS/(delta), Inductance);
             Components.append(Lseries);
 
             //Series capacitor
+            Cseries.Connections.clear();
             Cseries.setParams(QString("C%1").arg(++NumberComponents[Capacitor]), Capacitor, horizontal, posx+30, 0,
                               QString("N%1").arg(Ni+1), QString("N%1").arg(Ni+2));
             Cseries.val["C"] = num2str(delta/(w0*w0*Specification.ZS*gi[k+1]), Capacitance);
