@@ -788,7 +788,7 @@ double FilterDesignTool::getScale(QString scale) {
     return 1e6;
   if (!scale.compare("kHz"))
     return 1e3;
-  if (!scale.compare("Hz"))
+  else
     return 1;
 }
 

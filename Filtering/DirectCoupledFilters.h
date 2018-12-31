@@ -1,40 +1,39 @@
 #ifndef DIRECTCOUPLEDFILTERS_H
 #define DIRECTCOUPLEDFILTERS_H
-#include "Filtering/Network.h"
 #include "Filtering/LowpassPrototypeCoeffs.h"
-#include <QPen>
+#include "Filtering/Network.h"
 #include "general.h"
+#include <QPen>
 
-class DirectCoupledFilters : public Network
-{
+class DirectCoupledFilters : public Network {
 public:
-    DirectCoupledFilters();
-    ~DirectCoupledFilters();
-    DirectCoupledFilters(FilterSpecifications);
-    QList<ComponentInfo> getComponents();
-    QList<WireInfo> getWires();
-    QList<NodeInfo> getNodes();
-    void synthesize();
-    NetworkInfo getLadder();
-    QString getQucsNetlist(){return QucsNetlist;};
-    QMap<QString, QPen> displaygraphs;
+  DirectCoupledFilters();
+  virtual ~DirectCoupledFilters();
+  DirectCoupledFilters(FilterSpecifications);
+  QList<ComponentInfo> getComponents();
+  QList<WireInfo> getWires();
+  QList<NodeInfo> getNodes();
+  void synthesize();
+  NetworkInfo getLadder();
+  QString getQucsNetlist() { return QucsNetlist; };
+  QMap<QString, QPen> displaygraphs;
 
 private:
-    struct FilterSpecifications Specification;
-    QList<ComponentInfo> Components;
-    QList<WireInfo> Wires;
-    QList<NodeInfo> Nodes;
+  struct FilterSpecifications Specification;
+  QList<ComponentInfo> Components;
+  QList<WireInfo> Wires;
+  QList<NodeInfo> Nodes;
 
-    QString QucsNetlist;
+  QString QucsNetlist;
 
-    QMap<ComponentType, int> NumberComponents;//List for assigning IDs to the filter components
-    std::deque<double> gi;//Lowpass prototype
-    std::vector<std::complex<double> > Poles;
-    std::vector<std::complex<double> > Zeros;
+  QMap<ComponentType, int>
+      NumberComponents;  // List for assigning IDs to the filter components
+  std::deque<double> gi; // Lowpass prototype
+  std::vector<std::complex<double>> Poles;
+  std::vector<std::complex<double>> Zeros;
 
-    void Synthesize_Capacitative_Coupled_Shunt_Resonators();
-    void Synthesize_Inductive_Coupled_Series_Resonators();
+  void Synthesize_Capacitative_Coupled_Shunt_Resonators();
+  void Synthesize_Inductive_Coupled_Series_Resonators();
 };
-
 
 #endif // DIRECTCOUPLED_H

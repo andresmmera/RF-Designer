@@ -35,9 +35,9 @@ class SparEngine {
   const double c0 = 299792458; // Speed of light (m/s)
 public:
   SparEngine();
-  Mat getSparams(QList<ComponentInfo>, complex<double>, complex<double>, double,
-                 QStringList);
-  Mat getABCDmatrix(QList<ComponentInfo>, double, QStringList);
+  Mat getSparams(QList<ComponentInfo>, complex<double>, complex<double>,
+                 double);
+  Mat getABCDmatrix(QList<ComponentInfo>, double);
   void setNetwork(NetworkInfo);
   void setSimulationSettings(SP_Analysis);
   QMap<QString, vector<complex<double>>> getData();
