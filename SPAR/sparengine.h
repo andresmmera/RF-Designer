@@ -1,4 +1,4 @@
-/* 
+/*
  * sparengine.h - S parameter engine class definition
  *
  * copyright (C) 2016 Andres Martinez-Mera <andresmartinezmera@gmail.com>
@@ -21,36 +21,34 @@
  *
  */
 
-
 #ifndef SPARENGINE_H
 #define SPARENGINE_H
 
-#include <string.h>
-#include <set>
-#include "MathOperations.h"
 #include "Filtering/Network.h"
+#include "MathOperations.h"
+#include <set>
+#include <string.h>
 
 using namespace std;
 
-
-
-class SparEngine
-{
-    static const double c0 = 299792458;//Speed of light (m/s)
+class SparEngine {
+  const double c0 = 299792458; // Speed of light (m/s)
 public:
-    SparEngine();
-    Mat getSparams(QList<ComponentInfo>, complex<double>, complex<double>, double, QStringList);
-    Mat getABCDmatrix(QList<ComponentInfo>, double, QStringList);
-    void setNetwork(NetworkInfo);
-    void setSimulationSettings(SP_Analysis);
-    QMap<QString, vector<complex<double> > > getData();
-    void run();
-    vector<complex<double> > getSij(int, int);
-    vector<double> getFreq();
+  SparEngine();
+  Mat getSparams(QList<ComponentInfo>, complex<double>, complex<double>, double,
+                 QStringList);
+  Mat getABCDmatrix(QList<ComponentInfo>, double, QStringList);
+  void setNetwork(NetworkInfo);
+  void setSimulationSettings(SP_Analysis);
+  QMap<QString, vector<complex<double>>> getData();
+  void run();
+  vector<complex<double>> getSij(int, int);
+  vector<double> getFreq();
+
 private:
-    NetworkInfo NI;
-    SP_Analysis sim_settings;
-    vector<complex<double> > S11, S22, S21, S12;
+  NetworkInfo NI;
+  SP_Analysis sim_settings;
+  vector<complex<double>> S11, S22, S21, S12;
 };
 
 #endif // SPARENGINE_H
