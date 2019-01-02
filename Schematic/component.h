@@ -196,6 +196,14 @@ private:
   ComponentOrientation Orientation;
   std::map<QString, QString> Value;
   QString ID;
+
+  // Component symbol code
+  void paintCapacitor(QPainter *);
+  void paintInductor(QPainter *);
+  void paintTransmissionLine(QPainter *);
+  void paintResistor(QPainter *);
+  void paintTerm(QPainter *);
+
 signals:
   void DoubleClicked(struct ComponentInfo);
 };

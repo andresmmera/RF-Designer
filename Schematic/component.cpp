@@ -111,148 +111,23 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   painter->setFont(QFont("Arial", 6, QFont::Bold));
   switch (CompType) {
   case Capacitor:
-    if (Orientation == vertical) {
-      painter->drawLine(QPoint(0, 25), QPoint(0, 2 * 2));
-      painter->drawLine(QPoint(0, -25), QPoint(0, -2 * 2));
-      painter->drawLine(QPoint(-2 * 5, -2 * 2), QPoint(2 * 5, -2 * 2));
-      painter->drawLine(QPoint(-2 * 5, 2 * 2), QPoint(2 * 5, 2 * 2));
-      painter->setPen(QPen(Qt::black, 1));
-      painter->drawText(QRect(2, 5, 100, 100), QString("%1").arg(this->ID));
-      painter->drawText(QRect(2, 15, 100, 100), QString("%1").arg(Value["C"]));
-    } else {
-      painter->drawLine(QPoint(2 * 15, 0), QPoint(2 * 2, 0));
-      painter->drawLine(QPoint(-2 * 15, 0), QPoint(-2 * 2, 0));
-      painter->drawLine(QPoint(-2 * 2, -2 * 5), QPoint(-2 * 2, 2 * 5));
-      painter->drawLine(QPoint(2 * 2, -2 * 5), QPoint(2 * 2, 2 * 5));
-      painter->setPen(QPen(Qt::black, 1));
-      painter->drawText(QRect(-10, 10, 100, 100), QString("%1").arg(this->ID));
-      painter->drawText(QRect(-10, 20, 100, 100),
-                        QString("%1").arg(Value["C"]));
-    }
+    paintCapacitor(painter);
     break;
   case Inductor:
-    if (Orientation == vertical) {
-      painter->drawLine(QPoint(0, -2 * 15), QPoint(0, -2 * 7));
-      painter->drawArc(QRect(-2 * 2, -2 * 7, 2 * 5.0, 2 * 5.0), -90 * 16,
-                       180 * 16);
-      painter->drawArc(QRect(-2 * 2, -2 * 2, 2 * 5.0, 2 * 5.0), -90 * 16,
-                       180 * 16);
-      painter->drawArc(QRect(-2 * 2, 2 * 3, 2 * 5.0, 2 * 5.0), -90 * 16,
-                       180 * 16);
-      painter->drawLine(QPoint(0, 16), QPoint(0, 40));
-      painter->setPen(QPen(Qt::black, 1));
-      painter->drawText(QRect(7, 5, 100, 100), QString("%1").arg(this->ID));
-      painter->drawText(QRect(7, 15, 100, 100), QString("%1").arg(Value["L"]));
-    } else {
-      painter->drawLine(QPoint(-2 * 15, 0), QPoint(-2 * 7, 0));
-      painter->drawArc(QRect(-2 * 7, -2 * 3, 2 * 5.0, 2 * 5.0), 0 * 16,
-                       180 * 16);
-      painter->drawArc(QRect(-2 * 2, -2 * 3, 2 * 5.0, 2 * 5.0), 0 * 16,
-                       180 * 16);
-      painter->drawArc(QRect(2 * 3, -2 * 3, 2 * 5.0, 2 * 5.0), 0 * 16,
-                       180 * 16);
-      painter->drawLine(QPoint(2 * 8, 0), QPoint(2 * 20, 0));
-      painter->setPen(QPen(Qt::black, 1));
-      painter->drawText(QRect(-10, 0, 100, 100), QString("%1").arg(this->ID));
-      painter->drawText(QRect(-10, 10, 100, 100),
-                        QString("%1").arg(Value["L"]));
-    }
+    paintInductor(painter);
     break;
   case TransmissionLine:
-
-    if (Orientation == vertical) {
-      int w = 15;
-      painter->drawLine(QPoint(0, -30), QPoint(0, -14));
-      painter->drawLine(QPoint(-0.5 * w, -14), QPoint(0.5 * w, -14));
-      painter->drawLine(QPoint(-0.5 * w, -14), QPoint(0.5 * w, -14));
-      painter->drawLine(QPoint(-0.5 * w, -14), QPoint(-0.5 * w, 16));
-      painter->drawLine(QPoint(0.5 * w, -14), QPoint(0.5 * w, 16));
-      painter->drawLine(QPoint(-0.5 * w, 16), QPoint(0.5 * w, 16));
-      painter->drawLine(QPoint(0, 16), QPoint(0, 40));
-      painter->setPen(QPen(Qt::black, 1));
-      painter->drawText(QRect(7, -5, 100, 100), QString("%1").arg(this->ID));
-      painter->drawText(
-          QRect(7, 5, 100, 100),
-          QString("%1").arg(Value["Z0"].replace("Ohm", QChar(0xa9, 0x03))));
-      painter->drawText(QRect(7, 12, 100, 100),
-                        QString("%1").arg(Value["Length"]));
-    } else {
-      int w = 15;
-      painter->drawLine(QPoint(-30, 0), QPoint(-14, 0));
-      painter->drawLine(QPoint(-14, -0.5 * w), QPoint(-14, 0.5 * w));
-      painter->drawLine(QPoint(16, -0.5 * w), QPoint(16, 0.5 * w));
-      painter->drawLine(QPoint(-14, 0.5 * w), QPoint(16, 0.5 * w));
-      painter->drawLine(QPoint(-14, -0.5 * w), QPoint(16, -0.5 * w));
-      painter->drawLine(QPoint(16, 0), QPoint(40, 0));
-      painter->setPen(QPen(Qt::black, 1));
-      painter->drawText(QRect(-15, 7, 100, 100), QString("%1").arg(this->ID));
-      painter->drawText(
-          QRect(-15, 13, 100, 100),
-          QString("%1").arg(Value["Z0"].replace("Ohm", QChar(0xa9, 0x03))));
-      painter->drawText(QRect(-15, 20, 100, 100),
-                        QString("%1").arg(Value["Length"]));
-    }
+    paintTransmissionLine(painter);
     break;
   case Resistor:
-    if (Orientation == vertical) {
-      int w = 5;
-      painter->drawLine(QPoint(0, -30), QPoint(0, -14));
-
-      painter->drawLine(QPoint(0, -14), QPoint(w, -14 + 2.5));
-      painter->drawLine(QPoint(w, -14 + 2.5), QPoint(-w, -14 + 7.5));
-
-      painter->drawLine(QPoint(-w, -14 + 7.5), QPoint(w, -14 + 12.5));
-      painter->drawLine(QPoint(w, -14 + 12.5), QPoint(-w, -14 + 17.5));
-
-      painter->drawLine(QPoint(-w, -14 + 17.5), QPoint(w, -14 + 22.5));
-      painter->drawLine(QPoint(w, -14 + 22.5), QPoint(-w, -14 + 27.5));
-
-      painter->drawLine(QPoint(-w, -14 + 27.5), QPoint(0, 16));
-
-      painter->drawLine(QPoint(0, 16), QPoint(0, 40));
-      painter->setPen(QPen(Qt::black, 1));
-      painter->drawText(QRect(7, 5, 100, 100), QString("%1").arg(this->ID));
-      painter->drawText(
-          QRect(7, 15, 100, 100),
-          QString("%1").arg(Value["R"].replace("Ohm", QChar(0xa9, 0x03))));
-    } else {
-      // NOT IMPLEMENTED YET
-    }
+    paintResistor(painter);
     break;
   case GND:
     painter->drawLine(QPoint(0, -2 * 5), QPoint(0, 0));
     painter->drawLine(QPoint(-2 * 5, 0), QPoint(2 * 5, 0));
     break;
   case Term:
-    if (Orientation == vertical) {
-      QPainterPath path;
-      path.moveTo(-2 * 5, -2 * 3);
-      path.lineTo(0, 0);
-      path.lineTo(-2 * 5, 2 * 3);
-      path.lineTo(-2 * 5, -2 * 3);
-      painter->setPen(Qt ::NoPen);
-      painter->fillPath(path, QBrush(QColor("red")));
-      painter->setPen(QPen(Qt::black, 1));
-      QString str = QString("%1%2").arg(75).arg(QChar(0xa9, 0x03));
-      painter->drawText(QRect(-30, 0, 100, 100), QString("%1").arg(this->ID));
-      painter->drawText(
-          QRect(-30, 10, 100, 100),
-          QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
-    } else {
-      QPainterPath path;
-      path.moveTo(10, -6);
-      path.lineTo(0, 0);
-      path.lineTo(10, 6);
-      path.lineTo(10, -6);
-      painter->setPen(Qt ::NoPen);
-      painter->fillPath(path, QBrush(QColor("red")));
-      painter->setPen(QPen(Qt::black, 1));
-      QString str = QString("%1%2").arg(75).arg(QChar(0xa9, 0x03));
-      painter->drawText(QRect(15, 0, 100, 100), QString("%1").arg(this->ID));
-      painter->drawText(
-          QRect(15, 10, 100, 100),
-          QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
-    }
+    paintTerm(painter);
     break;
   default:
     break;
@@ -415,4 +290,143 @@ double ComponentInfo::getVal(QString Property) {
   {*/
   return val.toDouble() * scale;
   //}
+}
+
+void Component::paintCapacitor(QPainter *painter) {
+  if (Orientation == vertical) {
+    painter->drawLine(QPoint(0, 25), QPoint(0, 2 * 2));
+    painter->drawLine(QPoint(0, -25), QPoint(0, -2 * 2));
+    painter->drawLine(QPoint(-2 * 5, -2 * 2), QPoint(2 * 5, -2 * 2));
+    painter->drawLine(QPoint(-2 * 5, 2 * 2), QPoint(2 * 5, 2 * 2));
+    painter->setPen(QPen(Qt::black, 1));
+    painter->drawText(QRect(2, 5, 100, 100), QString("%1").arg(this->ID));
+    painter->drawText(QRect(2, 15, 100, 100), QString("%1").arg(Value["C"]));
+  } else {
+    painter->drawLine(QPoint(2 * 15, 0), QPoint(2 * 2, 0));
+    painter->drawLine(QPoint(-2 * 15, 0), QPoint(-2 * 2, 0));
+    painter->drawLine(QPoint(-2 * 2, -2 * 5), QPoint(-2 * 2, 2 * 5));
+    painter->drawLine(QPoint(2 * 2, -2 * 5), QPoint(2 * 2, 2 * 5));
+    painter->setPen(QPen(Qt::black, 1));
+    painter->drawText(QRect(-10, 10, 100, 100), QString("%1").arg(this->ID));
+    painter->drawText(QRect(-10, 20, 100, 100), QString("%1").arg(Value["C"]));
+  }
+}
+
+void Component::paintInductor(QPainter *painter) {
+  if (Orientation == vertical) {
+    painter->drawLine(QPoint(0, -2 * 15), QPoint(0, -2 * 7));
+    painter->drawArc(QRect(-2 * 2, -2 * 7, 2 * 5.0, 2 * 5.0), -90 * 16,
+                     180 * 16);
+    painter->drawArc(QRect(-2 * 2, -2 * 2, 2 * 5.0, 2 * 5.0), -90 * 16,
+                     180 * 16);
+    painter->drawArc(QRect(-2 * 2, 2 * 3, 2 * 5.0, 2 * 5.0), -90 * 16,
+                     180 * 16);
+    painter->drawLine(QPoint(0, 16), QPoint(0, 40));
+    painter->setPen(QPen(Qt::black, 1));
+    painter->drawText(QRect(7, 5, 100, 100), QString("%1").arg(this->ID));
+    painter->drawText(QRect(7, 15, 100, 100), QString("%1").arg(Value["L"]));
+  } else {
+    painter->drawLine(QPoint(-2 * 15, 0), QPoint(-2 * 7, 0));
+    painter->drawArc(QRect(-2 * 7, -2 * 3, 2 * 5.0, 2 * 5.0), 0 * 16, 180 * 16);
+    painter->drawArc(QRect(-2 * 2, -2 * 3, 2 * 5.0, 2 * 5.0), 0 * 16, 180 * 16);
+    painter->drawArc(QRect(2 * 3, -2 * 3, 2 * 5.0, 2 * 5.0), 0 * 16, 180 * 16);
+    painter->drawLine(QPoint(2 * 8, 0), QPoint(2 * 20, 0));
+    painter->setPen(QPen(Qt::black, 1));
+    painter->drawText(QRect(-10, 0, 100, 100), QString("%1").arg(this->ID));
+    painter->drawText(QRect(-10, 10, 100, 100), QString("%1").arg(Value["L"]));
+  }
+}
+
+void Component::paintTransmissionLine(QPainter *painter) {
+  if (Orientation == vertical) {
+    int w = 15;
+    painter->drawLine(QPoint(0, -30), QPoint(0, -14));
+    painter->drawLine(QPoint(-0.5 * w, -14), QPoint(0.5 * w, -14));
+    painter->drawLine(QPoint(-0.5 * w, -14), QPoint(0.5 * w, -14));
+    painter->drawLine(QPoint(-0.5 * w, -14), QPoint(-0.5 * w, 16));
+    painter->drawLine(QPoint(0.5 * w, -14), QPoint(0.5 * w, 16));
+    painter->drawLine(QPoint(-0.5 * w, 16), QPoint(0.5 * w, 16));
+    painter->drawLine(QPoint(0, 16), QPoint(0, 40));
+    painter->setPen(QPen(Qt::black, 1));
+    painter->drawText(QRect(7, -5, 100, 100), QString("%1").arg(this->ID));
+    painter->drawText(
+        QRect(7, 5, 100, 100),
+        QString("%1").arg(Value["Z0"].replace("Ohm", QChar(0xa9, 0x03))));
+    painter->drawText(QRect(7, 12, 100, 100),
+                      QString("%1").arg(Value["Length"]));
+  } else {
+    int w = 15;
+    painter->drawLine(QPoint(-30, 0), QPoint(-14, 0));
+    painter->drawLine(QPoint(-14, -0.5 * w), QPoint(-14, 0.5 * w));
+    painter->drawLine(QPoint(16, -0.5 * w), QPoint(16, 0.5 * w));
+    painter->drawLine(QPoint(-14, 0.5 * w), QPoint(16, 0.5 * w));
+    painter->drawLine(QPoint(-14, -0.5 * w), QPoint(16, -0.5 * w));
+    painter->drawLine(QPoint(16, 0), QPoint(40, 0));
+    painter->setPen(QPen(Qt::black, 1));
+    painter->drawText(QRect(-15, 7, 100, 100), QString("%1").arg(this->ID));
+    painter->drawText(
+        QRect(-15, 13, 100, 100),
+        QString("%1").arg(Value["Z0"].replace("Ohm", QChar(0xa9, 0x03))));
+    painter->drawText(QRect(-15, 20, 100, 100),
+                      QString("%1").arg(Value["Length"]));
+  }
+}
+
+void Component::paintResistor(QPainter *painter) {
+  if (Orientation == vertical) {
+    int w = 5;
+    painter->drawLine(QPoint(0, -30), QPoint(0, -14));
+
+    painter->drawLine(QPoint(0, -14), QPoint(w, -14 + 2.5));
+    painter->drawLine(QPoint(w, -14 + 2.5), QPoint(-w, -14 + 7.5));
+
+    painter->drawLine(QPoint(-w, -14 + 7.5), QPoint(w, -14 + 12.5));
+    painter->drawLine(QPoint(w, -14 + 12.5), QPoint(-w, -14 + 17.5));
+
+    painter->drawLine(QPoint(-w, -14 + 17.5), QPoint(w, -14 + 22.5));
+    painter->drawLine(QPoint(w, -14 + 22.5), QPoint(-w, -14 + 27.5));
+
+    painter->drawLine(QPoint(-w, -14 + 27.5), QPoint(0, 16));
+
+    painter->drawLine(QPoint(0, 16), QPoint(0, 40));
+    painter->setPen(QPen(Qt::black, 1));
+    painter->drawText(QRect(7, 5, 100, 100), QString("%1").arg(this->ID));
+    painter->drawText(
+        QRect(7, 15, 100, 100),
+        QString("%1").arg(Value["R"].replace("Ohm", QChar(0xa9, 0x03))));
+  } else {
+    // NOT IMPLEMENTED YET
+  }
+}
+
+void Component::paintTerm(QPainter *painter) {
+  if (Orientation == vertical) {
+    QPainterPath path;
+    path.moveTo(-2 * 5, -2 * 3);
+    path.lineTo(0, 0);
+    path.lineTo(-2 * 5, 2 * 3);
+    path.lineTo(-2 * 5, -2 * 3);
+    painter->setPen(Qt ::NoPen);
+    painter->fillPath(path, QBrush(QColor("red")));
+    painter->setPen(QPen(Qt::black, 1));
+    QString str = QString("%1%2").arg(75).arg(QChar(0xa9, 0x03));
+    painter->drawText(QRect(-30, 0, 100, 100), QString("%1").arg(this->ID));
+    painter->drawText(
+        QRect(-30, 10, 100, 100),
+        QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
+  } else {
+    QPainterPath path;
+    path.moveTo(10, -6);
+    path.lineTo(0, 0);
+    path.lineTo(10, 6);
+    path.lineTo(10, -6);
+    painter->setPen(Qt ::NoPen);
+    painter->fillPath(path, QBrush(QColor("red")));
+    painter->setPen(QPen(Qt::black, 1));
+    QString str = QString("%1%2").arg(75).arg(QChar(0xa9, 0x03));
+    painter->drawText(QRect(15, 0, 100, 100), QString("%1").arg(this->ID));
+    painter->drawText(
+        QRect(15, 10, 100, 100),
+        QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
+  }
 }
