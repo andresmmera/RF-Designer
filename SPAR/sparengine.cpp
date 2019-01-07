@@ -75,7 +75,7 @@ Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f) {
     case GND:
       continue;
     case Capacitor:
-      if (x[i].Orientation == horizontal) { // Series
+      if (x[i].Rotation == 90) { // Series
         ABCD_t(0, 0) = 1.;
         ABCD_t(0, 1) = complex<double>(0, -1. / (w * x[i].getVal("C")));
         ABCD_t(1, 0) = 0;
@@ -88,7 +88,7 @@ Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f) {
       }
       break;
     case Inductor:
-      if (x[i].Orientation == horizontal) { // Series
+      if (x[i].Rotation == -90) { // Series
         ABCD_t(0, 0) = 1.;
         ABCD_t(0, 1) = complex<double>(0, w * x[i].getVal("L"));
         ABCD_t(1, 0) = 0;
@@ -101,7 +101,7 @@ Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f) {
       }
       break;
     case TransmissionLine:
-      if (x[i].Orientation == horizontal) { // Series
+      if (x[i].Rotation == 90) { // Series
         ABCD_t(0, 0) = cosh(gamma * x[i].getVal("Length"));
         ABCD_t(0, 1) = x[i].getVal("Z0") * sinh(gamma * x[i].getVal("Length"));
         ABCD_t(1, 0) = sinh(gamma * x[i].getVal("Length")) / x[i].getVal("Z0");
@@ -135,7 +135,7 @@ Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f) {
       }
       break;
     case Resistor:
-      if (x[i].Orientation == horizontal) { // Series
+      if (x[i].Rotation == 90) { // Series
         ABCD_t(0, 0) = 1;
         ABCD_t(0, 1) = x[i].getVal("R");
         ABCD_t(1, 0) = 0;

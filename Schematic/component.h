@@ -21,19 +21,19 @@ enum ComponentType {
   GND,
   ConnectionNodes,
   Resistor,
-  TransmissionLine
+  TransmissionLine,
+  OpenStub,
+  ShortStub
 };
-enum ComponentOrientation { vertical, horizontal };
 
 class ComponentInfo {
 public:
   ComponentInfo() : Coordinates(2){};
-  ComponentInfo(QString ID_, ComponentType Type_,
-                ComponentOrientation Orientation_, double x,
+  ComponentInfo(QString ID_, ComponentType Type_, double rot_, double x,
                 double y,              // Coordinates
                 QString N1, QString N2 // Nodes
                 )
-      : ID(ID_), Type(Type_), Orientation(Orientation_), Net1(N1), Net2(N2),
+      : ID(ID_), Type(Type_), Rotation(rot_), Net1(N1), Net2(N2),
         Coordinates(2) {
     Coordinates[0] = x;
     Coordinates[1] = y;
@@ -44,23 +44,23 @@ public:
   QString ID;
   QStringList Connections;
   ComponentType Type;
-  ComponentOrientation Orientation;
+  double Rotation;
   QString Net1, Net2; // ID of the nodes where the component is connected
   std::vector<double> Coordinates;
 
-  void setParams(QString ID_, ComponentType Type_,
-                 ComponentOrientation Orientation_, double x,
+  void setParams(QString ID_, ComponentType Type_, double Rotation_, double x,
                  double y,              // Coordinates
                  QString N1, QString N2 // Nodes
   ) {
     ID = ID_;
     Type = Type_;
-    Orientation = Orientation_;
+    Rotation = Rotation_;
     Coordinates[0] = x;
     Coordinates[1] = y;
     Connections.append(N1);
     Connections.append(N2);
   };
+
   QString getQucs() {
     QString code;
     switch (Type) {
@@ -134,11 +134,18 @@ public:
   void setParams(QString O, int OP, QString D, int DP) {
     OriginID = O, DestinationID = D;
     PortOrigin = OP, PortDestination = DP;
+    WireColor = Qt::black;
+  };
+  void setParams(QString O, int OP, QString D, int DP, QColor Color) {
+    OriginID = O, DestinationID = D;
+    PortOrigin = OP, PortDestination = DP;
+    WireColor = Color;
   };
   QString OriginID;
   int PortOrigin;
   QString DestinationID;
   int PortDestination;
+  QColor WireColor;
 };
 
 class NodeInfo {
@@ -160,7 +167,7 @@ public:
 class Component : public Symbol {
   Q_OBJECT
 public:
-  Component(GraphWidget *graphWidget, ComponentType, ComponentOrientation,
+  Component(GraphWidget *graphWidget, ComponentType, double,
             std::map<QString, QString>, QString ID);
   Component(GraphWidget *graphWidget, struct ComponentInfo);
   void addWire(Wire *Wire);
@@ -175,7 +182,7 @@ public:
              QWidget *widget);
   QPoint getPortLocation(int);
   QString getID();
-  void setOrientation(ComponentOrientation);
+  void setRotation(double);
   void setParameters(std::map<QString, QString>);
   std::map<QString, QString> getParameters();
   void setComponentType(ComponentType);
@@ -193,9 +200,12 @@ private:
   QPointF newPos;
   GraphWidget *graph;
   ComponentType CompType;
-  ComponentOrientation Orientation;
+  double Rotation;
   std::map<QString, QString> Value;
   QString ID;
+
+  void RotatePoint(QPoint &);
+  void RotatePoint(QPoint &, double);
 
   // Component symbol code
   void paintCapacitor(QPainter *);
@@ -203,6 +213,9 @@ private:
   void paintTransmissionLine(QPainter *);
   void paintResistor(QPainter *);
   void paintTerm(QPainter *);
+  void paintGND(QPainter *);
+  void paintOpenStub(QPainter *);
+  void paintShortStub(QPainter *);
 
 signals:
   void DoubleClicked(struct ComponentInfo);

@@ -8,14 +8,12 @@
 
 #include <qdebug.h>
 
-//! [0]
-Component::Component(GraphWidget *graphWidget, ComponentType comp,
-                     ComponentOrientation Or_, std::map<QString, QString> val,
-                     QString ID_)
+Component::Component(GraphWidget *graphWidget, ComponentType comp, double Rot_,
+                     std::map<QString, QString> val, QString ID_)
     : graph(graphWidget) {
   ID = ID_;
   CompType = comp;
-  Orientation = Or_;
+  Rotation = Rot_;
   Value = val;
   setFlag(ItemIsMovable, false);
   setFlag(ItemSendsGeometryChanges);
@@ -27,7 +25,7 @@ Component::Component(GraphWidget *graphWidget, ComponentInfo CI)
     : graph(graphWidget) {
   ID = CI.ID;
   CompType = CI.Type;
-  Orientation = CI.Orientation;
+  Rotation = CI.Rotation;
   Value = CI.val;
   setPos(CI.Coordinates.at(0),
          CI.Coordinates.at(1)); // Coordinates in the schematic window
@@ -50,24 +48,20 @@ QRectF Component::boundingRect() const {
   QRect R;
   switch (CompType) {
   case TransmissionLine:
-    (Orientation == horizontal) ? R = QRect(-25, -10, 50, 60)
-                                : R = QRect(-15, -20, 60, 50);
+    R = QRect(-40, -40, 80, 80);
     break;
   case Resistor:
-    (Orientation == horizontal) ? R = QRect(-25, -10, 50, 40)
-                                : R = QRect(-15, -20, 60, 50);
+    R = QRect(-30, -30, 60, 60);
     break;
   case Capacitor:
   case Inductor:
-    (Orientation == horizontal) ? R = QRect(-25, -10, 50, 40)
-                                : R = QRect(-15, -20, 50, 50);
+    R = QRect(-40, -40, 80, 80);
     break;
   case GND:
     R = QRect(-2 * 7, -2 * 7, 2 * 15, 2 * 10);
     break;
   case Term:
-    (Orientation == horizontal) ? R = QRect(0, -10, 40, 40)
-                                : R = QRect(-40, -10, 40, 40);
+    R = QRect(-25, -25, 50, 50);
     break;
   default:
     break;
@@ -80,23 +74,20 @@ QPainterPath Component::shape() const {
   QPainterPath path;
   switch (CompType) {
   case Capacitor:
-    path.addRect(-2 * 7, -2 * 7, 2 * 15, 2 * 15);
+    path.addRect(-15, -15, 30, 30);
     break;
   case TransmissionLine:
   case Resistor:
-    (Orientation == horizontal) ? path.addRect(-2 * 9, -2 * 5, 2 * 20, 2 * 10)
-                                : path.addRect(-2 * 5, -2 * 9, 2 * 15, 2 * 20);
+    path.addRect(-30, -30, 60, 60);
     break;
   case Inductor:
-    (Orientation == horizontal) ? path.addRect(-2 * 9, -2 * 5, 2 * 20, 2 * 10)
-                                : path.addRect(-2 * 5, -2 * 9, 2 * 10, 2 * 20);
+    path.addRect(-20, -20, 40, 40);
     break;
   case GND:
     path.addRect(-2 * 7, -2 * 7, 2 * 15, 2 * 10);
     break;
   case Term:
-    (Orientation == horizontal) ? path.addRect(0, -2 * 4, 2 * 5, 2 * 8)
-                                : path.addRect(-2 * 5, -2 * 4, 2 * 5, 2 * 8);
+    path.addRect(-15, -15, 30, 30);
     break;
   default:
     break;
@@ -119,12 +110,14 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   case TransmissionLine:
     paintTransmissionLine(painter);
     break;
+  case OpenStub:
+    paintOpenStub(painter);
+    break;
   case Resistor:
     paintResistor(painter);
     break;
   case GND:
-    painter->drawLine(QPoint(0, -2 * 5), QPoint(0, 0));
-    painter->drawLine(QPoint(-2 * 5, 0), QPoint(2 * 5, 0));
+    paintGND(painter);
     break;
   case Term:
     paintTerm(painter);
@@ -133,13 +126,19 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     break;
   }
 
-  /*    //Debug code: Shows the bounding box of the component. This is the
- region where the selection works painter->setPen(QPen(Qt::red, 1));
- painter->drawPath(this->shape());//Component box-> This is the area where the
- component can be selected painter->setPen(QPen(Qt::green, 1));
- painter->drawRect(this->boundingRect());//Component bounding box->This is the
- area where the component can be painted
-*/
+  /*
+  painter->setPen(QPen(Qt::red, 1));
+  painter->drawPoint(QPoint(0, 0));
+
+  // Debug code: Shows the bounding box of the component. This is the
+  // region where the selection works painter->setPen(QPen(Qt::red, 1));
+  painter->drawPath(
+      this->shape()); // Component box-> This is the area where the
+  // component can be selected painter->setPen(QPen(Qt::green, 1));
+  painter->drawRect(
+      this->boundingRect()); // Component bounding box->This is the
+                             // area where the component can be painted
+                             */
 }
 
 QVariant Component::itemChange(GraphicsItemChange change,
@@ -171,7 +170,7 @@ void Component::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
   update();
   struct ComponentInfo CI;
   CI.ID = this->ID;
-  CI.Orientation = this->Orientation;
+  CI.Rotation = this->Rotation;
   CI.Type = this->CompType;
   CI.val = this->Value;
   emit DoubleClicked(CI);
@@ -186,31 +185,61 @@ QPoint Component::getPortLocation(int port_number) {
   case TransmissionLine:
   case Resistor:
   case Inductor:
+    switch (port_number) {
+    case 1:
+      P = QPoint(0, -25);
+      break;
+    case 0:
+    default:
+      P = QPoint(0, 25);
+    }
+    break;
   case Capacitor:
     switch (port_number) {
     case 1:
-      (Orientation == vertical) ? P = QPoint(0, -28) : P = QPoint(25, -8);
+      P = QPoint(0, -20);
       break;
+    case 0:
     default:
-      (Orientation == vertical) ? P = QPoint(0, 18) : P = QPoint(-25, -8);
+      P = QPoint(0, 20);
     }
     break;
   case GND:
-    P = QPoint(0, -18);
+    P = QPoint(0, -11);
     break;
   case Term:
-    P = QPoint(0, -8);
+    P = QPoint(0, 0);
     break;
   default:
     break;
   }
-
+  RotatePoint(P);
   return P;
+}
+
+// This function rotates the port position P about the object centroid (0,0)
+// according to the component rotation
+void Component::RotatePoint(QPoint &P) {
+  double r = (M_PI / 180) * Rotation;
+  double x_rotated = P.x() * cos(r) - P.y() * sin(r);
+  double y_rotated = P.x() * sin(r) + P.y() * cos(r);
+  P.setX(x_rotated);
+  P.setY(y_rotated);
+}
+
+// This function rotates the port position P about the object centroid (0,0)
+// according to the angle in the function arguments
+void Component::RotatePoint(QPoint &P, double angle) {
+  double r = (M_PI / 180) * angle;
+  double x_rotated = P.x() * cos(r) - P.y() * sin(r);
+  double y_rotated = P.x() * sin(r) + P.y() * cos(r);
+  P.setX(x_rotated);
+  P.setY(y_rotated);
 }
 
 QString Component::getID() { return ID; }
 
-void Component::setOrientation(ComponentOrientation CO) { Orientation = CO; }
+void Component::setRotation(double R) { Rotation = R; }
 
 void Component::setParameters(std::map<QString, QString> val) { Value = val; }
 
@@ -292,141 +321,234 @@ double ComponentInfo::getVal(QString Property) {
   //}
 }
 
+// This function draws the capacitor with the rotation specified by the Rotation
+// field.
 void Component::paintCapacitor(QPainter *painter) {
-  if (Orientation == vertical) {
-    painter->drawLine(QPoint(0, 25), QPoint(0, 2 * 2));
-    painter->drawLine(QPoint(0, -25), QPoint(0, -2 * 2));
-    painter->drawLine(QPoint(-2 * 5, -2 * 2), QPoint(2 * 5, -2 * 2));
-    painter->drawLine(QPoint(-2 * 5, 2 * 2), QPoint(2 * 5, 2 * 2));
-    painter->setPen(QPen(Qt::black, 1));
-    painter->drawText(QRect(2, 5, 100, 100), QString("%1").arg(this->ID));
-    painter->drawText(QRect(2, 15, 100, 100), QString("%1").arg(Value["C"]));
-  } else {
-    painter->drawLine(QPoint(2 * 15, 0), QPoint(2 * 2, 0));
-    painter->drawLine(QPoint(-2 * 15, 0), QPoint(-2 * 2, 0));
-    painter->drawLine(QPoint(-2 * 2, -2 * 5), QPoint(-2 * 2, 2 * 5));
-    painter->drawLine(QPoint(2 * 2, -2 * 5), QPoint(2 * 2, 2 * 5));
-    painter->setPen(QPen(Qt::black, 1));
-    painter->drawText(QRect(-10, 10, 100, 100), QString("%1").arg(this->ID));
-    painter->drawText(QRect(-10, 20, 100, 100), QString("%1").arg(Value["C"]));
+
+  if (Rotation != 0) {
+    painter->rotate(Rotation);
   }
+
+  // The following lines draw the capacitor in a vertical position
+  // Lines from ports to parallel plates
+  painter->drawLine(QPoint(0, 20), QPoint(0, 4));
+  painter->drawLine(QPoint(0, -20), QPoint(0, -4));
+
+  // Parallel plates
+  painter->drawLine(QPoint(-10, -4), QPoint(10, -4));
+  painter->drawLine(QPoint(-10, 4), QPoint(10, 4));
+  painter->setPen(QPen(Qt::black, 1));
+
+  if (Rotation != 0) { // The rotation is undone to draw the text
+    painter->rotate(-Rotation);
+  }
+
+  QPoint OriginText(2, 5);
+  if (Rotation != 0)
+    OriginText.setX(-10), OriginText.setY(10);
+
+  painter->drawText(QRect(OriginText, QPoint(100, 100)),
+                    QString("%1").arg(this->ID));
+  painter->drawText(QRect(OriginText + QPoint(0, 10), QPoint(100, 100)),
+                    QString("%1").arg(Value["C"]));
 }
 
+// This function draws the inductor with the rotation specified by the Rotation
+// field.
 void Component::paintInductor(QPainter *painter) {
-  if (Orientation == vertical) {
-    painter->drawLine(QPoint(0, -2 * 15), QPoint(0, -2 * 7));
-    painter->drawArc(QRect(-2 * 2, -2 * 7, 2 * 5.0, 2 * 5.0), -90 * 16,
-                     180 * 16);
-    painter->drawArc(QRect(-2 * 2, -2 * 2, 2 * 5.0, 2 * 5.0), -90 * 16,
-                     180 * 16);
-    painter->drawArc(QRect(-2 * 2, 2 * 3, 2 * 5.0, 2 * 5.0), -90 * 16,
-                     180 * 16);
-    painter->drawLine(QPoint(0, 16), QPoint(0, 40));
-    painter->setPen(QPen(Qt::black, 1));
-    painter->drawText(QRect(7, 5, 100, 100), QString("%1").arg(this->ID));
-    painter->drawText(QRect(7, 15, 100, 100), QString("%1").arg(Value["L"]));
-  } else {
-    painter->drawLine(QPoint(-2 * 15, 0), QPoint(-2 * 7, 0));
-    painter->drawArc(QRect(-2 * 7, -2 * 3, 2 * 5.0, 2 * 5.0), 0 * 16, 180 * 16);
-    painter->drawArc(QRect(-2 * 2, -2 * 3, 2 * 5.0, 2 * 5.0), 0 * 16, 180 * 16);
-    painter->drawArc(QRect(2 * 3, -2 * 3, 2 * 5.0, 2 * 5.0), 0 * 16, 180 * 16);
-    painter->drawLine(QPoint(2 * 8, 0), QPoint(2 * 20, 0));
-    painter->setPen(QPen(Qt::black, 1));
-    painter->drawText(QRect(-10, 0, 100, 100), QString("%1").arg(this->ID));
-    painter->drawText(QRect(-10, 10, 100, 100), QString("%1").arg(Value["L"]));
+  if (Rotation != 0) {
+    painter->rotate(Rotation);
   }
+
+  // The following lines draw the capacitor in a vertical position
+  painter->drawLine(QPoint(0, -25), QPoint(0, -2 * 7));
+  painter->drawArc(QRect(-2 * 2, -2 * 7, 2 * 5.0, 2 * 5.0), -90 * 16, 180 * 16);
+  painter->drawArc(QRect(-2 * 2, -2 * 2, 2 * 5.0, 2 * 5.0), -90 * 16, 180 * 16);
+  painter->drawArc(QRect(-2 * 2, 2 * 3, 2 * 5.0, 2 * 5.0), -90 * 16, 180 * 16);
+  painter->drawLine(QPoint(0, 16), QPoint(0, 25));
+  painter->setPen(QPen(Qt::black, 1));
+
+  if (Rotation != 0) { // The rotation is undone to draw the text
+    painter->rotate(-Rotation);
+  }
+
+  QPoint OriginText(10, -10);
+  if (Rotation != 0)
+    OriginText.setX(-10), OriginText.setY(5);
+
+  painter->drawText(QRect(OriginText, QPoint(100, 100)),
+                    QString("%1").arg(this->ID));
+  painter->drawText(QRect(OriginText + QPoint(0, +10), QPoint(100, 100)),
+                    QString("%1").arg(Value["L"]));
+}
+
+void Component::paintGND(QPainter *painter) {
+  if (Rotation != 0) {
+    painter->rotate(Rotation);
+  }
+
+  painter->drawLine(QPoint(0, -10), QPoint(0, 0));
+  painter->drawLine(QPoint(-10, 0), QPoint(10, 0));
+
+  if (Rotation != 0) { // The rotation is undone to draw the text
+    painter->rotate(-Rotation);
+  }
+  painter->drawText(QRect(7, 5, 100, 100), QString("%1").arg(this->ID));
+  painter->drawText(QRect(7, 15, 100, 100), QString("%1").arg(Value["L"]));
 }
 
 void Component::paintTransmissionLine(QPainter *painter) {
-  if (Orientation == vertical) {
-    int w = 15;
-    painter->drawLine(QPoint(0, -30), QPoint(0, -14));
-    painter->drawLine(QPoint(-0.5 * w, -14), QPoint(0.5 * w, -14));
-    painter->drawLine(QPoint(-0.5 * w, -14), QPoint(0.5 * w, -14));
-    painter->drawLine(QPoint(-0.5 * w, -14), QPoint(-0.5 * w, 16));
-    painter->drawLine(QPoint(0.5 * w, -14), QPoint(0.5 * w, 16));
-    painter->drawLine(QPoint(-0.5 * w, 16), QPoint(0.5 * w, 16));
-    painter->drawLine(QPoint(0, 16), QPoint(0, 40));
-    painter->setPen(QPen(Qt::black, 1));
-    painter->drawText(QRect(7, -5, 100, 100), QString("%1").arg(this->ID));
-    painter->drawText(
-        QRect(7, 5, 100, 100),
-        QString("%1").arg(Value["Z0"].replace("Ohm", QChar(0xa9, 0x03))));
-    painter->drawText(QRect(7, 12, 100, 100),
-                      QString("%1").arg(Value["Length"]));
-  } else {
-    int w = 15;
-    painter->drawLine(QPoint(-30, 0), QPoint(-14, 0));
-    painter->drawLine(QPoint(-14, -0.5 * w), QPoint(-14, 0.5 * w));
-    painter->drawLine(QPoint(16, -0.5 * w), QPoint(16, 0.5 * w));
-    painter->drawLine(QPoint(-14, 0.5 * w), QPoint(16, 0.5 * w));
-    painter->drawLine(QPoint(-14, -0.5 * w), QPoint(16, -0.5 * w));
-    painter->drawLine(QPoint(16, 0), QPoint(40, 0));
-    painter->setPen(QPen(Qt::black, 1));
-    painter->drawText(QRect(-15, 7, 100, 100), QString("%1").arg(this->ID));
-    painter->drawText(
-        QRect(-15, 13, 100, 100),
-        QString("%1").arg(Value["Z0"].replace("Ohm", QChar(0xa9, 0x03))));
-    painter->drawText(QRect(-15, 20, 100, 100),
-                      QString("%1").arg(Value["Length"]));
+
+  if (Rotation != 0) {
+    painter->rotate(Rotation);
   }
+
+  int w = 15;
+  painter->drawLine(QPoint(0, -25), QPoint(0, -14));
+  painter->drawLine(QPoint(-0.5 * w, -14), QPoint(0.5 * w, -14));
+  painter->drawLine(QPoint(-0.5 * w, -14), QPoint(0.5 * w, -14));
+  painter->drawLine(QPoint(-0.5 * w, -14), QPoint(-0.5 * w, 16));
+  painter->drawLine(QPoint(0.5 * w, -14), QPoint(0.5 * w, 16));
+  painter->drawLine(QPoint(-0.5 * w, 16), QPoint(0.5 * w, 16));
+  painter->drawLine(QPoint(0, 16), QPoint(0, 25));
+  painter->setPen(QPen(Qt::black, 1));
+
+  if (Rotation != 0) { // The rotation is undone to draw the text
+    painter->rotate(-Rotation);
+  }
+
+  QPoint OriginText(10, -10);
+  if (Rotation != 0)
+    OriginText.setX(-10), OriginText.setY(10);
+
+  painter->drawText(QRect(OriginText, QPoint(100, 100)),
+                    QString("%1").arg(this->ID));
+  painter->drawText(
+      QRect(OriginText + QPoint(0, 10), QPoint(100, 100)),
+      QString("%1").arg(Value["Z0"].replace("Ohm", QChar(0xa9, 0x03))));
+  painter->drawText(QRect(OriginText + QPoint(0, 20), QPoint(100, 100)),
+                    QString("%1").arg(Value["Length"]));
 }
 
 void Component::paintResistor(QPainter *painter) {
-  if (Orientation == vertical) {
-    int w = 5;
-    painter->drawLine(QPoint(0, -30), QPoint(0, -14));
 
-    painter->drawLine(QPoint(0, -14), QPoint(w, -14 + 2.5));
-    painter->drawLine(QPoint(w, -14 + 2.5), QPoint(-w, -14 + 7.5));
-
-    painter->drawLine(QPoint(-w, -14 + 7.5), QPoint(w, -14 + 12.5));
-    painter->drawLine(QPoint(w, -14 + 12.5), QPoint(-w, -14 + 17.5));
-
-    painter->drawLine(QPoint(-w, -14 + 17.5), QPoint(w, -14 + 22.5));
-    painter->drawLine(QPoint(w, -14 + 22.5), QPoint(-w, -14 + 27.5));
-
-    painter->drawLine(QPoint(-w, -14 + 27.5), QPoint(0, 16));
-
-    painter->drawLine(QPoint(0, 16), QPoint(0, 40));
-    painter->setPen(QPen(Qt::black, 1));
-    painter->drawText(QRect(7, 5, 100, 100), QString("%1").arg(this->ID));
-    painter->drawText(
-        QRect(7, 15, 100, 100),
-        QString("%1").arg(Value["R"].replace("Ohm", QChar(0xa9, 0x03))));
-  } else {
-    // NOT IMPLEMENTED YET
+  if (Rotation != 0) {
+    painter->rotate(Rotation);
   }
+
+  int w = 5;
+  painter->drawLine(QPoint(0, -25), QPoint(0, -14));
+  painter->drawLine(QPoint(0, -14), QPoint(w, -14 + 2.5));
+  painter->drawLine(QPoint(w, -14 + 2.5), QPoint(-w, -14 + 7.5));
+  painter->drawLine(QPoint(-w, -14 + 7.5), QPoint(w, -14 + 12.5));
+  painter->drawLine(QPoint(w, -14 + 12.5), QPoint(-w, -14 + 17.5));
+  painter->drawLine(QPoint(-w, -14 + 17.5), QPoint(w, -14 + 22.5));
+  painter->drawLine(QPoint(w, -14 + 22.5), QPoint(-w, -14 + 27.5));
+  painter->drawLine(QPoint(-w, -14 + 27.5), QPoint(0, 16));
+  painter->drawLine(QPoint(0, 16), QPoint(0, 25));
+
+  if (Rotation != 0) {
+    painter->rotate(-Rotation);
+  }
+
+  QPoint OriginText(10, -10);
+  if (Rotation != 0)
+    OriginText.setX(-10), OriginText.setY(10);
+
+  painter->setPen(QPen(Qt::black, 1));
+  painter->drawText(QRect(OriginText, QPoint(100, 100)),
+                    QString("%1").arg(this->ID));
+  painter->drawText(
+      QRect(OriginText + QPoint(0, 10), QPoint(100, 100)),
+      QString("%1").arg(Value["R"].replace("Ohm", QChar(0xa9, 0x03))));
 }
 
 void Component::paintTerm(QPainter *painter) {
-  if (Orientation == vertical) {
-    QPainterPath path;
-    path.moveTo(-2 * 5, -2 * 3);
-    path.lineTo(0, 0);
-    path.lineTo(-2 * 5, 2 * 3);
-    path.lineTo(-2 * 5, -2 * 3);
-    painter->setPen(Qt ::NoPen);
-    painter->fillPath(path, QBrush(QColor("red")));
-    painter->setPen(QPen(Qt::black, 1));
-    QString str = QString("%1%2").arg(75).arg(QChar(0xa9, 0x03));
-    painter->drawText(QRect(-30, 0, 100, 100), QString("%1").arg(this->ID));
-    painter->drawText(
-        QRect(-30, 10, 100, 100),
-        QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
-  } else {
-    QPainterPath path;
-    path.moveTo(10, -6);
-    path.lineTo(0, 0);
-    path.lineTo(10, 6);
-    path.lineTo(10, -6);
-    painter->setPen(Qt ::NoPen);
-    painter->fillPath(path, QBrush(QColor("red")));
-    painter->setPen(QPen(Qt::black, 1));
-    QString str = QString("%1%2").arg(75).arg(QChar(0xa9, 0x03));
-    painter->drawText(QRect(15, 0, 100, 100), QString("%1").arg(this->ID));
-    painter->drawText(
-        QRect(15, 10, 100, 100),
-        QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
+  if (Rotation != 0) {
+    painter->rotate(Rotation);
   }
+
+  QPainterPath path;
+  path.moveTo(10, -6);
+  path.lineTo(0, 0);
+  path.lineTo(10, 6);
+  path.lineTo(10, -6);
+  painter->setPen(Qt ::NoPen);
+  painter->fillPath(path, QBrush(QColor("red")));
+  painter->setPen(QPen(Qt::black, 1));
+
+  if (Rotation != 0) { // The rotation is undone to draw the text
+    painter->rotate(-Rotation);
+  }
+
+  QString str = QString("%1%2").arg(75).arg(QChar(0xa9, 0x03));
+  painter->drawText(QRect(-5, 0, 100, 100), QString("%1").arg(this->ID));
+  painter->drawText(
+      QRect(-5, 10, 100, 100),
+      QString("%1").arg(Value["Z"].replace("Ohm", QChar(0xa9, 0x03))));
+}
+
+void Component::paintOpenStub(QPainter *painter) {
+  if (Rotation != 0) {
+    painter->rotate(Rotation);
+  }
+  int w = 15;
+  painter->drawLine(QPoint(0, -30), QPoint(0, -14));
+  painter->drawLine(QPoint(-0.5 * w, -14), QPoint(0.5 * w, -14));
+  painter->drawLine(QPoint(-0.5 * w, -14), QPoint(0.5 * w, -14));
+  painter->drawLine(QPoint(-0.5 * w, -14), QPoint(-0.5 * w, 16));
+  painter->drawLine(QPoint(0.5 * w, -14), QPoint(0.5 * w, 16));
+  painter->drawLine(QPoint(-0.5 * w, 16), QPoint(0.5 * w, 16));
+  painter->drawLine(QPoint(0, 16), QPoint(0, 40));
+  painter->setPen(QPen(Qt::black, 1));
+
+  if (Rotation != 0) { // The rotation is undone to draw the text
+    painter->rotate(-Rotation);
+  }
+
+  QPoint OriginText(10, -10);
+  if (Rotation != 0)
+    OriginText.setX(-10), OriginText.setY(10);
+
+  painter->drawText(QRect(OriginText, QPoint(100, 100)),
+                    QString("%1").arg(this->ID));
+  painter->drawText(
+      QRect(OriginText + QPoint(0, 10), QPoint(100, 100)),
+      QString("%1").arg(Value["Z0"].replace("Ohm", QChar(0xa9, 0x03))));
+  painter->drawText(QRect(OriginText + QPoint(0, 20), QPoint(100, 100)),
+                    QString("%1").arg(Value["Length"]));
+}
+
+void Component::paintShortStub(QPainter *painter) {
+
+  if (Rotation != 0) {
+    painter->rotate(Rotation);
+  }
+
+  int w = 15;
+  painter->drawLine(QPoint(0, -25), QPoint(0, -14));
+  painter->drawLine(QPoint(-0.5 * w, -14), QPoint(0.5 * w, -14));
+  painter->drawLine(QPoint(-0.5 * w, -14), QPoint(0.5 * w, -14));
+  painter->drawLine(QPoint(-0.5 * w, -14), QPoint(-0.5 * w, 16));
+  painter->drawLine(QPoint(0.5 * w, -14), QPoint(0.5 * w, 16));
+  painter->drawLine(QPoint(-0.5 * w, 16), QPoint(0.5 * w, 16));
+  painter->drawLine(QPoint(0, 16), QPoint(0, 25));
+  painter->drawLine(QPoint(-0.5 * w, 25), QPoint(-0.5 * w, 25));
+  painter->setPen(QPen(Qt::black, 1));
+
+  if (Rotation != 0) { // The rotation is undone to draw the text
+    painter->rotate(-Rotation);
+  }
+
+  QPoint OriginText(10, -10);
+  if (Rotation != 0)
+    OriginText.setX(-10), OriginText.setY(10);
+
+  painter->drawText(QRect(OriginText, QPoint(100, 100)),
+                    QString("%1").arg(this->ID));
+  painter->drawText(
+      QRect(OriginText + QPoint(0, 10), QPoint(100, 100)),
+      QString("%1").arg(Value["Z0"].replace("Ohm", QChar(0xa9, 0x03))));
+  painter->drawText(QRect(OriginText + QPoint(0, 20), QPoint(100, 100)),
+                    QString("%1").arg(Value["Length"]));
 }

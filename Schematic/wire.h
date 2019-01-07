@@ -46,37 +46,38 @@
 class Symbol;
 
 //! [0]
-class Wire : public QGraphicsItem
-{
+class Wire : public QGraphicsItem {
 public:
-    Wire(Symbol *sourceNode, int port_num_source, Symbol *destNode, int port_num_dest);
-    Wire();
+  Wire(Symbol *sourceNode, int port_num_source, Symbol *destNode,
+       int port_num_dest);
+  Wire();
 
+  void setSource(Symbol *, int);
+  void setDestination(Symbol *, int);
+  void setColor(QColor);
+  void paintWire();
 
-    void setSource(Symbol*, int);
-    void setDestination(Symbol*, int);
-    void paintWire();
+  Symbol *sourceNode() const;
+  Symbol *destNode() const;
 
-    Symbol *sourceNode() const;
-    Symbol *destNode() const;
+  void adjust();
 
-    void adjust();
+  enum { Type = UserType + 2 };
+  int type() const { return Type; }
+  QPoint getPortLocation(int);
 
-    enum { Type = UserType + 2 };
-    int type() const { return Type; }
-    QPoint getPortLocation(int);
-    
 protected:
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    
-private:
-    Symbol *source, *dest;
+  QRectF boundingRect() const;
+  void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+             QWidget *widget);
 
-    QPointF sourcePoint;
-    QPointF destPoint;
-    qreal arrowSize;
-    int port_num_source, port_num_dest;
+private:
+  Symbol *source, *dest;
+  QColor WireColor;
+  QPointF sourcePoint;
+  QPointF destPoint;
+  qreal arrowSize;
+  int port_num_source, port_num_dest;
 };
 //! [0]
 

@@ -180,6 +180,7 @@ void GraphWidget::setWires(QList<WireInfo> wrs) {
     }
 
     Wire *w = new Wire();
+    w->setColor(wrs.at(i).WireColor);
     OriginIsNode ? w->setSource(Nodes.at(origin), wrs.at(i).PortOrigin)
                  : w->setSource(Components.at(origin), wrs.at(i).PortOrigin);
     DestIsNode
