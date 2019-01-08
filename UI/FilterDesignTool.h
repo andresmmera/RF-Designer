@@ -33,6 +33,7 @@ public:
 private slots:
   void UpdateDesignParameters();
   void ResposeComboChanged();
+  void ImplementationComboChanged();
   void EllipticTypeChanged();
   // Zverev mode slots
   void SwitchZverevTablesMode(bool);

@@ -209,7 +209,7 @@ FilterDesignTool::FilterDesignTool() {
   // Connection functions for updating the network requirements and simulate on
   // the fly
   connect(FilterImplementationCombo, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(UpdateDesignParameters()));
+          SLOT(ImplementationComboChanged()));
   connect(CLCRadioButton, SIGNAL(toggled(bool)), this,
           SLOT(ChangeRL_CLC_LCL_mode()));
   // connect(LCLRadioButton, SIGNAL(toggled(bool)), this,
@@ -444,10 +444,6 @@ void FilterDesignTool::UpdateDesignParameters() {
   if (!FilterClassCombo->currentText().compare("Bandstop"))
     Filter_SP.FilterType = Bandstop;
 
-  if (FilterImplementationCombo->currentText() == "LC Direct Coupled") {
-    Filter_SP.FilterType = Bandpass;
-    FilterClassCombo->setCurrentIndex(2);
-  }
   //**************************** Set coupling
   //********************************************
   if (!DC_CouplingTypeCombo->currentText().compare(
@@ -486,10 +482,7 @@ void FilterDesignTool::UpdateDesignParameters() {
   if (Filter_SP.Implementation == "LC Direct Coupled") {
     DC_CouplingTypeCombo->show();
     DC_CouplingLabel->show();
-    FilterClassCombo->blockSignals(true);
     FilterResponseTypeCombo->blockSignals(true);
-    FilterClassCombo->setCurrentIndex(2);
-    FilterClassCombo->setEnabled(false);
     CLCRadioButton->hide();
     LCLRadioButton->hide();
     QString CurrentResponse = FilterResponseTypeCombo->currentText();
@@ -808,3 +801,32 @@ double FilterDesignTool::getScale(QString scale) {
 
 // The purpose of this function is to trigger a design from the main application
 void FilterDesignTool::design() { UpdateDesignParameters(); }
+
+// This function updates the input combos according to the filter implementation
+void FilterDesignTool::ImplementationComboChanged() {
+  if (FilterImplementationCombo->currentText() == "LC Direct Coupled") {
+    // Only bandpass filters can be implemented using direct coupled filters
+    // The elliptic response cannot be implemented too
+    FilterClassCombo->clear();
+    FilterClassCombo->addItem("Bandpass");
+    FilterClassCombo->setCurrentIndex(0);
+  }
+  if (FilterImplementationCombo->currentText() == "LC Ladder") {
+    // All response types available: Lowpass, highpass, bandpass and notch
+    // Elliptic types are available
+    FilterClassCombo->clear();
+    FilterClassCombo->addItem("Lowpass");
+    FilterClassCombo->addItem("Highpass");
+    FilterClassCombo->addItem("Bandpass");
+    FilterClassCombo->addItem("Bandstop");
+  }
+  if (FilterImplementationCombo->currentText() == "Quarter-wavelength") {
+    // Only bandpass and notch types available
+    // Of course, the elliptic type cannot be implemented this way.
+    FilterClassCombo->clear();
+    FilterClassCombo->addItem("Bandpass");
+    FilterClassCombo->addItem("Bandstop");
+    FilterClassCombo->setCurrentIndex(0);
+  }
+  UpdateDesignParameters();
+}
