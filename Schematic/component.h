@@ -74,6 +74,8 @@ public:
     case Inductor:
       code = "L";
       break;
+    case OpenStub:
+    case ShortStub:
     case TransmissionLine:
       code = "TLIN";
       break;
@@ -96,6 +98,8 @@ public:
                   // to Qucs property names
     while (it != val.end()) {
       switch (Type) {
+      case OpenStub:
+      case ShortStub:
       case TransmissionLine:
         prop = it->first;
         if (prop == "Length")

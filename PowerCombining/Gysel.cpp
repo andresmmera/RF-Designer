@@ -13,7 +13,7 @@ void PowerCombinerDesigner::Gysel() {
                     TransmissionLine, 0, 0, -50, "N0", "N1");
   TL1.ID = QString("TLIN%1").arg(++NumberComponents[TransmissionLine]);
   TL1.val["Z0"] = num2str(sqrt(2) * Specs.Z0, Resistance);
-  TL1.val["Length"] = ConvertLengthFromM(lambda4);
+  TL1.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL1);
 
   WireInfo WI(TL1.ID, 0, TermSpar1.ID, 0);
@@ -23,7 +23,7 @@ void PowerCombinerDesigner::Gysel() {
                     TransmissionLine, 0, 0, 50, "N0", "N4");
   TL2.ID = QString("TLIN%1").arg(++NumberComponents[TransmissionLine]);
   TL2.val["Z0"] = num2str(sqrt(2) * Specs.Z0, Resistance);
-  TL2.val["Length"] = ConvertLengthFromM(lambda4);
+  TL2.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL2);
 
   WI.setParams(TL2.ID, 1, TermSpar1.ID, 0);
@@ -32,7 +32,7 @@ void PowerCombinerDesigner::Gysel() {
   ComponentInfo TL3(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                     TransmissionLine, 90, 100, -75, "N1", "N2");
   TL3.val["Z0"] = num2str(Specs.Z0, Resistance);
-  TL3.val["Length"] = ConvertLengthFromM(lambda4);
+  TL3.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL3);
 
   ComponentInfo TermSpar2(QString("T%1").arg(++NumberComponents[Term]), Term,
@@ -49,7 +49,7 @@ void PowerCombinerDesigner::Gysel() {
   ComponentInfo TL4(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                     TransmissionLine, 90, 100, 75, "N3", "N4");
   TL4.val["Z0"] = num2str(Specs.Z0, Resistance);
-  TL4.val["Length"] = ConvertLengthFromM(lambda4);
+  TL4.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL4);
 
   ComponentInfo TermSpar3(QString("T%1").arg(++NumberComponents[Term]), Term,
@@ -71,7 +71,7 @@ void PowerCombinerDesigner::Gysel() {
   ComponentInfo TL5(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                     TransmissionLine, 0, 150, 0, "N2", "N3");
   TL5.val["Z0"] = num2str(Specs.Z0 / sqrt(2), Resistance);
-  TL5.val["Length"] = ConvertLengthFromM(lambda2);
+  TL5.val["Length"] = ConvertLengthFromM(Specs.units, lambda2);
   Components.append(TL5);
 
   // Node

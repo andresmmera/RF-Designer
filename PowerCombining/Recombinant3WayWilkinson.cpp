@@ -22,7 +22,7 @@ void PowerCombinerDesigner::Recombinant3WayWilkinson() {
   ComponentInfo TL1(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                     TransmissionLine, 90, 50, 0, "N0", "N1");
   TL1.val["Z0"] = num2str(Z1, Resistance);
-  TL1.val["Length"] = ConvertLengthFromM(lambda4);
+  TL1.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL1);
 
   WireInfo WI(TL1.ID, 0, TermSpar1.ID, 0);
@@ -37,7 +37,7 @@ void PowerCombinerDesigner::Recombinant3WayWilkinson() {
   ComponentInfo TL2(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                     TransmissionLine, 90, 125, -75, "N1", "N2");
   TL2.val["Z0"] = num2str(Z2, Resistance);
-  TL2.val["Length"] = ConvertLengthFromM(lambda4);
+  TL2.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL2);
 
   NodeInfo N2(QString("N%1").arg(++NumberComponents[ConnectionNodes]), 175,
@@ -53,7 +53,7 @@ void PowerCombinerDesigner::Recombinant3WayWilkinson() {
   ComponentInfo TL3(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                     TransmissionLine, 90, 125, 75, "N1", "N3");
   TL3.val["Z0"] = num2str(Z2, Resistance);
-  TL3.val["Length"] = ConvertLengthFromM(lambda4);
+  TL3.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL3);
 
   NodeInfo N3(QString("N%1").arg(++NumberComponents[ConnectionNodes]), 175, 75);
@@ -80,7 +80,7 @@ void PowerCombinerDesigner::Recombinant3WayWilkinson() {
   ComponentInfo TL4(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                     TransmissionLine, 90, 225, -125, "N2", "N4");
   TL4.val["Z0"] = num2str(Z2, Resistance);
-  TL4.val["Length"] = ConvertLengthFromM(lambda4);
+  TL4.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL4);
 
   WI.setParams(TL4.ID, 0, N2.ID, 0);
@@ -104,7 +104,7 @@ void PowerCombinerDesigner::Recombinant3WayWilkinson() {
   ComponentInfo TL5(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                     TransmissionLine, 90, 225, -50, "N2", "N5");
   TL5.val["Z0"] = num2str(Z4, Resistance);
-  TL5.val["Length"] = ConvertLengthFromM(lambda4);
+  TL5.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL5);
 
   NodeInfo N5(QString("N%1").arg(++NumberComponents[ConnectionNodes]), 275,
@@ -146,7 +146,7 @@ void PowerCombinerDesigner::Recombinant3WayWilkinson() {
   ComponentInfo TL6(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                     TransmissionLine, 90, 225, 125, "N3", "N6");
   TL6.val["Z0"] = num2str(Z2, Resistance);
-  TL6.val["Length"] = ConvertLengthFromM(lambda4);
+  TL6.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL6);
 
   NodeInfo N6(QString("N%1").arg(++NumberComponents[ConnectionNodes]), 275,
@@ -162,7 +162,7 @@ void PowerCombinerDesigner::Recombinant3WayWilkinson() {
   ComponentInfo TL7(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                     TransmissionLine, 90, 225, 50, "N3", "N5");
   TL7.val["Z0"] = num2str(Z4, Resistance);
-  TL7.val["Length"] = ConvertLengthFromM(lambda4);
+  TL7.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL7);
 
   NodeInfo N7(QString("N%1").arg(++NumberComponents[ConnectionNodes]), 275, 50);

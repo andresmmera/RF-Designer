@@ -100,39 +100,24 @@ Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f) {
         ABCD_t(1, 1) = 1.;
       }
       break;
+    case OpenStub:
+      ABCD_t(0, 0) = 1.;
+      ABCD_t(0, 1) = 0;
+      ABCD_t(1, 0) = tanh(gamma * x[i].getVal("Length")) / (x[i].getVal("Z0"));
+      ABCD_t(1, 1) = 1;
+      break;
+    case ShortStub:
+      ABCD_t(0, 0) = 1.;
+      ABCD_t(0, 1) = 0;
+      ABCD_t(1, 0) =
+          1. / (x[i].getVal("Z0") * tanh(gamma * x[i].getVal("Length")));
+      ABCD_t(1, 1) = 1;
+      break;
     case TransmissionLine:
-      if (x[i].Rotation == 90) { // Series
-        ABCD_t(0, 0) = cosh(gamma * x[i].getVal("Length"));
-        ABCD_t(0, 1) = x[i].getVal("Z0") * sinh(gamma * x[i].getVal("Length"));
-        ABCD_t(1, 0) = sinh(gamma * x[i].getVal("Length")) / x[i].getVal("Z0");
-        ABCD_t(1, 1) = cosh(gamma * x[i].getVal("Length"));
-      } else { // Shunt. Here we need to determine whether the stub is opened or
-               // short circuited
-        if (i == x.size() - 1) { // It's the last element of the list, so
-                                 // there's no hypothetical gnd next
-          ABCD_t(0, 0) = 1.;
-          ABCD_t(0, 1) = 0;
-          ABCD_t(1, 0) =
-              (tanh(gamma * x[i].getVal("Length"))) / x[i].getVal("Z0");
-          ABCD_t(1, 1) = cosh(gamma * x[i].getVal("Length"));
-        } else { // Check if the next element is a gnd
-          if (x[i + 1].Type == GND) {
-            ABCD_t(0, 0) = 1.;
-            ABCD_t(0, 1) = 0;
-            ABCD_t(1, 0) =
-                1. / (x[i].getVal("Z0") * tanh(gamma * x[i].getVal("Length")));
-            ABCD_t(1, 1) = 1;
-            i++;   // Increment the index so as to skip the gnd in the next loop
-                   // iteration
-          } else { // Open circuit stub in the middle of the ladder
-            ABCD_t(0, 0) = 1.;
-            ABCD_t(0, 1) = 0;
-            ABCD_t(1, 0) =
-                (tanh(gamma * x[i].getVal("Length"))) / x[i].getVal("Z0");
-            ABCD_t(1, 1) = cosh(gamma * x[i].getVal("Length"));
-          }
-        }
-      }
+      ABCD_t(0, 0) = cosh(gamma * x[i].getVal("Length"));
+      ABCD_t(0, 1) = x[i].getVal("Z0") * sinh(gamma * x[i].getVal("Length"));
+      ABCD_t(1, 0) = sinh(gamma * x[i].getVal("Length")) / x[i].getVal("Z0");
+      ABCD_t(1, 1) = cosh(gamma * x[i].getVal("Length"));
       break;
     case Resistor:
       if (x[i].Rotation == 90) { // Series

@@ -55,6 +55,7 @@ FilterDesignTool::FilterDesignTool() {
   FilterImplementationCombo = new QComboBox();
   FilterImplementationCombo->addItem("LC Ladder");
   FilterImplementationCombo->addItem("LC Direct Coupled");
+  FilterImplementationCombo->addItem("Quarter-wavelength");
   FilterDesignLayout->addWidget(new QLabel("Implementation"), 0, 0);
   FilterDesignLayout->addWidget(FilterImplementationCombo, 0, 1);
   //******** Tee or Pi (LC ladder only) ********
@@ -273,6 +274,7 @@ void FilterDesignTool::synthesize() {
   EllipticFilter *EF;
   CanonicalFilter *CF;
   DirectCoupledFilters *DCF;
+  QuarterWaveFilters *QWF;
 
   // Recalculate network
   if (FilterImplementationCombo->currentText() == "LC Ladder") {
@@ -314,6 +316,19 @@ void FilterDesignTool::synthesize() {
     SchInfo.displayGraphs = DCF->displaygraphs;
     SchInfo.Description = "";
     delete DCF;
+  }
+  if (FilterImplementationCombo->currentText() == "Quarter-wavelength") {
+    QWF = new QuarterWaveFilters(Filter_SP);
+    QWF->synthesize();
+    SchInfo.netlist = QWF->getQucsNetlist();
+    SchInfo.Comps = QWF->getComponents();
+    SchInfo.Wires = QWF->getWires();
+    SchInfo.Nodes = QWF->getNodes();
+    SchInfo.displayGraphs = QWF->displaygraphs;
+    SchInfo.Description =
+        "NOT LADDER"; // For some reason, the short stub implementation is buggy
+                      // in the internal simulator
+    delete QWF;
   }
   SchInfo.SPAR_Settings = SPAR_Settings;
 }
@@ -420,16 +435,15 @@ void FilterDesignTool::UpdateDesignParameters() {
 
   //**************************** Set filter type
   //**************************************
-  if (FilterImplementationCombo->currentText() == "LC Ladder") {
-    if (!FilterClassCombo->currentText().compare("Lowpass"))
-      Filter_SP.FilterType = Lowpass;
-    if (!FilterClassCombo->currentText().compare("Highpass"))
-      Filter_SP.FilterType = Highpass;
-    if (!FilterClassCombo->currentText().compare("Bandpass"))
-      Filter_SP.FilterType = Bandpass;
-    if (!FilterClassCombo->currentText().compare("Bandstop"))
-      Filter_SP.FilterType = Bandstop;
-  }
+  if (!FilterClassCombo->currentText().compare("Lowpass"))
+    Filter_SP.FilterType = Lowpass;
+  if (!FilterClassCombo->currentText().compare("Highpass"))
+    Filter_SP.FilterType = Highpass;
+  if (!FilterClassCombo->currentText().compare("Bandpass"))
+    Filter_SP.FilterType = Bandpass;
+  if (!FilterClassCombo->currentText().compare("Bandstop"))
+    Filter_SP.FilterType = Bandstop;
+
   if (FilterImplementationCombo->currentText() == "LC Direct Coupled") {
     Filter_SP.FilterType = Bandpass;
     FilterClassCombo->setCurrentIndex(2);

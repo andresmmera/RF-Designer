@@ -47,6 +47,8 @@ QList<Wire *> Component::Wires() const { return WireList; }
 QRectF Component::boundingRect() const {
   QRect R;
   switch (CompType) {
+  case OpenStub:
+  case ShortStub:
   case TransmissionLine:
     R = QRect(-40, -40, 80, 80);
     break;
@@ -76,6 +78,8 @@ QPainterPath Component::shape() const {
   case Capacitor:
     path.addRect(-15, -15, 30, 30);
     break;
+  case OpenStub:
+  case ShortStub:
   case TransmissionLine:
   case Resistor:
     path.addRect(-30, -30, 60, 60);
@@ -112,6 +116,9 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     break;
   case OpenStub:
     paintOpenStub(painter);
+    break;
+  case ShortStub:
+    paintShortStub(painter);
     break;
   case Resistor:
     paintResistor(painter);
@@ -182,6 +189,8 @@ void Component::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
 QPoint Component::getPortLocation(int port_number) {
   QPoint P;
   switch (CompType) {
+  case OpenStub:
+  case ShortStub:
   case TransmissionLine:
   case Resistor:
   case Inductor:
@@ -499,7 +508,6 @@ void Component::paintOpenStub(QPainter *painter) {
   painter->drawLine(QPoint(-0.5 * w, -14), QPoint(-0.5 * w, 16));
   painter->drawLine(QPoint(0.5 * w, -14), QPoint(0.5 * w, 16));
   painter->drawLine(QPoint(-0.5 * w, 16), QPoint(0.5 * w, 16));
-  painter->drawLine(QPoint(0, 16), QPoint(0, 40));
   painter->setPen(QPen(Qt::black, 1));
 
   if (Rotation != 0) { // The rotation is undone to draw the text
@@ -533,7 +541,7 @@ void Component::paintShortStub(QPainter *painter) {
   painter->drawLine(QPoint(0.5 * w, -14), QPoint(0.5 * w, 16));
   painter->drawLine(QPoint(-0.5 * w, 16), QPoint(0.5 * w, 16));
   painter->drawLine(QPoint(0, 16), QPoint(0, 25));
-  painter->drawLine(QPoint(-0.5 * w, 25), QPoint(-0.5 * w, 25));
+  painter->drawLine(QPoint(-0.5 * w, 25), QPoint(0.5 * w, 25));
   painter->setPen(QPen(Qt::black, 1));
 
   if (Rotation != 0) { // The rotation is undone to draw the text

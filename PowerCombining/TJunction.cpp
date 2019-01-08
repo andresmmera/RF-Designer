@@ -16,7 +16,7 @@ void PowerCombinerDesigner::TJunction() {
   ComponentInfo TL1(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                     TransmissionLine, 90, 25, 0, "N0", "N1");
   TL1.val["Z0"] = num2str(Specs.Z0, Resistance);
-  TL1.val["Length"] = ConvertLengthFromM(lambda4);
+  TL1.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL1);
 
   WireInfo WI(TermSpar1.ID, 0, TL1.ID, 0);
@@ -25,7 +25,7 @@ void PowerCombinerDesigner::TJunction() {
   ComponentInfo TL2(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                     TransmissionLine, 90, 100, -50, "N1", "N2");
   TL2.val["Z0"] = num2str(Specs.Z0 * (K + 1), Resistance);
-  TL2.val["Length"] = ConvertLengthFromM(lambda4);
+  TL2.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL2);
 
   WI.setParams(TL2.ID, 0, TL1.ID, 1);
@@ -34,7 +34,7 @@ void PowerCombinerDesigner::TJunction() {
   ComponentInfo TL3(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                     TransmissionLine, 90, 100, 50, "N1", "N3");
   TL3.val["Z0"] = num2str(Specs.Z0 * (K + 1) / K, Resistance);
-  TL3.val["Length"] = ConvertLengthFromM(lambda4);
+  TL3.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL3);
 
   WI.setParams(TL3.ID, 0, TL1.ID, 1);
@@ -48,7 +48,7 @@ void PowerCombinerDesigner::TJunction() {
                   TransmissionLine, 90, 175, -50, "N2", "N4");
     TL4.val["Z0"] =
         num2str(sqrt(2 * Specs.Z0 * Specs.Z0 * (K + 1)), Resistance);
-    TL4.val["Length"] = ConvertLengthFromM(lambda4);
+    TL4.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
     Components.append(TL4);
 
     WI.setParams(TL4.ID, 0, TL2.ID, 1);
@@ -58,7 +58,7 @@ void PowerCombinerDesigner::TJunction() {
                   TransmissionLine, 90, 175, 50, "N3", "N5");
     TL5.val["Z0"] =
         num2str(sqrt(2 * Specs.Z0 * Specs.Z0 * (K + 1) / K), Resistance);
-    TL5.val["Length"] = ConvertLengthFromM(lambda4);
+    TL5.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
     Components.append(TL5);
 
     WI.setParams(TL5.ID, 0, TL3.ID, 1);

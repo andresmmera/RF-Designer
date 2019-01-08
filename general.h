@@ -10,5 +10,6 @@ QString RoundVariablePrecision(double);
 QString num2str(double, Units);
 QString num2str(double);
 std::complex<double> Str2Complex(QString);
+QString ConvertLengthFromM(QString, double);
 
 #endif // GENERAL_H

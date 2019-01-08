@@ -79,7 +79,7 @@ void PowerCombinerDesigner::MultistageWilkinson() {
     TL.setParams(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                  TransmissionLine, 90, posx, 0, "N0", "N1");
     TL.val["Z0"] = num2str(Specs.Z0, Resistance);
-    TL.val["Length"] = ConvertLengthFromM(lambda4);
+    TL.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
     Components.append(TL);
 
     // Node
@@ -213,7 +213,7 @@ void PowerCombinerDesigner::MultistageWilkinson() {
           TransmissionLine, 90, posx + 15, -50, QString("%1").arg(PreviousNode),
           QString("Nupper%1").arg(i));
       TL_Upper.val["Z0"] = num2str(Zlines[i], Resistance);
-      TL_Upper.val["Length"] = ConvertLengthFromM(lambda4);
+      TL_Upper.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
       Components.append(TL_Upper);
 
       if (i > 0) { // Connect the current section to the previous one
@@ -238,7 +238,7 @@ void PowerCombinerDesigner::MultistageWilkinson() {
           TransmissionLine, 90, posx + 15, 50, QString("%1").arg(PreviousNode),
           QString("Nlower%1").arg(i));
       TL_Lower.val["Z0"] = num2str(Zlines[i], Resistance);
-      TL_Lower.val["Length"] = ConvertLengthFromM(lambda4);
+      TL_Lower.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
       Components.append(TL_Lower);
 
       if (i > 0) { // Connect the current section to the previous one

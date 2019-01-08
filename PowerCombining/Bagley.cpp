@@ -15,13 +15,13 @@ void PowerCombinerDesigner::Bagley() {
                     TransmissionLine, 0, (Specs.Noutputs - 1) * 100, 50, "N0",
                     QString("N%1").arg(Specs.Noutputs));
   TL1.val["Z0"] = num2str(Zbranch, Resistance);
-  TL1.val["Length"] = ConvertLengthFromM(lambda4);
+  TL1.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL1);
 
   ComponentInfo TL2(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
                     TransmissionLine, 0, 0, 50, "N0", "N1");
   TL2.val["Z0"] = num2str(Zbranch, Resistance);
-  TL2.val["Length"] = ConvertLengthFromM(lambda4);
+  TL2.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Components.append(TL2);
 
   WireInfo WI(TL1.ID, 1, TermSpar.ID, 0);
@@ -46,7 +46,7 @@ void PowerCombinerDesigner::Bagley() {
                  TransmissionLine, 90, posx, 100, QString("N%1").arg(i),
                  QString("N%1").arg(i + 1));
     TL.val["Z0"] = num2str(Zbranch, Resistance);
-    TL.val["Length"] = ConvertLengthFromM(lambda2);
+    TL.val["Length"] = ConvertLengthFromM(Specs.units, lambda2);
     Components.append(TL);
 
     WI.setParams(TermSpar.ID, 0, TL.ID, 0);
