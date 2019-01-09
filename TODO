@@ -1,14 +1,10 @@
 TO DO
 --------------------------------------
-
-
-* Fix schematic display in Elliptic filters. It is also needed to code the HP transformation, actually Elliptic filters are LP
+* Include the attenuator designer
 * Do some research and add to the filter designer direct coupled filter, specially the inductive coupled shunt resonators
-* Do some reasearch and add a filter design tool with the image parameter method
-* Add the power combiner stuff
+* Do some research and add a filter design tool with the image parameter method
 * Add the narrowband matching techniques recently included in the Qucs 0.0.20
 * Add the wideband tool... and do some research concerning RFT and analytic method
 * General impedance synthesis using Brune/Darlington synthesis
 * Zverev transformations
-* Smith chart tool
-* IP3/NF/Power balance tool
+

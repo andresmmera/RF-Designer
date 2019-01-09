@@ -1,3 +1,19 @@
+/***************************************************************************
+                                Network.h
+                                ----------
+    copyright            :  QUCS team
+    author                :  2019 Andres Martinez-Mera
+    email                  :  andresmmera@protonmail.com
+ ***************************************************************************/
+
+/***************************************************************************
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
 #ifndef NETWORK_H
 #define NETWORK_H
 
@@ -51,10 +67,10 @@ struct FilterSpecifications {
   double Ripple;        // Ripple (Chebyshev and Cauer)
   double fc; // Cutoff frequency (lowpass and highpass filters) or center
              // frequency (bandpass and bandstop)
-  double bw;            // Filter bandwidth
-  double ZS;            // Source impedance
-  double ZL;            // Load impedance
-  double as;            // Stopband attenuation
+  double bw; // Filter bandwidth
+  double ZS; // Source impedance
+  double ZL; // Load impedance
+  double as; // Stopband attenuation
   QString EllipticType; // Type of elliptic filter
   bool UseZverevTables;
   double minZ; // Minimum synthesizable impedance (only for stepped impedance
