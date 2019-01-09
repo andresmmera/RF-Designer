@@ -1,5 +1,5 @@
 /***************************************************************************
-                                QuarterQaveFilters.cpp
+                                QuarterWaveFilters.cpp
                                 ----------
     copyright            :  QUCS team
     author                :  2019 Andres Martinez-Mera

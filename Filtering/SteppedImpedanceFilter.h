@@ -1,5 +1,5 @@
 /***************************************************************************
-                                QuarterWaveFilters.h
+                                SteppedImpedanceFilter.h
                                 ----------
     copyright            :  QUCS team
     author                :  2019 Andres Martinez-Mera
@@ -15,19 +15,19 @@
  *
  ***************************************************************************/
 
-#ifndef QUARTERWAVEFILTERS_H
-#define QUARTERWAVEFILTERS_H
+#ifndef STEPPEDIMPEDANCEFILTER_H
+#define STEPPEDIMPEDANCEFILTER_H
 
 #include "Filtering/LowpassPrototypeCoeffs.h"
 #include "Filtering/Network.h"
 #include "general.h"
 #include <QPen>
 
-class QuarterWaveFilters : public Network {
+class SteppedImpedanceFilter : public Network {
 public:
-  QuarterWaveFilters();
-  virtual ~QuarterWaveFilters();
-  QuarterWaveFilters(FilterSpecifications);
+  SteppedImpedanceFilter();
+  virtual ~SteppedImpedanceFilter();
+  SteppedImpedanceFilter(FilterSpecifications);
   QList<ComponentInfo> getComponents();
   QList<WireInfo> getWires();
   QList<NodeInfo> getNodes();
@@ -50,7 +50,7 @@ private:
   std::vector<std::complex<double>> Poles;
   std::vector<std::complex<double>> Zeros;
 
-  void Synthesize_QW(FilterClass);
+  void Synthesize_STIF();
 };
 
-#endif // QUARTERWAVEFILTERS_H
+#endif // STEPPEDIMPEDANCEFILTER_H

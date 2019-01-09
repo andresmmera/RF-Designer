@@ -18,7 +18,8 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     UI/PowerCombiningTool.h \
     PowerCombining/PowerCombinerDesigner.h \
     general.h \
-    Filtering/QuarterWaveFilters.h
+    Filtering/QuarterWaveFilters.h \
+    Filtering/SteppedImpedanceFilter.h
 
 
 SOURCES += main.cpp \
@@ -50,7 +51,8 @@ SOURCES += main.cpp \
     PowerCombining/Lim_Eom.cpp \
     PowerCombining/Wilkinson3way_ImprovedIsolation.cpp \
     PowerCombining/Recombinant3WayWilkinson.cpp \
-    Filtering/QuarterWaveFilters.cpp
+    Filtering/QuarterWaveFilters.cpp \
+    Filtering/SteppedImpedanceFilter.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 

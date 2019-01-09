@@ -56,6 +56,7 @@ FilterDesignTool::FilterDesignTool() {
   FilterImplementationCombo->addItem("LC Ladder");
   FilterImplementationCombo->addItem("LC Direct Coupled");
   FilterImplementationCombo->addItem("Quarter-wavelength");
+  FilterImplementationCombo->addItem("Stepped impedance");
   FilterDesignLayout->addWidget(new QLabel("Implementation"), 0, 0);
   FilterDesignLayout->addWidget(FilterImplementationCombo, 0, 1);
   //******** Tee or Pi (LC ladder only) ********
@@ -199,11 +200,41 @@ FilterDesignTool::FilterDesignTool() {
   FilterDesignLayout->addWidget(PhaseErrorLabel, 10, 0);
   FilterDesignLayout->addWidget(PhaseErrorCombobox, 10, 1);
   FilterDesignLayout->addWidget(PhaseErrorLabelDeg, 10, 2);
+  //***************  Minimum impedance achievable in the manufacturing process
+  //**************
+  MinimumZLabel = new QLabel("Minimum Z");
+  MinimumZ_Spinbox = new QDoubleSpinBox();
+  MinimumZ_Spinbox->setMinimum(1);
+  MinimumZ_Spinbox->setMaximum(1000);
+  MinimumZ_Spinbox->setValue(10);
+  MinimumZ_Spinbox->setSingleStep(10);
+  MinimumZ_Unit_Label = new QLabel(QChar(0xa9, 0x03));
+  MinimumZLabel->hide();
+  MinimumZ_Spinbox->hide();
+  MinimumZ_Unit_Label->hide();
+  FilterDesignLayout->addWidget(MinimumZLabel, 11, 0);
+  FilterDesignLayout->addWidget(MinimumZ_Spinbox, 11, 1);
+  FilterDesignLayout->addWidget(MinimumZ_Unit_Label, 11, 2);
+  //***************  Maximum impedance achievable in the manufacturing process
+  //**************
+  MaximumZLabel = new QLabel("Maximum Z");
+  MaximumZ_Spinbox = new QDoubleSpinBox();
+  MaximumZ_Spinbox->setMinimum(1);
+  MaximumZ_Spinbox->setMaximum(1000);
+  MaximumZ_Spinbox->setValue(400);
+  MaximumZ_Spinbox->setSingleStep(10);
+  MaximumZ_Unit_Label = new QLabel(QChar(0xa9, 0x03));
+  MaximumZLabel->hide();
+  MaximumZ_Spinbox->hide();
+  MaximumZ_Unit_Label->hide();
+  FilterDesignLayout->addWidget(MaximumZLabel, 12, 0);
+  FilterDesignLayout->addWidget(MaximumZ_Spinbox, 12, 1);
+  FilterDesignLayout->addWidget(MaximumZ_Unit_Label, 12, 2);
   //************ Source impedance **********
   SourceImpedanceLineEdit = new QLineEdit("50");
-  FilterDesignLayout->addWidget(new QLabel("ZS"), 11, 0);
-  FilterDesignLayout->addWidget(SourceImpedanceLineEdit, 11, 1);
-  FilterDesignLayout->addWidget(new QLabel(QChar(0xa9, 0x03)), 11, 2);
+  FilterDesignLayout->addWidget(new QLabel("ZS"), 13, 0);
+  FilterDesignLayout->addWidget(SourceImpedanceLineEdit, 13, 1);
+  FilterDesignLayout->addWidget(new QLabel(QChar(0xa9, 0x03)), 13, 2);
   this->setLayout(FilterDesignLayout);
 
   // Connection functions for updating the network requirements and simulate on
@@ -248,6 +279,10 @@ FilterDesignTool::FilterDesignTool() {
           SLOT(UpdateLoad_Impedance(int)));
   connect(RLCombobox, SIGNAL(currentIndexChanged(int)), this,
           SLOT(UpdateRipple(int)));
+  connect(MinimumZ_Spinbox, SIGNAL(valueChanged(double)), this,
+          SLOT(UpdateDesignParameters()));
+  connect(MaximumZ_Spinbox, SIGNAL(valueChanged(double)), this,
+          SLOT(UpdateDesignParameters()));
 }
 
 FilterDesignTool::~FilterDesignTool() {
@@ -268,6 +303,12 @@ FilterDesignTool::~FilterDesignTool() {
   delete StopbandAttLabel;
   delete StopbandAttdBLabel;
   delete EllipticTypeLabel;
+  delete MinimumZLabel;
+  delete MinimumZ_Spinbox;
+  delete MinimumZ_Unit_Label;
+  delete MaximumZLabel;
+  delete MaximumZ_Spinbox;
+  delete MaximumZ_Unit_Label;
 }
 
 void FilterDesignTool::synthesize() {
@@ -275,6 +316,7 @@ void FilterDesignTool::synthesize() {
   CanonicalFilter *CF;
   DirectCoupledFilters *DCF;
   QuarterWaveFilters *QWF;
+  SteppedImpedanceFilter *STIF;
 
   // Recalculate network
   if (FilterImplementationCombo->currentText() == "LC Ladder") {
@@ -329,6 +371,17 @@ void FilterDesignTool::synthesize() {
         "NOT LADDER"; // For some reason, the short stub implementation is buggy
                       // in the internal simulator
     delete QWF;
+  }
+  if (FilterImplementationCombo->currentText() == "Stepped impedance") {
+    STIF = new SteppedImpedanceFilter(Filter_SP);
+    STIF->synthesize();
+    SchInfo.netlist = STIF->getQucsNetlist();
+    SchInfo.Comps = STIF->getComponents();
+    SchInfo.Wires = STIF->getWires();
+    SchInfo.Nodes = STIF->getNodes();
+    SchInfo.displayGraphs = STIF->displaygraphs;
+    SchInfo.Description = "";
+    delete STIF;
   }
   SchInfo.SPAR_Settings = SPAR_Settings;
 }
@@ -519,6 +572,22 @@ void FilterDesignTool::UpdateDesignParameters() {
     FilterResponseTypeCombo->blockSignals(false);
   }
 
+  if (Filter_SP.Implementation == "Stepped impedance") {
+    MinimumZLabel->show();
+    MinimumZ_Spinbox->show();
+    MinimumZ_Unit_Label->show();
+    MaximumZLabel->show();
+    MaximumZ_Spinbox->show();
+    MaximumZ_Unit_Label->show();
+  } else {
+    MinimumZLabel->hide();
+    MinimumZ_Spinbox->hide();
+    MinimumZ_Unit_Label->hide();
+    MaximumZLabel->hide();
+    MaximumZ_Spinbox->hide();
+    MaximumZ_Unit_Label->hide();
+  }
+
   // Update parameters
   Filter_SP.bw = BWSpinbox->value() * getScale(BW_ScaleCombobox->currentText());
   Filter_SP.fc = FCSpinbox->value() * getScale(FC_ScaleCombobox->currentText());
@@ -526,6 +595,8 @@ void FilterDesignTool::UpdateDesignParameters() {
   Filter_SP.ZS = SourceImpedanceLineEdit->text().toDouble();
   Filter_SP.UseZverevTables = UseZverevTablesCheckBox->isChecked();
   Filter_SP.Implementation = FilterImplementationCombo->currentText();
+  Filter_SP.minZ = MinimumZ_Spinbox->value();
+  Filter_SP.maxZ = MaximumZ_Spinbox->value();
 
   if (!UseZverevTablesCheckBox->isChecked()) {
     Filter_SP.order = OrderSpinBox->value();
@@ -809,6 +880,13 @@ void FilterDesignTool::ImplementationComboChanged() {
     // The elliptic response cannot be implemented too
     FilterClassCombo->clear();
     FilterClassCombo->addItem("Bandpass");
+    FilterClassCombo->setCurrentIndex(0);
+  }
+  if (FilterImplementationCombo->currentText() == "Stepped impedance") {
+    // Only bandpass filters can be implemented using direct coupled filters
+    // The elliptic response cannot be implemented too
+    FilterClassCombo->clear();
+    FilterClassCombo->addItem("Lowpass");
     FilterClassCombo->setCurrentIndex(0);
   }
   if (FilterImplementationCombo->currentText() == "LC Ladder") {
