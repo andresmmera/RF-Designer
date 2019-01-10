@@ -73,6 +73,7 @@ FilterDesignTool::FilterDesignTool() {
   FilterImplementationCombo->addItem("LC Direct Coupled");
   FilterImplementationCombo->addItem("Quarter-wavelength");
   FilterImplementationCombo->addItem("Stepped impedance");
+  FilterImplementationCombo->addItem("End-coupled");
   FilterDesignLayout->addWidget(new QLabel("Implementation"), 0, 0);
   FilterDesignLayout->addWidget(FilterImplementationCombo, 0, 1);
   //******** Tee or Pi (LC ladder only) ********
@@ -333,6 +334,7 @@ void FilterDesignTool::synthesize() {
   DirectCoupledFilters *DCF;
   QuarterWaveFilters *QWF;
   SteppedImpedanceFilter *STIF;
+  EndCoupled *ECF;
 
   // Recalculate network
   if (FilterImplementationCombo->currentText() == "LC Ladder") {
@@ -398,6 +400,18 @@ void FilterDesignTool::synthesize() {
     SchInfo.displayGraphs = STIF->displaygraphs;
     SchInfo.Description = "";
     delete STIF;
+  }
+
+  if (FilterImplementationCombo->currentText() == "End-coupled") {
+    ECF = new EndCoupled(Filter_SP);
+    ECF->synthesize();
+    SchInfo.netlist = ECF->getQucsNetlist();
+    SchInfo.Comps = ECF->getComponents();
+    SchInfo.Wires = ECF->getWires();
+    SchInfo.Nodes = ECF->getNodes();
+    SchInfo.displayGraphs = ECF->displaygraphs;
+    SchInfo.Description = "";
+    delete ECF;
   }
   SchInfo.SPAR_Settings = SPAR_Settings;
 }
@@ -922,5 +936,14 @@ void FilterDesignTool::ImplementationComboChanged() {
     FilterClassCombo->addItem("Bandstop");
     FilterClassCombo->setCurrentIndex(0);
   }
+
+  if (FilterImplementationCombo->currentText() == "End-coupled") {
+    // Only bandpass and notch types available
+    // Of course, the elliptic type cannot be implemented this way.
+    FilterClassCombo->clear();
+    FilterClassCombo->addItem("Bandpass");
+    FilterClassCombo->setCurrentIndex(0);
+  }
+
   UpdateDesignParameters();
 }

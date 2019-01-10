@@ -504,8 +504,8 @@ void EllipticFilter::Insert_LowpassMinL_Section(
     Components.append(Cshunt);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND,
-                     vertical, posx + 50, 100, "", "");
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                     posx + 50, 100, "", "");
     Components.append(Ground);
 
     //***** GND to capacitor *****
@@ -549,14 +549,13 @@ void EllipticFilter::Insert_LowpassMinL_Section(
 
   if (Cshunt_LP->at(j) != 0) {
     Cshunt.setParams(QString("C%1").arg(++NumberComponents[Capacitor]),
-                     Capacitor, vertical, posx, 50, QString("N%1").arg(Ni),
-                     "gnd");
+                     Capacitor, 0, posx, 50, QString("N%1").arg(Ni), "gnd");
     Cshunt.val["C"] = num2str(Cshunt_LP->at(j), Capacitance);
     Components.append(Cshunt);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND,
-                     vertical, posx, 100, "", "");
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                     posx, 100, "", "");
     Components.append(Ground);
   }
   // Node
@@ -683,13 +682,13 @@ void EllipticFilter::Insert_HighpassMinC_Section(
 
   if (CentralSection) {
     Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor,
-                     vertical, posx + 50, 50, QString("N%1").arg(Ni), "gnd");
+                     0, posx + 50, 50, QString("N%1").arg(Ni), "gnd");
     Lshunt.val["L"] = num2str(Kl / Cshunt_LP->at(j), Inductance);
     Components.append(Lshunt);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND,
-                     vertical, posx + 50, 100, "", "");
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                     posx + 50, 100, "", "");
     Components.append(Ground);
 
     //***** GND to capacitor *****
@@ -736,8 +735,8 @@ void EllipticFilter::Insert_HighpassMinC_Section(
     Components.append(Lshunt);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND,
-                     vertical, posx, 100, "", "");
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                     posx, 100, "", "");
     Components.append(Ground);
   }
   // Node
@@ -939,8 +938,8 @@ void EllipticFilter::Insert_LowpassMinC_Section(
   Components.append(Cshunt);
 
   // GND
-  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical,
-                   posx, 140, "", "");
+  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0, posx,
+                   140, "", "");
   Components.append(Ground);
 
   //***** Inductor to node *****
@@ -1094,8 +1093,8 @@ void EllipticFilter::Insert_HighpassMinL_Section(
   }
 
   // GND
-  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical,
-                   posx, 140, "", "");
+  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0, posx,
+                   140, "", "");
   Components.append(Ground);
 
   //***** Inductor to node *****
@@ -1192,8 +1191,8 @@ void EllipticFilter::Insert_Bandpass_1_Section(
     Components.append(Cshunt);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND,
-                     vertical, posx + 50, 100, "", "");
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                     posx + 50, 100, "", "");
     Components.append(Ground);
 
     WI.setParams(Cshunt.ID, 0, Ground.ID, 0);
@@ -1205,8 +1204,8 @@ void EllipticFilter::Insert_Bandpass_1_Section(
     Components.append(Lshunt);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND,
-                     vertical, posx, 100, "", "");
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                     posx, 100, "", "");
     Components.append(Ground);
 
     WI.setParams(Lshunt.ID, 0, Ground.ID, 0);
@@ -1259,8 +1258,8 @@ void EllipticFilter::Insert_Bandpass_1_Section(
     Components.append(Cshunt);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND,
-                     vertical, posx - 50, 100, "", "");
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                     posx - 50, 100, "", "");
     Components.append(Ground);
 
     WI.setParams(Cshunt.ID, 0, Ground.ID, 0);
@@ -1272,8 +1271,8 @@ void EllipticFilter::Insert_Bandpass_1_Section(
     Components.append(Lshunt);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND,
-                     vertical, posx, 100, "", "");
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                     posx, 100, "", "");
     Components.append(Ground);
 
     WI.setParams(Lshunt.ID, 0, Ground.ID, 0);
@@ -1591,7 +1590,7 @@ void EllipticFilter::Insert_Bandpass_2_Section(
     Components.append(Cshunt2);
   }
   // GND
-  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical,
+  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
                    posx + 40, 200, "", "");
   Components.append(Ground);
 
@@ -1614,7 +1613,7 @@ void EllipticFilter::Insert_Bandpass_2_Section(
   }
 
   // GND
-  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, vertical,
+  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
                    posx + 110, 200, "", "");
   Components.append(Ground);
 
@@ -1701,8 +1700,8 @@ void EllipticFilter::Insert_Bandstop_2_Section(
     Components.append(Lshunt);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND,
-                     vertical, posx + 25, 150, "", "");
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                     posx + 25, 150, "", "");
     Components.append(Ground);
 
     // Node
@@ -1772,14 +1771,14 @@ void EllipticFilter::Insert_Bandstop_2_Section(
     }
 
     Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor,
-                     vertical, posx - 25, 50,
-                     QString("NV%1").arg(virtual_nodes), "gnd");
+                     0, posx - 25, 50, QString("NV%1").arg(virtual_nodes),
+                     "gnd");
     Lshunt.val["L"] = num2str(Lshunt_BS_T2, Inductance);
     Components.append(Lshunt);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND,
-                     vertical, posx - 25, 150, "", "");
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                     posx - 25, 150, "", "");
     Components.append(Ground);
 
     WI.setParams(Cshunt.ID, 0, Ground.ID, 0);
@@ -2096,8 +2095,8 @@ void EllipticFilter::Insert_Bandstop_1_Section(
     Components.append(Cshunt2);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND,
-                     vertical, posx + 40, 200, "", "");
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                     posx + 40, 200, "", "");
     Components.append(Ground);
 
     WI.setParams(Cshunt2.ID, 0, Ground.ID, 0);
@@ -2110,8 +2109,8 @@ void EllipticFilter::Insert_Bandstop_1_Section(
     Components.append(Lshunt2);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND,
-                     vertical, posx + 110, 200, "", "");
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                     posx + 110, 200, "", "");
     Components.append(Ground);
 
     WI.setParams(Lshunt2.ID, 0, Ground.ID, 0);
@@ -2124,8 +2123,8 @@ void EllipticFilter::Insert_Bandstop_1_Section(
     Wires.append(WI);
   } else { // Cshunt -> +infty and Lshunt -> 0
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND,
-                     vertical, posx + 75, 200, "", "");
+    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                     posx + 75, 200, "", "");
     Components.append(Ground);
 
     WI.setParams(Lshunt1.ID, 0, Ground.ID, 0);

@@ -32,6 +32,7 @@
 #include "Filtering/CanonicalFilter.h"
 #include "Filtering/DirectCoupledFilters.h"
 #include "Filtering/EllipticFilter.h"
+#include "Filtering/EndCoupled.h"
 #include "Filtering/Network.h"
 #include "Filtering/QuarterWaveFilters.h"
 #include "Filtering/SteppedImpedanceFilter.h"
