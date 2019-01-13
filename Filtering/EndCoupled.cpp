@@ -61,7 +61,7 @@ void EndCoupled::synthesize() {
   displaygraphs[QString("S[1,1]")] = QPen(Qt::blue, 1, Qt::SolidLine);
 }
 
-// This function synthesizes a lowpass filter using the stepped-impedance
+// This function synthesizes an end-coupled bandpass filter
 // implementation Reference: Microstrip filters for RF/Microwave Applications.
 // Jia-Sheng Hong. M. J. Lancaster. 2001. John Wiley and Sons. Pages 121-123.
 void EndCoupled::Synthesize_ECF() {

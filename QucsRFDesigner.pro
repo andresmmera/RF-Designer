@@ -20,7 +20,8 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     general.h \
     Filtering/QuarterWaveFilters.h \
     Filtering/SteppedImpedanceFilter.h \
-    Filtering/EndCoupled.h
+    Filtering/EndCoupled.h \
+    Filtering/CapacitivelyCoupledShuntResonatorsFilter.h
 
 
 SOURCES += main.cpp \
@@ -54,7 +55,8 @@ SOURCES += main.cpp \
     PowerCombining/Recombinant3WayWilkinson.cpp \
     Filtering/QuarterWaveFilters.cpp \
     Filtering/SteppedImpedanceFilter.cpp \
-    Filtering/EndCoupled.cpp
+    Filtering/EndCoupled.cpp \
+    Filtering/CapacitivelyCoupledShuntResonatorsFilter.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 

@@ -74,6 +74,7 @@ FilterDesignTool::FilterDesignTool() {
   FilterImplementationCombo->addItem("Quarter-wavelength");
   FilterImplementationCombo->addItem("Stepped impedance");
   FilterImplementationCombo->addItem("End-coupled");
+  FilterImplementationCombo->addItem("Capacitively-coupled shunt resonators");
   FilterDesignLayout->addWidget(new QLabel("Implementation"), 0, 0);
   FilterDesignLayout->addWidget(FilterImplementationCombo, 0, 1);
   //******** Tee or Pi (LC ladder only) ********
@@ -335,6 +336,7 @@ void FilterDesignTool::synthesize() {
   QuarterWaveFilters *QWF;
   SteppedImpedanceFilter *STIF;
   EndCoupled *ECF;
+  CapacitivelyCoupledShuntResonatorsFilter *CCSRF;
 
   // Recalculate network
   if (FilterImplementationCombo->currentText() == "LC Ladder") {
@@ -413,6 +415,20 @@ void FilterDesignTool::synthesize() {
     SchInfo.Description = "";
     delete ECF;
   }
+
+  if (FilterImplementationCombo->currentText() ==
+      "Capacitively-coupled shunt resonators") {
+    CCSRF = new CapacitivelyCoupledShuntResonatorsFilter(Filter_SP);
+    CCSRF->synthesize();
+    SchInfo.netlist = CCSRF->getQucsNetlist();
+    SchInfo.Comps = CCSRF->getComponents();
+    SchInfo.Wires = CCSRF->getWires();
+    SchInfo.Nodes = CCSRF->getNodes();
+    SchInfo.displayGraphs = CCSRF->displaygraphs;
+    SchInfo.Description = "";
+    delete CCSRF;
+  }
+
   SchInfo.SPAR_Settings = SPAR_Settings;
 }
 
@@ -937,7 +953,9 @@ void FilterDesignTool::ImplementationComboChanged() {
     FilterClassCombo->setCurrentIndex(0);
   }
 
-  if (FilterImplementationCombo->currentText() == "End-coupled") {
+  if ((FilterImplementationCombo->currentText() == "End-coupled") ||
+      (FilterImplementationCombo->currentText() ==
+       "Capacitively-coupled shunt resonators")) {
     // Only bandpass and notch types available
     // Of course, the elliptic type cannot be implemented this way.
     FilterClassCombo->clear();
