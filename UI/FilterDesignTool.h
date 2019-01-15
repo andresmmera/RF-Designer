@@ -66,7 +66,8 @@ private:
   // ************************** FILTER DESIGN ***************************
   QWidget *SetupFilterDesignGUI();
   QComboBox *FilterClassCombo, *FilterResponseTypeCombo,
-      *FilterImplementationCombo, *FC_ScaleCombobox, *BW_ScaleCombobox;
+      *FilterImplementationCombo, *FC_ScaleCombobox, *BW_ScaleCombobox,
+      *SemiLumpedImplementationCombo;
   QComboBox *EllipticType, *DC_CouplingTypeCombo;
   QDoubleSpinBox *FCSpinbox, *BWSpinbox, *RippleSpinbox, *StopbandAttSpinbox,
       *MinimumZ_Spinbox, *MaximumZ_Spinbox;
@@ -77,7 +78,7 @@ private:
   QRadioButton *CLCRadioButton, *LCLRadioButton;
   QLabel *StopbandAttLabel, *StopbandAttdBLabel, *EllipticTypeLabel,
       *RippleLabel, *RippledBLabel, *DC_CouplingLabel, *MaximumZ_Unit_Label,
-      *MinimumZ_Unit_Label;
+      *MinimumZ_Unit_Label, *SemiLumpedImplementationLabel;
   QLabel *RLlabel, *RLlabelOhm, *PhaseErrorLabel, *PhaseErrorLabelDeg,
       *MinimumZLabel, *MaximumZLabel; // Zverev mode
   QCheckBox *UseZverevTablesCheckBox;

@@ -46,6 +46,7 @@ enum Coupling {
   CapacitativeCoupledShuntResonators,
   InductiveCoupledSeriesResonators
 };
+enum SemiLumpedImplementation { ONLY_INDUCTORS, INDUCTORS_AND_SHUNT_CAPS };
 
 static const double SPEED_OF_LIGHT =
     299792458.0; // REMOVE THIS WHEN THIS TOOL BECOMES INTEGRATED IN QUCS
@@ -77,6 +78,7 @@ struct FilterSpecifications {
                // filters)
   double maxZ; // Maximum synthesizable impedance (only for stepped impedance
                // filters)
+  SemiLumpedImplementation SemiLumpedISettings;
 };
 
 struct NetworkInfo {

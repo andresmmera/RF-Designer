@@ -75,6 +75,7 @@ FilterDesignTool::FilterDesignTool() {
   FilterImplementationCombo->addItem("Stepped impedance");
   FilterImplementationCombo->addItem("End-coupled");
   FilterImplementationCombo->addItem("Capacitively-coupled shunt resonators");
+  FilterImplementationCombo->addItem("Semilumped Elliptic");
   FilterDesignLayout->addWidget(new QLabel("Implementation"), 0, 0);
   FilterDesignLayout->addWidget(FilterImplementationCombo, 0, 1);
   //******** Tee or Pi (LC ladder only) ********
@@ -248,11 +249,22 @@ FilterDesignTool::FilterDesignTool() {
   FilterDesignLayout->addWidget(MaximumZLabel, 12, 0);
   FilterDesignLayout->addWidget(MaximumZ_Spinbox, 12, 1);
   FilterDesignLayout->addWidget(MaximumZ_Unit_Label, 12, 2);
+  //************************* Semilumped implementation settings
+  //*********************
+  SemiLumpedImplementationLabel = new QLabel("Semilumped settings");
+  SemiLumpedImplementationCombo = new QComboBox();
+  SemiLumpedImplementationCombo->addItem(
+      "Replace inductors and shunt capacitors");
+  SemiLumpedImplementationCombo->addItem("Replace only inductors");
+  SemiLumpedImplementationCombo->hide();
+  SemiLumpedImplementationLabel->hide();
+  FilterDesignLayout->addWidget(SemiLumpedImplementationLabel, 13, 0);
+  FilterDesignLayout->addWidget(SemiLumpedImplementationCombo, 13, 1);
   //************ Source impedance **********
   SourceImpedanceLineEdit = new QLineEdit("50");
-  FilterDesignLayout->addWidget(new QLabel("ZS"), 13, 0);
-  FilterDesignLayout->addWidget(SourceImpedanceLineEdit, 13, 1);
-  FilterDesignLayout->addWidget(new QLabel(QChar(0xa9, 0x03)), 13, 2);
+  FilterDesignLayout->addWidget(new QLabel("ZS"), 14, 0);
+  FilterDesignLayout->addWidget(SourceImpedanceLineEdit, 14, 1);
+  FilterDesignLayout->addWidget(new QLabel(QChar(0xa9, 0x03)), 14, 2);
   this->setLayout(FilterDesignLayout);
 
   // Connection functions for updating the network requirements and simulate on
@@ -301,6 +313,8 @@ FilterDesignTool::FilterDesignTool() {
           SLOT(UpdateDesignParameters()));
   connect(MaximumZ_Spinbox, SIGNAL(valueChanged(double)), this,
           SLOT(UpdateDesignParameters()));
+  connect(SemiLumpedImplementationCombo, SIGNAL(currentIndexChanged(int)), this,
+          SLOT(UpdateDesignParameters()));
 }
 
 FilterDesignTool::~FilterDesignTool() {
@@ -330,7 +344,7 @@ FilterDesignTool::~FilterDesignTool() {
 }
 
 void FilterDesignTool::synthesize() {
-  EllipticFilter *EF;
+  EllipticFilter *EF, *SMLEF;
   CanonicalFilter *CF;
   DirectCoupledFilters *DCF;
   QuarterWaveFilters *QWF;
@@ -427,6 +441,18 @@ void FilterDesignTool::synthesize() {
     SchInfo.displayGraphs = CCSRF->displaygraphs;
     SchInfo.Description = "";
     delete CCSRF;
+  }
+  if (FilterImplementationCombo->currentText() == "Semilumped Elliptic") {
+    SMLEF = new EllipticFilter(Filter_SP);
+    SMLEF->setSemilumpedMode(true);
+    SMLEF->synthesize();
+    SchInfo.netlist = SMLEF->getQucsNetlist();
+    SchInfo.Comps = SMLEF->getComponents();
+    SchInfo.Wires = SMLEF->getWires();
+    SchInfo.Nodes = SMLEF->getNodes();
+    SchInfo.displayGraphs = SMLEF->displaygraphs;
+    SchInfo.Description = "NOT LADDER";
+    delete SMLEF;
   }
 
   SchInfo.SPAR_Settings = SPAR_Settings;
@@ -618,7 +644,8 @@ void FilterDesignTool::UpdateDesignParameters() {
     FilterResponseTypeCombo->blockSignals(false);
   }
 
-  if (Filter_SP.Implementation == "Stepped impedance") {
+  if ((Filter_SP.Implementation == "Stepped impedance") ||
+      (Filter_SP.Implementation == "Semilumped Elliptic")) {
     MinimumZLabel->show();
     MinimumZ_Spinbox->show();
     MinimumZ_Unit_Label->show();
@@ -643,6 +670,12 @@ void FilterDesignTool::UpdateDesignParameters() {
   Filter_SP.Implementation = FilterImplementationCombo->currentText();
   Filter_SP.minZ = MinimumZ_Spinbox->value();
   Filter_SP.maxZ = MaximumZ_Spinbox->value();
+
+  if (SemiLumpedImplementationCombo->currentText() ==
+      "Replace inductors and shunt capacitors")
+    Filter_SP.SemiLumpedISettings = INDUCTORS_AND_SHUNT_CAPS;
+  if (SemiLumpedImplementationCombo->currentText() == "Replace only inductors")
+    Filter_SP.SemiLumpedISettings = ONLY_INDUCTORS;
 
   if (!UseZverevTablesCheckBox->isChecked()) {
     Filter_SP.order = OrderSpinBox->value();
@@ -961,6 +994,22 @@ void FilterDesignTool::ImplementationComboChanged() {
     FilterClassCombo->clear();
     FilterClassCombo->addItem("Bandpass");
     FilterClassCombo->setCurrentIndex(0);
+  }
+
+  if (FilterImplementationCombo->currentText() == "Semilumped Elliptic") {
+    // Only lowpass and highpass
+    FilterClassCombo->clear();
+    FilterClassCombo->addItem("Lowpass");
+    FilterClassCombo->addItem("Highpass");
+  }
+
+  if (FilterImplementationCombo->currentText().contains(
+          "Semilumped Elliptic")) {
+    SemiLumpedImplementationCombo->show();
+    SemiLumpedImplementationLabel->show();
+  } else {
+    SemiLumpedImplementationCombo->hide();
+    SemiLumpedImplementationLabel->hide();
   }
 
   UpdateDesignParameters();

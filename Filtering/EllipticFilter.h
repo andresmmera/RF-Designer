@@ -32,6 +32,7 @@ public:
   NetworkInfo getLadder();
   QString getQucsNetlist() { return QucsNetlist; }
   QMap<QString, QPen> displaygraphs;
+  void setSemilumpedMode(bool);
 
 private:
   struct FilterSpecifications Specification;
@@ -44,8 +45,9 @@ private:
   QMap<ComponentType, int>
       NumberComponents; // List for assigning IDs to the filter components
   std::vector<double> *Cseries_LP, *Lseries_LP,
-      *Cshunt_LP; // Elliptic network parameters
-  double RL;      // Load resistance
+      *Cshunt_LP;          // Elliptic network parameters
+  double RL;               // Load resistance
+  bool semilumped = false; // Activate semilumped implementation mode
   std::vector<std::complex<double>> Poles;
   std::vector<std::complex<double>> Zeros;
   unsigned int virtual_nodes;
@@ -74,6 +76,12 @@ private:
   void Insert_HighpassMinL_Section(int &, unsigned int &,
                                    QMap<QString, unsigned int> &, unsigned int,
                                    bool, bool);
+  void Insert_LowpassSemilumpedMinC_Section(int &, unsigned int &,
+                                            QMap<QString, unsigned int> &,
+                                            unsigned int, bool, bool);
+  void Insert_HighpassSemilumpedMinL_Section(int &, unsigned int &,
+                                             QMap<QString, unsigned int> &,
+                                             unsigned int, bool, bool);
 
   void Insert_Bandpass_1_Section(int &, unsigned int &,
                                  QMap<QString, unsigned int> &, unsigned int,
