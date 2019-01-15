@@ -76,6 +76,7 @@ FilterDesignTool::FilterDesignTool() {
   FilterImplementationCombo->addItem("End-coupled");
   FilterImplementationCombo->addItem("Capacitively-coupled shunt resonators");
   FilterImplementationCombo->addItem("Semilumped Elliptic");
+  FilterImplementationCombo->addItem("Semilumped Canonical");
   FilterDesignLayout->addWidget(new QLabel("Implementation"), 0, 0);
   FilterDesignLayout->addWidget(FilterImplementationCombo, 0, 1);
   //******** Tee or Pi (LC ladder only) ********
@@ -345,7 +346,7 @@ FilterDesignTool::~FilterDesignTool() {
 
 void FilterDesignTool::synthesize() {
   EllipticFilter *EF, *SMLEF;
-  CanonicalFilter *CF;
+  CanonicalFilter *CF, *SMLCF;
   DirectCoupledFilters *DCF;
   QuarterWaveFilters *QWF;
   SteppedImpedanceFilter *STIF;
@@ -453,6 +454,19 @@ void FilterDesignTool::synthesize() {
     SchInfo.displayGraphs = SMLEF->displaygraphs;
     SchInfo.Description = "NOT LADDER";
     delete SMLEF;
+  }
+
+  if (FilterImplementationCombo->currentText() == "Semilumped Canonical") {
+    SMLCF = new CanonicalFilter(Filter_SP);
+    SMLCF->setSemilumpedMode(true);
+    SMLCF->synthesize();
+    SchInfo.netlist = SMLCF->getQucsNetlist();
+    SchInfo.Comps = SMLCF->getComponents();
+    SchInfo.Wires = SMLCF->getWires();
+    SchInfo.Nodes = SMLCF->getNodes();
+    SchInfo.displayGraphs = SMLCF->displaygraphs;
+    SchInfo.Description = "";
+    delete SMLCF;
   }
 
   SchInfo.SPAR_Settings = SPAR_Settings;
@@ -996,15 +1010,14 @@ void FilterDesignTool::ImplementationComboChanged() {
     FilterClassCombo->setCurrentIndex(0);
   }
 
-  if (FilterImplementationCombo->currentText() == "Semilumped Elliptic") {
+  if (FilterImplementationCombo->currentText().contains("Semilumped")) {
     // Only lowpass and highpass
     FilterClassCombo->clear();
     FilterClassCombo->addItem("Lowpass");
     FilterClassCombo->addItem("Highpass");
   }
 
-  if (FilterImplementationCombo->currentText().contains(
-          "Semilumped Elliptic")) {
+  if (FilterImplementationCombo->currentText().contains("Semilumped")) {
     SemiLumpedImplementationCombo->show();
     SemiLumpedImplementationLabel->show();
   } else {

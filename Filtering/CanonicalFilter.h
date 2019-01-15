@@ -34,12 +34,14 @@ public:
   NetworkInfo getLadder();
   QString getQucsNetlist() { return QucsNetlist; }
   QMap<QString, QPen> displaygraphs;
+  void setSemilumpedMode(bool);
 
 private:
   struct FilterSpecifications Specification;
   QList<ComponentInfo> Components;
   QList<WireInfo> Wires;
   QList<NodeInfo> Nodes;
+  bool semilumped = false; // Activate semilumped implementation mode
 
   QString QucsNetlist;
 
@@ -50,10 +52,11 @@ private:
   std::deque<double> gi;
 
   //***********  Schematic synthesis ********************
-  void SynthesizeLPF(); // Lowpass
-  void SynthesizeHPF(); // Highpass
-  void SynthesizeBPF(); // Bandpass
-  void SynthesizeBSF(); // Bandstop
+  void SynthesizeLPF();           // Lowpass
+  void SynthesizeSemilumpedLPF(); // Semilumped Lowpass implementation
+  void SynthesizeHPF();           // Highpass
+  void SynthesizeBPF();           // Bandpass
+  void SynthesizeBSF();           // Bandstop
 };
 
 #endif // CANONICALFILTER_H

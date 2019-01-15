@@ -37,6 +37,7 @@ CanonicalFilter::CanonicalFilter(FilterSpecifications FS) {
 
 CanonicalFilter::~CanonicalFilter() {}
 
+void CanonicalFilter::setSemilumpedMode(bool mode) { this->semilumped = mode; }
 QList<ComponentInfo> CanonicalFilter::getComponents() { return Components; }
 
 QList<WireInfo> CanonicalFilter::getWires() { return Wires; }
@@ -103,6 +104,7 @@ void CanonicalFilter::SynthesizeLPF() {
   ComponentInfo Cshunt, Lseries, Ground;
   WireInfo WI;
   NodeInfo NI;
+  double L_ci, L_li, lambda0 = SPEED_OF_LIGHT / Specification.fc;
 
   // Synthesize CLC of LCL network
   int N = Specification.order; // Number of elements
@@ -133,17 +135,38 @@ void CanonicalFilter::SynthesizeLPF() {
         ((!Specification.isCLC) && (k % 2 != Kcontrol))) {
       // Shunt capacitor
       Cshunt.Connections.clear();
-      Cshunt.setParams(QString("C%1").arg(++NumberComponents[Capacitor]),
-                       Capacitor, 0.0, posx, 50, QString("N%1").arg(Ni), "gnd");
       gi[k + 1] *= 1 / (2 * M_PI * Specification.fc *
                         Specification.ZS); // Lowpass to highpass transformation
-      Cshunt.val["C"] = num2str(gi[k + 1], Capacitance);
-      Components.append(Cshunt);
+      if ((semilumped == true) &&
+          (Specification.SemiLumpedISettings == INDUCTORS_AND_SHUNT_CAPS)) {
+        Cshunt.setParams(
+            QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
+            OpenStub, 0.0, posx, 50, QString("N%1").arg(Ni),
+            QString("NOPEN%1").arg(Ni));
+        // Microstrip Filters for RF/Microwave Applications. JIA-SHENG HONG. M.
+        // J. LANCASTER. JOHN WILEY & SONS, INC. 2001. page 119. Eq. 5.9
+        L_ci =
+            lambda0 / (2 * M_PI) *
+            asin(2 * M_PI * Specification.fc * Specification.minZ * gi[k + 1]);
+        Cshunt.val["Z0"] = num2str(Specification.minZ, Resistance);
+        Cshunt.val["Length"] = ConvertLengthFromM("mm", L_ci);
+      } else {
+        // Lumped capacitor
+        Cshunt.setParams(QString("C%1").arg(++NumberComponents[Capacitor]),
+                         Capacitor, 0.0, posx, 50, QString("N%1").arg(Ni),
+                         "gnd");
+        Cshunt.val["C"] = num2str(gi[k + 1], Capacitance);
 
-      // GND
-      Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
-                       posx, 100, "", "");
-      Components.append(Ground);
+        // GND
+        Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                         posx, 100, "", "");
+        Components.append(Ground);
+
+        //***** GND to capacitor *****
+        WI.setParams(Ground.ID, 0, Cshunt.ID, 0);
+        Wires.append(WI);
+      }
+      Components.append(Cshunt);
 
       // Node
       NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]),
@@ -155,10 +178,6 @@ void CanonicalFilter::SynthesizeLPF() {
       WI.setParams(NI.ID, 0, Cshunt.ID, 1);
       Wires.append(WI);
 
-      //***** GND to capacitor *****
-      WI.setParams(Ground.ID, 0, Cshunt.ID, 0);
-      Wires.append(WI);
-
       //***** Capacitor to the previous Lseries/Term *****
       WI.setParams(NI.ID, 1, ConnectionAux, 0);
       Wires.append(WI);
@@ -168,13 +187,27 @@ void CanonicalFilter::SynthesizeLPF() {
     } else {
       // Series inductor
       Lseries.Connections.clear();
-      Lseries.setParams(QString("L%1").arg(++NumberComponents[Inductor]),
-                        Inductor, -90, posx, 0, QString("N%1").arg(Ni),
-                        QString("N%1").arg(Ni + 1));
       gi[k + 1] *= Specification.ZS / (2 * M_PI * Specification.fc);
-      Lseries.val["L"] = num2str(gi[k + 1], Inductance);
-      Components.append(Lseries);
+      if (semilumped == true) {
+        // Microstrip Filters for RF/Microwave Applications. JIA-SHENG HONG. M.
+        // J. LANCASTER. JOHN WILEY & SONS, INC. 2001. page 119. Eq. 5.9
+        L_li =
+            lambda0 / (2 * M_PI) *
+            asin(2 * M_PI * Specification.fc * gi[k + 1] / Specification.maxZ);
+        Lseries.setParams(
+            QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
+            TransmissionLine, -90, posx, 0, QString("N%1").arg(Ni),
+            QString("N%1").arg(Ni + 1));
+        Lseries.val["Z0"] = num2str(Specification.maxZ, Resistance);
+        Lseries.val["Length"] = ConvertLengthFromM("mm", L_li);
+      } else {
+        Lseries.setParams(QString("L%1").arg(++NumberComponents[Inductor]),
+                          Inductor, -90, posx, 0, QString("N%1").arg(Ni),
+                          QString("N%1").arg(Ni + 1));
 
+        Lseries.val["L"] = num2str(gi[k + 1], Inductance);
+      }
+      Components.append(Lseries);
       Ni++;
       // Wiring
       WI.setParams(ConnectionAux, 0, Lseries.ID, 1);
@@ -205,6 +238,7 @@ void CanonicalFilter::SynthesizeHPF() {
   // Synthesize CLC of LCL network
   int N = Specification.order; // Number of elements
   int posx = 0;
+  double L_li, lambda0 = SPEED_OF_LIGHT / Specification.fc;
   QString ConnectionAux = "";
   Components.clear();
 
@@ -226,16 +260,33 @@ void CanonicalFilter::SynthesizeHPF() {
         ((!Specification.isCLC) && (k % 2 != 0))) {
       // Shunt inductor
       Lshunt.Connections.clear();
-      Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]),
-                       Inductor, 0, posx, 50, QString("N%1").arg(Ni), "gnd");
       gi[k + 1] = Specification.ZS / (2 * M_PI * Specification.fc * gi[k + 1]);
-      Lshunt.val["L"] = num2str(gi[k + 1], Inductance);
-      Components.append(Lshunt);
+      if (semilumped == true) {
+        Lshunt.setParams(
+            QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
+            ShortStub, 0, posx, 50, QString("N%1").arg(Ni), "gnd");
+        // Microstrip Filters for RF/Microwave Applications. JIA-SHENG HONG. M.
+        // J. LANCASTER. JOHN WILEY & SONS, INC. 2001. page 119. Eq. 5.9
+        L_li =
+            lambda0 / (2 * M_PI) *
+            asin(2 * M_PI * Specification.fc * gi[k + 1] / Specification.maxZ);
+        Lshunt.val["Z0"] = num2str(Specification.maxZ, Resistance);
+        Lshunt.val["Length"] = ConvertLengthFromM("mm", L_li);
+      } else {
+        Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]),
+                         Inductor, 0, posx, 50, QString("N%1").arg(Ni), "gnd");
+        Lshunt.val["L"] = num2str(gi[k + 1], Inductance);
 
-      // GND
-      Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
-                       posx, 100, "", "");
-      Components.append(Ground);
+        // GND
+        Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
+                         posx, 100, "", "");
+        Components.append(Ground);
+
+        //***** GND to capacitor *****
+        WI.setParams(Ground.ID, 0, Lshunt.ID, 0);
+        Wires.append(WI);
+      }
+      Components.append(Lshunt);
 
       // Node
       NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]),
@@ -245,10 +296,6 @@ void CanonicalFilter::SynthesizeHPF() {
       // Wires
       //***** Capacitor to node *****
       WI.setParams(NI.ID, 1, Lshunt.ID, 1);
-      Wires.append(WI);
-
-      //***** GND to capacitor *****
-      WI.setParams(Ground.ID, 0, Lshunt.ID, 0);
       Wires.append(WI);
 
       //***** Capacitor to the previous Lseries/Term *****
