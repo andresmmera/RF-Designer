@@ -67,6 +67,9 @@ QRectF Component::boundingRect() const {
   case TransmissionLine:
     R = QRect(-40, -40, 80, 80);
     break;
+  case CoupledLines:
+    R = QRect(-60, -60, 120, 120);
+    break;
   case Resistor:
     R = QRect(-30, -30, 60, 60);
     break;
@@ -97,6 +100,7 @@ QPainterPath Component::shape() const {
   case ShortStub:
   case TransmissionLine:
   case Resistor:
+  case CoupledLines:
     path.addRect(-30, -30, 60, 60);
     break;
   case Inductor:
@@ -144,23 +148,25 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   case Term:
     paintTerm(painter);
     break;
+  case CoupledLines:
+    paintCoupledLines(painter);
+    break;
   default:
     break;
   }
 
   /*
+  // Debug code: Shows the bounding box of the component. This is the
   painter->setPen(QPen(Qt::red, 1));
   painter->drawPoint(QPoint(0, 0));
 
-  // Debug code: Shows the bounding box of the component. This is the
-  // region where the selection works painter->setPen(QPen(Qt::red, 1));
-  painter->drawPath(
-      this->shape()); // Component box-> This is the area where the
-  // component can be selected painter->setPen(QPen(Qt::green, 1));
-  painter->drawRect(
-      this->boundingRect()); // Component bounding box->This is the
-                             // area where the component can be painted
-                             */
+   // region where the selection works painter->setPen(QPen(Qt::red, 1));
+   painter->drawPath(
+       this->shape()); // Component box-> This is the area where the
+   // component can be selected painter->setPen(QPen(Qt::green, 1));
+   painter->drawRect(
+       this->boundingRect()); // Component bounding box->This is the
+                              // area where the component can be painted*/
 }
 
 QVariant Component::itemChange(GraphicsItemChange change,
@@ -236,7 +242,24 @@ QPoint Component::getPortLocation(int port_number) {
     break;
   default:
     break;
+  case CoupledLines:
+    switch (port_number) {
+    case 0:
+    default:
+      P = QPoint(-10, -25);
+      break;
+    case 1:
+      P = QPoint(10, -25);
+      break;
+    case 2:
+      P = QPoint(-10, 25);
+      break;
+    case 3:
+      P = QPoint(10, 25);
+      break;
+    }
   }
+
   RotatePoint(P);
   return P;
 }
@@ -573,5 +596,61 @@ void Component::paintShortStub(QPainter *painter) {
       QRect(OriginText + QPoint(0, 10), QPoint(100, 100)),
       QString("%1").arg(Value["Z0"].replace("Ohm", QChar(0xa9, 0x03))));
   painter->drawText(QRect(OriginText + QPoint(0, 20), QPoint(100, 100)),
+                    QString("%1").arg(Value["Length"]));
+}
+
+void Component::paintCoupledLines(QPainter *painter) {
+
+  if (Rotation != 0) {
+    painter->rotate(Rotation);
+  }
+
+  int w = 15, shiftx = 10;
+
+  // The coupled lines painting code is the same as the transmission line code,
+  // but it is shifted by shiftx
+  painter->drawLine(QPoint(-shiftx, -25), QPoint(-shiftx, -14));
+  painter->drawLine(QPoint(-shiftx - 0.5 * w, -14),
+                    QPoint(-shiftx + 0.5 * w, -14));
+  painter->drawLine(QPoint(-shiftx - 0.5 * w, -14),
+                    QPoint(-shiftx + 0.5 * w, -14));
+  painter->drawLine(QPoint(-shiftx - 0.5 * w, -14),
+                    QPoint(-shiftx - 0.5 * w, 16));
+  painter->drawLine(QPoint(-shiftx + 0.5 * w, -14),
+                    QPoint(-shiftx + 0.5 * w, 16));
+  painter->drawLine(QPoint(-shiftx - 0.5 * w, 16),
+                    QPoint(-shiftx + 0.5 * w, 16));
+  painter->drawLine(QPoint(-shiftx, 16), QPoint(-shiftx, 25));
+
+  painter->drawLine(QPoint(shiftx, -25), QPoint(shiftx, -14));
+  painter->drawLine(QPoint(shiftx - 0.5 * w, -14),
+                    QPoint(shiftx + 0.5 * w, -14));
+  painter->drawLine(QPoint(shiftx - 0.5 * w, -14),
+                    QPoint(shiftx + 0.5 * w, -14));
+  painter->drawLine(QPoint(shiftx - 0.5 * w, -14),
+                    QPoint(shiftx - 0.5 * w, 16));
+  painter->drawLine(QPoint(shiftx + 0.5 * w, -14),
+                    QPoint(shiftx + 0.5 * w, 16));
+  painter->drawLine(QPoint(shiftx - 0.5 * w, 16), QPoint(shiftx + 0.5 * w, 16));
+  painter->drawLine(QPoint(shiftx, 16), QPoint(shiftx, 25));
+  painter->setPen(QPen(Qt::black, 1));
+
+  if (Rotation != 0) { // The rotation is undone to draw the text
+    painter->rotate(-Rotation);
+  }
+
+  QPoint OriginText(20, -10);
+  if (Rotation != 0)
+    OriginText.setX(-20), OriginText.setY(20);
+
+  painter->drawText(QRect(OriginText, QPoint(100, 100)),
+                    QString("%1").arg(this->ID));
+  painter->drawText(
+      QRect(OriginText + QPoint(0, 10), QPoint(100, 100)),
+      QString("%1").arg(Value["Ze"].replace("Ohm", QChar(0xa9, 0x03))));
+  painter->drawText(
+      QRect(OriginText + QPoint(0, 20), QPoint(100, 100)),
+      QString("%1").arg(Value["Zo"].replace("Ohm", QChar(0xa9, 0x03))));
+  painter->drawText(QRect(OriginText + QPoint(0, 30), QPoint(100, 100)),
                     QString("%1").arg(Value["Length"]));
 }

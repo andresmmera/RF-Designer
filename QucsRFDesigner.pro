@@ -13,7 +13,6 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     UI/smithchart.h \
     Filtering/DirectCoupledFilters.h \
     Filtering/LowpassPrototypeCoeffs.h \
-    Filtering/EdgeCoupled.h \
     UI/FilterDesignTool.h \
     UI/PowerCombiningTool.h \
     PowerCombining/PowerCombinerDesigner.h \
@@ -21,7 +20,8 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     Filtering/QuarterWaveFilters.h \
     Filtering/SteppedImpedanceFilter.h \
     Filtering/EndCoupled.h \
-    Filtering/CapacitivelyCoupledShuntResonatorsFilter.h
+    Filtering/CapacitivelyCoupledShuntResonatorsFilter.h \
+    Filtering/CoupledLineBandpassFilter.h
 
 
 SOURCES += main.cpp \
@@ -37,7 +37,6 @@ SOURCES += main.cpp \
     UI/smithchart.cpp \
     Filtering/DirectCoupledFilters.cpp \
     Filtering/LowpassPrototypeCoeffs.cpp \
-    Filtering/EdgeCoupled.cpp \
     UI/FilterDesignTool.cpp \
     UI/PowerCombiningTool.cpp \
     PowerCombining/PowerCombinerDesigner.cpp \
@@ -56,7 +55,8 @@ SOURCES += main.cpp \
     Filtering/QuarterWaveFilters.cpp \
     Filtering/SteppedImpedanceFilter.cpp \
     Filtering/EndCoupled.cpp \
-    Filtering/CapacitivelyCoupledShuntResonatorsFilter.cpp
+    Filtering/CapacitivelyCoupledShuntResonatorsFilter.cpp \
+    Filtering/CoupledLineBandpassFilter.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 

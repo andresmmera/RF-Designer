@@ -39,7 +39,8 @@ enum ComponentType {
   Resistor,
   TransmissionLine,
   OpenStub,
-  ShortStub
+  ShortStub,
+  CoupledLines
 };
 
 class ComponentInfo {
@@ -77,6 +78,18 @@ public:
     Connections.append(N2);
   };
 
+  void setParams(QString ID_, ComponentType Type_, double Rotation_, double x,
+                 double y,         // Coordinates
+                 QStringList Nodes // Nodes
+  ) {
+    ID = ID_;
+    Type = Type_;
+    Rotation = Rotation_;
+    Coordinates[0] = x;
+    Coordinates[1] = y;
+    Connections = Nodes;
+  };
+
   QString getQucs() {
     QString code;
     switch (Type) {
@@ -89,6 +102,9 @@ public:
       break;
     case Inductor:
       code = "L";
+      break;
+    case CoupledLines:
+      code = "CTLIN";
       break;
     case OpenStub:
     case ShortStub:
@@ -117,6 +133,7 @@ public:
       case OpenStub:
       case ShortStub:
       case TransmissionLine:
+      case CoupledLines:
         prop = it->first;
         if (prop == "Length")
           prop = "L";
@@ -236,6 +253,7 @@ private:
   void paintGND(QPainter *);
   void paintOpenStub(QPainter *);
   void paintShortStub(QPainter *);
+  void paintCoupledLines(QPainter *);
 
 signals:
   void DoubleClicked(struct ComponentInfo);

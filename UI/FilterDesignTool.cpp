@@ -77,6 +77,7 @@ FilterDesignTool::FilterDesignTool() {
   FilterImplementationCombo->addItem("Capacitively-coupled shunt resonators");
   FilterImplementationCombo->addItem("Semilumped Elliptic");
   FilterImplementationCombo->addItem("Semilumped Canonical");
+  FilterImplementationCombo->addItem("Coupled line bandpass");
   FilterDesignLayout->addWidget(new QLabel("Implementation"), 0, 0);
   FilterDesignLayout->addWidget(FilterImplementationCombo, 0, 1);
   //******** Tee or Pi (LC ladder only) ********
@@ -352,6 +353,7 @@ void FilterDesignTool::synthesize() {
   SteppedImpedanceFilter *STIF;
   EndCoupled *ECF;
   CapacitivelyCoupledShuntResonatorsFilter *CCSRF;
+  CoupledLineBandpassFilter *CLBPF;
 
   // Recalculate network
   if (FilterImplementationCombo->currentText() == "LC Ladder") {
@@ -467,6 +469,17 @@ void FilterDesignTool::synthesize() {
     SchInfo.displayGraphs = SMLCF->displaygraphs;
     SchInfo.Description = "";
     delete SMLCF;
+  }
+  if (FilterImplementationCombo->currentText() == "Coupled line bandpass") {
+    CLBPF = new CoupledLineBandpassFilter(Filter_SP);
+    CLBPF->synthesize();
+    SchInfo.netlist = CLBPF->getQucsNetlist();
+    SchInfo.Comps = CLBPF->getComponents();
+    SchInfo.Wires = CLBPF->getWires();
+    SchInfo.Nodes = CLBPF->getNodes();
+    SchInfo.displayGraphs = CLBPF->displaygraphs;
+    SchInfo.Description = "NOT LADDER";
+    delete CLBPF;
   }
 
   SchInfo.SPAR_Settings = SPAR_Settings;
@@ -1002,7 +1015,8 @@ void FilterDesignTool::ImplementationComboChanged() {
 
   if ((FilterImplementationCombo->currentText() == "End-coupled") ||
       (FilterImplementationCombo->currentText() ==
-       "Capacitively-coupled shunt resonators")) {
+       "Capacitively-coupled shunt resonators") ||
+      (FilterImplementationCombo->currentText() == "Coupled line bandpass")) {
     // Only bandpass and notch types available
     // Of course, the elliptic type cannot be implemented this way.
     FilterClassCombo->clear();

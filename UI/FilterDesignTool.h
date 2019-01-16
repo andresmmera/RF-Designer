@@ -31,6 +31,7 @@
 
 #include "Filtering/CanonicalFilter.h"
 #include "Filtering/CapacitivelyCoupledShuntResonatorsFilter.h"
+#include "Filtering/CoupledLineBandpassFilter.h"
 #include "Filtering/DirectCoupledFilters.h"
 #include "Filtering/EllipticFilter.h"
 #include "Filtering/EndCoupled.h"
