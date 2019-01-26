@@ -32,6 +32,7 @@
 #include "Filtering/CanonicalFilter.h"
 #include "Filtering/CapacitivelyCoupledShuntResonatorsFilter.h"
 #include "Filtering/CoupledLineBandpassFilter.h"
+#include "Filtering/CoupledLineHarmonicRejectionSIRBandpassFilter.h"
 #include "Filtering/DirectCoupledFilters.h"
 #include "Filtering/EllipticFilter.h"
 #include "Filtering/EndCoupled.h"
@@ -71,7 +72,7 @@ private:
       *SemiLumpedImplementationCombo;
   QComboBox *EllipticType, *DC_CouplingTypeCombo;
   QDoubleSpinBox *FCSpinbox, *BWSpinbox, *RippleSpinbox, *StopbandAttSpinbox,
-      *MinimumZ_Spinbox, *MaximumZ_Spinbox;
+      *MinimumZ_Spinbox, *MaximumZ_Spinbox, *ImpedanceRatio_Spinbox;
   QSpinBox *OrderSpinBox;
   QComboBox *OrderCombobox, *RLCombobox, *PhaseErrorCombobox; // Zverev mode
   QComboBox *RippleCombobox;
@@ -79,7 +80,8 @@ private:
   QRadioButton *CLCRadioButton, *LCLRadioButton;
   QLabel *StopbandAttLabel, *StopbandAttdBLabel, *EllipticTypeLabel,
       *RippleLabel, *RippledBLabel, *DC_CouplingLabel, *MaximumZ_Unit_Label,
-      *MinimumZ_Unit_Label, *SemiLumpedImplementationLabel;
+      *MinimumZ_Unit_Label, *SemiLumpedImplementationLabel,
+      *ImpedanceRatio_Label;
   QLabel *RLlabel, *RLlabelOhm, *PhaseErrorLabel, *PhaseErrorLabelDeg,
       *MinimumZLabel, *MaximumZLabel; // Zverev mode
   QCheckBox *UseZverevTablesCheckBox;

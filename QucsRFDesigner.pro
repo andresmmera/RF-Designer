@@ -21,7 +21,8 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     Filtering/SteppedImpedanceFilter.h \
     Filtering/EndCoupled.h \
     Filtering/CapacitivelyCoupledShuntResonatorsFilter.h \
-    Filtering/CoupledLineBandpassFilter.h
+    Filtering/CoupledLineBandpassFilter.h \
+    Filtering/CoupledLineHarmonicRejectionSIRBandpassFilter.h
 
 
 SOURCES += main.cpp \
@@ -56,7 +57,8 @@ SOURCES += main.cpp \
     Filtering/SteppedImpedanceFilter.cpp \
     Filtering/EndCoupled.cpp \
     Filtering/CapacitivelyCoupledShuntResonatorsFilter.cpp \
-    Filtering/CoupledLineBandpassFilter.cpp
+    Filtering/CoupledLineBandpassFilter.cpp \
+    Filtering/CoupledLineHarmonicRejectionSIRBandpassFilter.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 

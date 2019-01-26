@@ -78,6 +78,8 @@ FilterDesignTool::FilterDesignTool() {
   FilterImplementationCombo->addItem("Semilumped Elliptic");
   FilterImplementationCombo->addItem("Semilumped Canonical");
   FilterImplementationCombo->addItem("Coupled line bandpass");
+  FilterImplementationCombo->addItem(
+      "Coupled line SIR with harmonic rejection");
   FilterDesignLayout->addWidget(new QLabel("Implementation"), 0, 0);
   FilterDesignLayout->addWidget(FilterImplementationCombo, 0, 1);
   //******** Tee or Pi (LC ladder only) ********
@@ -262,11 +264,23 @@ FilterDesignTool::FilterDesignTool() {
   SemiLumpedImplementationLabel->hide();
   FilterDesignLayout->addWidget(SemiLumpedImplementationLabel, 13, 0);
   FilterDesignLayout->addWidget(SemiLumpedImplementationCombo, 13, 1);
+
+  // Coupled line SIR BPF type
+  ImpedanceRatio_Label = new QLabel(QString("Impedance ratio, K"));
+  ImpedanceRatio_Spinbox = new QDoubleSpinBox();
+  ImpedanceRatio_Spinbox->setMinimum(0.1);
+  ImpedanceRatio_Spinbox->setMaximum(10);
+  ImpedanceRatio_Spinbox->setValue(0.5);
+  ImpedanceRatio_Spinbox->setSingleStep(0.1);
+
+  FilterDesignLayout->addWidget(ImpedanceRatio_Label, 14, 0);
+  FilterDesignLayout->addWidget(ImpedanceRatio_Spinbox, 14, 1);
+
   //************ Source impedance **********
   SourceImpedanceLineEdit = new QLineEdit("50");
-  FilterDesignLayout->addWidget(new QLabel("ZS"), 14, 0);
-  FilterDesignLayout->addWidget(SourceImpedanceLineEdit, 14, 1);
-  FilterDesignLayout->addWidget(new QLabel(QChar(0xa9, 0x03)), 14, 2);
+  FilterDesignLayout->addWidget(new QLabel("ZS"), 15, 0);
+  FilterDesignLayout->addWidget(SourceImpedanceLineEdit, 15, 1);
+  FilterDesignLayout->addWidget(new QLabel(QChar(0xa9, 0x03)), 15, 2);
   this->setLayout(FilterDesignLayout);
 
   // Connection functions for updating the network requirements and simulate on
@@ -317,6 +331,8 @@ FilterDesignTool::FilterDesignTool() {
           SLOT(UpdateDesignParameters()));
   connect(SemiLumpedImplementationCombo, SIGNAL(currentIndexChanged(int)), this,
           SLOT(UpdateDesignParameters()));
+  connect(ImpedanceRatio_Spinbox, SIGNAL(valueChanged(double)), this,
+          SLOT(UpdateDesignParameters()));
 }
 
 FilterDesignTool::~FilterDesignTool() {
@@ -354,6 +370,7 @@ void FilterDesignTool::synthesize() {
   EndCoupled *ECF;
   CapacitivelyCoupledShuntResonatorsFilter *CCSRF;
   CoupledLineBandpassFilter *CLBPF;
+  CoupledLineHarmonicRejectionSIRBandpassFilter *CLSIRF;
 
   // Recalculate network
   if (FilterImplementationCombo->currentText() == "LC Ladder") {
@@ -480,6 +497,19 @@ void FilterDesignTool::synthesize() {
     SchInfo.displayGraphs = CLBPF->displaygraphs;
     SchInfo.Description = "NOT LADDER";
     delete CLBPF;
+  }
+
+  if (FilterImplementationCombo->currentText() ==
+      "Coupled line SIR with harmonic rejection") {
+    CLSIRF = new CoupledLineHarmonicRejectionSIRBandpassFilter(Filter_SP);
+    CLSIRF->synthesize();
+    SchInfo.netlist = CLSIRF->getQucsNetlist();
+    SchInfo.Comps = CLSIRF->getComponents();
+    SchInfo.Wires = CLSIRF->getWires();
+    SchInfo.Nodes = CLSIRF->getNodes();
+    SchInfo.displayGraphs = CLSIRF->displaygraphs;
+    SchInfo.Description = "NOT LADDER";
+    delete CLSIRF;
   }
 
   SchInfo.SPAR_Settings = SPAR_Settings;
@@ -697,6 +727,7 @@ void FilterDesignTool::UpdateDesignParameters() {
   Filter_SP.Implementation = FilterImplementationCombo->currentText();
   Filter_SP.minZ = MinimumZ_Spinbox->value();
   Filter_SP.maxZ = MaximumZ_Spinbox->value();
+  Filter_SP.ImpedanceRatio = ImpedanceRatio_Spinbox->value();
 
   if (SemiLumpedImplementationCombo->currentText() ==
       "Replace inductors and shunt capacitors")
@@ -1016,7 +1047,9 @@ void FilterDesignTool::ImplementationComboChanged() {
   if ((FilterImplementationCombo->currentText() == "End-coupled") ||
       (FilterImplementationCombo->currentText() ==
        "Capacitively-coupled shunt resonators") ||
-      (FilterImplementationCombo->currentText() == "Coupled line bandpass")) {
+      (FilterImplementationCombo->currentText() == "Coupled line bandpass") ||
+      (FilterImplementationCombo->currentText() ==
+       "Coupled line SIR with harmonic rejection")) {
     // Only bandpass and notch types available
     // Of course, the elliptic type cannot be implemented this way.
     FilterClassCombo->clear();

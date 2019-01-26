@@ -79,6 +79,7 @@ struct FilterSpecifications {
   double maxZ; // Maximum synthesizable impedance (only for stepped impedance
                // filters)
   SemiLumpedImplementation SemiLumpedISettings;
+  double ImpedanceRatio;
 };
 
 struct NetworkInfo {
