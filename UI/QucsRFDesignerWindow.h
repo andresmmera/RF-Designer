@@ -40,6 +40,7 @@
 #include "qcustomplot.h"
 
 // Tools
+#include "UI/AttenuatorDesignTool.h"
 #include "UI/FilterDesignTool.h"
 #include "UI/PowerCombiningTool.h"
 
@@ -104,6 +105,7 @@ private: // Actions
   QVector<QCustomPlot *> DisplayWindow;
   FilterDesignTool *Filter_Tool;           // Widget for filter design
   PowerCombiningTool *PowerCombining_Tool; // Widget for power combiner design
+  AttenuatorDesignTool *AttenuatorDesign_Tool;
 
   SmithChart *Smith_plot;
 

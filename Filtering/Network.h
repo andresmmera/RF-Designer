@@ -120,6 +120,15 @@ struct PowerCombinerParams {
   double Z0;                      // Reference impedance
 };
 
+struct AttenuatorDesignParameters {
+  QString Topology;   // Attenuator topology
+  double Zin;         // Input impedance
+  double Zout;        // Output impedance
+  double Attenuation; // Attenuation in dB
+  double Frequency;   // Central frequency of tuned attenuators
+  double Pin;         // Input power in W
+};
+
 class Network {
 public:
   virtual QList<ComponentInfo> getComponents() = 0;

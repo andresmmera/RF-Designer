@@ -39,11 +39,14 @@ QucsRFDesignerWindow::QucsRFDesignerWindow() {
   QWidget *MatchingWidget =
       new QWidget(); // Impedance matching. Not started yet...
   PowerCombining_Tool = new PowerCombiningTool();
+  AttenuatorDesign_Tool = new AttenuatorDesignTool();
 
   TabWidget->addTab(Filter_Tool, "Filter design");
   TabWidget->addTab(MatchingWidget, "Matching");
   TabWidget->addTab(PowerCombining_Tool, "Power Combining");
+  TabWidget->addTab(AttenuatorDesign_Tool, "Attenuator Design");
   TabWidget->setMinimumSize(200, 150);
+
   //*********************************** End of the setup panel
 
   //******************* Plot window *******************
@@ -131,6 +134,8 @@ QucsRFDesignerWindow::QucsRFDesignerWindow() {
   connect(Filter_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)), this,
           SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
   connect(PowerCombining_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)),
+          this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
+  connect(AttenuatorDesign_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)),
           this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
 
   Filter_Tool->design();
@@ -513,6 +518,10 @@ void QucsRFDesignerWindow::SwitchTabs(int tabindex) {
   case 2: // Power combining
     dock_DisplayWindow2->hide();
     PowerCombining_Tool->design();
+    break;
+  case 3: // Attenuator design
+    dock_DisplayWindow2->hide();
+    AttenuatorDesign_Tool->design();
     break;
   }
 }
