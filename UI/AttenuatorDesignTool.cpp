@@ -22,7 +22,7 @@ AttenuatorDesignTool::AttenuatorDesignTool() {
   Topology_Label = new QLabel("Topology");
   Topology_Combo = new QComboBox();
   Topology_Combo->addItem("Pi");
-  Topology_Combo->addItem("Tee  ");
+  Topology_Combo->addItem("Tee");
   Topology_Combo->addItem("Bridged Tee");
   Topology_Combo->addItem("Reflection attenuator");
   Topology_Combo->addItem("Quarter-wave series");
@@ -154,6 +154,15 @@ AttenuatorDesignTool::AttenuatorDesignTool() {
   connect(Pin_units_Combo, SIGNAL(currentIndexChanged(int)), this,
           SLOT(UpdateDesignParameters()));
 
+  connect(R1_Pdiss_Units_Combo, SIGNAL(currentIndexChanged(QString)), this,
+          SLOT(UpdatePowerDissipationData()));
+  connect(R2_Pdiss_Units_Combo, SIGNAL(currentIndexChanged(QString)), this,
+          SLOT(UpdatePowerDissipationData()));
+  connect(R3_Pdiss_Units_Combo, SIGNAL(currentIndexChanged(QString)), this,
+          SLOT(UpdatePowerDissipationData()));
+  /* connect(R4_Pdiss_Units_Combo, SIGNAL(currentIndexChanged(QString)), this,
+           SLOT(UpdatePowerDissipationData()));
+ **/
   this->setLayout(AttenuatorDesignLayout);
 }
 
@@ -194,7 +203,7 @@ void AttenuatorDesignTool::UpdateDesignParameters() {
   Specs.Zin = ZinSpinBox->value();
   Specs.Zout = ZoutSpinBox->value();
   Specs.Topology = Topology_Combo->currentText();
-  Specs.Pin = getPowerW();
+  Specs.Pin = getPowerW(Pin_SpinBox->value(), Pin_units_Combo->currentIndex());
 
   AttenuatorDesigner *AttDesigner = new AttenuatorDesigner(Specs);
   AttDesigner->synthesize();
@@ -204,6 +213,10 @@ void AttenuatorDesignTool::UpdateDesignParameters() {
   SchInfo.Nodes = AttDesigner->getNodes();
   SchInfo.displayGraphs = AttDesigner->displaygraphs;
   SchInfo.Description = "NOT LADDER";
+
+  // Update power dissipation data
+  setPdiss(AttDesigner->Pdiss);
+  UpdatePowerDissipationData();
   delete AttDesigner;
   // EMIT SIGNAL TO SIMULATE
   emit simulateNetwork(SchInfo);
@@ -215,9 +228,8 @@ void AttenuatorDesignTool::on_TopoCombo_currentIndexChanged(int index) {}
 void AttenuatorDesignTool::design() { UpdateDesignParameters(); }
 
 // This function returns the input power in Watts
-double AttenuatorDesignTool::getPowerW() {
-  double Pin = Pin_SpinBox->value();
-  switch (Pin_units_Combo->currentIndex()) {
+double AttenuatorDesignTool::getPowerW(double Pin, unsigned int index) {
+  switch (index) {
   default:
   case 0:             // mW
     Pin = Pin * 1e-3; // mW -> W
@@ -261,3 +273,23 @@ double AttenuatorDesignTool::getFreq() {
   }
   return freqSpinBox->value() * pow(10, exp);
 }
+
+void AttenuatorDesignTool::UpdatePowerDissipationData() {
+  // Update R1
+  Pdiss_R1_Lineedit->setText(QString("%1").arg(
+      getPowerW(Pdiss.R1, R1_Pdiss_Units_Combo->currentIndex())));
+
+  // Update R2
+  Pdiss_R2_Lineedit->setText(QString("%1").arg(
+      getPowerW(Pdiss.R2, R2_Pdiss_Units_Combo->currentIndex())));
+
+  // Update R3
+  Pdiss_R3_Lineedit->setText(QString("%1").arg(
+      getPowerW(Pdiss.R3, R3_Pdiss_Units_Combo->currentIndex())));
+
+  // Update R4
+  /*  Pdiss_R4_Lineedit->setText(QString("%1").arg(
+        getPowerW(Pdiss.R4, R4_Pdiss_Units_Combo->currentIndex())));*/
+}
+
+void AttenuatorDesignTool::setPdiss(struct PdissAtt Pdiss_) { Pdiss = Pdiss_; }

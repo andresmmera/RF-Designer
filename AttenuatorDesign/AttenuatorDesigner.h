@@ -20,6 +20,10 @@
 #include "general.h"
 #include "math.h"
 
+struct PdissAtt {
+  double R1, R2, R3, R4;
+};
+
 class AttenuatorDesigner {
 public:
   AttenuatorDesigner(AttenuatorDesignParameters);
@@ -29,6 +33,7 @@ public:
   QMap<QString, QPen> displaygraphs;
   void synthesize();
   QString getQucsNetlist() { return QucsNetlist; };
+  struct PdissAtt Pdiss; // Power dissipated by the resistors
 
 private:
   AttenuatorDesignParameters Specs;
@@ -42,6 +47,8 @@ private:
 
   // Attenuator design functions
   void PiAttenuator();
+  void TeeAttenuator();
+  void BridgedTeeAttenuator();
 };
 
 #endif // ATTENUATORDESIGNER_H

@@ -36,9 +36,11 @@ public:
   AttenuatorDesignTool();
   ~AttenuatorDesignTool();
   void design();
+  void setPdiss(struct PdissAtt);
 
 private slots:
   void UpdateDesignParameters();
+  void UpdatePowerDissipationData();
   void on_TopoCombo_currentIndexChanged(int);
 
 private:
@@ -51,9 +53,12 @@ private:
       *R2_Pdiss_Units_Combo, *R3_Pdiss_Units_Combo, *FreqScaleCombo;
   QLineEdit *Pdiss_R1_Lineedit, *Pdiss_R2_Lineedit, *Pdiss_R3_Lineedit;
   QCheckBox *LumpedImplementationCheckbox;
+  struct PdissAtt
+      Pdiss; // Power dissipated by the resistors. It is calculated in the
+             // specific design functions an copied here after the synthesis
 
   double getFreq();
-  double getPowerW();
+  double getPowerW(double, unsigned int);
   QString netlist;
   SchematicInfo SchInfo; // Schematic representation
 

@@ -29,6 +29,10 @@ QList<NodeInfo> AttenuatorDesigner::getNodes() { return Nodes; }
 void AttenuatorDesigner::synthesize() {
   if (Specs.Topology == "Pi")
     PiAttenuator();
+  if (Specs.Topology == "Tee")
+    TeeAttenuator();
+  if (Specs.Topology == "Bridged Tee")
+    BridgedTeeAttenuator();
 
   // Build Qucs netlist
   QucsNetlist.clear();

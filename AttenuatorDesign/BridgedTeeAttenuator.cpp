@@ -18,25 +18,26 @@
 
 // Reference: RF design guide. Systems, circuits, and equations. Peter
 // Vizmuller. Artech House, 1995
-void AttenuatorDesigner::PiAttenuator() {
+void AttenuatorDesigner::BridgedTeeAttenuator() {
   ComponentInfo TermSpar1, TermSpar2;
-  ComponentInfo Ground, Res1, Res2, Res3;
+  ComponentInfo Ground, Res1, Res2, Res3, Res4;
   WireInfo WI;
   NodeInfo NI;
 
   Components.clear();
   // Design equations
-  double L = pow(10, .1 * Specs.Attenuation);
-  double R2 = (.5 * (L - 1)) * sqrt(Specs.Zin * Specs.Zout / L);
-  double R1 = 1 / (((L + 1) / (Specs.Zin * (L - 1))) - (1 / R2));
-  double R3 = 1 / (((L + 1) / (Specs.Zout * (L - 1))) - (1 / R2));
+  double L = pow(10, .05 * Specs.Attenuation);
+  double R1 = Specs.Zin * (L - 1);
+  double R4 = Specs.Zin / (L - 1);
 
   // Power dissipation calculation
-  Pdiss.R1 = Specs.Pin * Specs.Zin / R1;
-  Pdiss.R2 = Specs.Pin * R2 * (R1 - Specs.Zin) * (R1 - Specs.Zin) /
-             (R1 * R1 * Specs.Zin);
-  double K = R1 * R2 - Specs.Zin * (R1 + R2);
-  Pdiss.R3 = Specs.Pin * K * K / (R1 * R1 * R3 * Specs.Zin);
+  double K = R1 * R4 + Specs.Zin * (2 * R4 + Specs.Zin);
+  K *= K;
+  Pdiss.R1 = Specs.Pin * (4 * R1 * R4 * R4 * Specs.Zin) / (K);
+  Pdiss.R2 = Specs.Pin * (R1 * R4 + Specs.Zin * Specs.Zin) *
+             (R1 * R4 + Specs.Zin * Specs.Zin) / K;
+  Pdiss.R3 = 0;
+  Pdiss.R4 = 4 * R4 * Specs.Zin * Specs.Zin / K;
 
   // Circuit implementation
   TermSpar1.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, 180,
@@ -44,15 +45,17 @@ void AttenuatorDesigner::PiAttenuator() {
   TermSpar1.val["Z"] = num2str(Specs.Zin, Resistance);
   Components.append(TermSpar1);
 
-  // 1st shunt resistor
-  Res1.setParams(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, 0,
-                 50, 50, "N0", "gnd");
+  // Series resistor
+  Res1.setParams(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, 90,
+                 100, 0, "N0", "N1");
   Res1.val["R"] = num2str(R1, Resistance);
   Components.append(Res1);
 
-  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0, 50,
-                   100, "", "");
-  Components.append(Ground);
+  // 1st shunt resistor
+  Res2.setParams(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, 0,
+                 50, 50, "N0", "NA");
+  Res2.val["R"] = num2str(Specs.Zin, Resistance);
+  Components.append(Res2);
 
   // Node
   NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), 50, 0);
@@ -61,42 +64,53 @@ void AttenuatorDesigner::PiAttenuator() {
   WI.setParams(TermSpar1.ID, 0, NI.ID, 0);
   Wires.append(WI);
 
-  WI.setParams(Res1.ID, 1, NI.ID, 0);
+  WI.setParams(Res2.ID, 1, NI.ID, 0);
   Wires.append(WI);
 
-  WI.setParams(Res1.ID, 2, Ground.ID, 0);
-  Wires.append(WI);
-
-  // Series resistor
-  Res2.setParams(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, 90,
-                 100, 0, "N0", "N1");
-  Res2.val["R"] = num2str(R2, Resistance);
-  Components.append(Res2);
-
-  WI.setParams(Res2.ID, 0, NI.ID, 0);
+  WI.setParams(Res1.ID, 0, NI.ID, 0);
   Wires.append(WI);
 
   // 2nd shunt resistor
   Res3.setParams(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, 0,
-                 150, 50, "N1", "gnd");
-  Res3.val["R"] = num2str(R3, Resistance);
+                 150, 50, "N1", "NA");
+  Res3.val["R"] = num2str(Specs.Zin, Resistance);
   Components.append(Res3);
+
+  // Node
+  NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), 100,
+               80);
+  Nodes.append(NI);
+
+  // 3rd shunt resistor
+  Res4.setParams(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, 0,
+                 100, 120, "NA", "gnd");
+  Res4.val["R"] = num2str(R4, Resistance);
+  Components.append(Res4);
+
+  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0, 100,
+                   170, "", "");
+  Components.append(Ground);
+
+  WI.setParams(Res2.ID, 0, NI.ID, 0);
+  Wires.append(WI);
+
+  WI.setParams(Res3.ID, 0, NI.ID, 0);
+  Wires.append(WI);
+
+  WI.setParams(Res4.ID, 1, NI.ID, 0);
+  Wires.append(WI);
+
+  WI.setParams(Res4.ID, 0, Ground.ID, 0);
+  Wires.append(WI);
 
   // Node
   NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), 150, 0);
   Nodes.append(NI);
 
-  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0, 150,
-                   100, "", "");
-  Components.append(Ground);
-
-  WI.setParams(Res2.ID, 1, NI.ID, 0);
+  WI.setParams(Res1.ID, 1, NI.ID, 0);
   Wires.append(WI);
 
   WI.setParams(Res3.ID, 1, NI.ID, 0);
-  Wires.append(WI);
-
-  WI.setParams(Res3.ID, 0, Ground.ID, 0);
   Wires.append(WI);
 
   TermSpar2.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, 0,

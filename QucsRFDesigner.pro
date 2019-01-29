@@ -63,7 +63,9 @@ SOURCES += main.cpp \
     Filtering/CoupledLineHarmonicRejectionSIRBandpassFilter.cpp \
     UI/AttenuatorDesignTool.cpp \
     AttenuatorDesign/AttenuatorDesigner.cpp \
-    AttenuatorDesign/PiAttenuator.cpp
+    AttenuatorDesign/PiAttenuator.cpp \
+    AttenuatorDesign/TeeAttenuator.cpp \
+    AttenuatorDesign/BridgedTeeAttenuator.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 
