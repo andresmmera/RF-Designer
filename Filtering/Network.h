@@ -127,6 +127,7 @@ struct AttenuatorDesignParameters {
   double Attenuation; // Attenuation in dB
   double Frequency;   // Central frequency of tuned attenuators
   double Pin;         // Input power in W
+  bool Lumped_TL;     // Use the lumped equivalent of a QW transmission line
 };
 
 class Network {

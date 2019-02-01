@@ -35,6 +35,8 @@ void AttenuatorDesigner::synthesize() {
     BridgedTeeAttenuator();
   if (Specs.Topology == "Reflection Attenuator")
     ReflectionAttenuator();
+  if (Specs.Topology == "Quarter-wave series")
+    QW_SeriesAttenuator();
 
   // Build Qucs netlist
   QucsNetlist.clear();

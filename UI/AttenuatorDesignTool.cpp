@@ -153,7 +153,8 @@ AttenuatorDesignTool::AttenuatorDesignTool() {
           SLOT(UpdateDesignParameters()));
   connect(Pin_units_Combo, SIGNAL(currentIndexChanged(int)), this,
           SLOT(UpdateDesignParameters()));
-
+  connect(LumpedImplementationCheckbox, SIGNAL(stateChanged(int)), this,
+          SLOT(UpdateDesignParameters()));
   connect(R1_Pdiss_Units_Combo, SIGNAL(currentIndexChanged(QString)), this,
           SLOT(UpdatePowerDissipationData()));
   connect(R2_Pdiss_Units_Combo, SIGNAL(currentIndexChanged(QString)), this,
@@ -204,6 +205,7 @@ void AttenuatorDesignTool::UpdateDesignParameters() {
   Specs.Zout = ZoutSpinBox->value();
   Specs.Topology = Topology_Combo->currentText();
   Specs.Pin = getPowerW(Pin_SpinBox->value(), Pin_units_Combo->currentIndex());
+  Specs.Lumped_TL = LumpedImplementationCheckbox->isChecked();
 
   AttenuatorDesigner *AttDesigner = new AttenuatorDesigner(Specs);
   AttDesigner->synthesize();
