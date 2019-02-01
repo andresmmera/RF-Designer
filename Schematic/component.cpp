@@ -68,6 +68,7 @@ QRectF Component::boundingRect() const {
     R = QRect(-40, -40, 80, 80);
     break;
   case CoupledLines:
+  case Coupler:
     R = QRect(-60, -60, 120, 120);
     break;
   case Resistor:
@@ -101,6 +102,7 @@ QPainterPath Component::shape() const {
   case TransmissionLine:
   case Resistor:
   case CoupledLines:
+  case Coupler:
     path.addRect(-30, -30, 60, 60);
     break;
   case Inductor:
@@ -151,6 +153,8 @@ void Component::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   case CoupledLines:
     paintCoupledLines(painter);
     break;
+  case Coupler:
+    paintCoupler(painter);
   default:
     break;
   }
@@ -242,6 +246,8 @@ QPoint Component::getPortLocation(int port_number) {
     break;
   default:
     break;
+
+  case Coupler:
   case CoupledLines:
     switch (port_number) {
     case 0:
@@ -633,6 +639,55 @@ void Component::paintCoupledLines(QPainter *painter) {
                     QPoint(shiftx + 0.5 * w, 16));
   painter->drawLine(QPoint(shiftx - 0.5 * w, 16), QPoint(shiftx + 0.5 * w, 16));
   painter->drawLine(QPoint(shiftx, 16), QPoint(shiftx, 25));
+  painter->setPen(QPen(Qt::black, 1));
+
+  if (Rotation != 0) { // The rotation is undone to draw the text
+    painter->rotate(-Rotation);
+  }
+
+  QPoint OriginText(20, -10);
+  if (Rotation != 0)
+    OriginText.setX(-20), OriginText.setY(20);
+
+  painter->drawText(QRect(OriginText, QPoint(100, 100)),
+                    QString("%1").arg(this->ID));
+  painter->drawText(
+      QRect(OriginText + QPoint(0, 10), QPoint(100, 100)),
+      QString("%1").arg(Value["Ze"].replace("Ohm", QChar(0xa9, 0x03))));
+  painter->drawText(
+      QRect(OriginText + QPoint(0, 20), QPoint(100, 100)),
+      QString("%1").arg(Value["Zo"].replace("Ohm", QChar(0xa9, 0x03))));
+  painter->drawText(QRect(OriginText + QPoint(0, 30), QPoint(100, 100)),
+                    QString("%1").arg(Value["Length"]));
+}
+
+void Component::paintCoupler(QPainter *painter) {
+
+  if (Rotation != 0) {
+    painter->rotate(Rotation);
+  }
+
+  int w = 15, shiftx = 10;
+
+  // Terms
+  painter->drawLine(QPoint(-10, -25), QPoint(-10, -20));
+  painter->drawLine(QPoint(-10, 20), QPoint(-10, 25));
+  painter->drawLine(QPoint(10, -25), QPoint(10, -20));
+  painter->drawLine(QPoint(10, 20), QPoint(10, 25));
+
+  // Box
+  painter->drawRect(QRect(-15, -20, 30, 40));
+
+  painter->setPen(QPen(Qt::black, 1));
+  // Draw lines
+  painter->drawLine(QPoint(-10, -12), QPoint(-10, 12));
+  painter->drawLine(QPoint(10, -12), QPoint(10, 12));
+
+  // Draw couplings
+  painter->setPen(QPen(Qt::gray, 1, Qt::DotLine));
+  painter->drawLine(QPoint(-10, -12), QPoint(10, 12));
+  painter->drawLine(QPoint(10, -12), QPoint(-10, 12));
+
   painter->setPen(QPen(Qt::black, 1));
 
   if (Rotation != 0) { // The rotation is undone to draw the text

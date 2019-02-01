@@ -20,7 +20,7 @@
 #include "Schematic/component.h"
 #include <QString>
 #include <cmath>
-enum Units { Capacitance, Inductance, Length, Resistance };
+enum Units { Capacitance, Inductance, Length, Resistance, Degrees, NoUnits };
 
 QString RoundVariablePrecision(double);
 QString num2str(double, Units);

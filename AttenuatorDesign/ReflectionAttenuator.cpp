@@ -1,5 +1,5 @@
 /***************************************************************************
-                                TeeAttenuator.cpp
+                                ReflectionAttenuator.cpp
                                 ----------
     copyright            :  QUCS team
     author                :  2019 Andres Martinez-Mera
@@ -18,24 +18,20 @@
 
 // Reference: RF design guide. Systems, circuits, and equations. Peter
 // Vizmuller. Artech House, 1995
-void AttenuatorDesigner::TeeAttenuator() {
+void AttenuatorDesigner::ReflectionAttenuator() {
   ComponentInfo TermSpar1, TermSpar2;
-  ComponentInfo Ground, Res1, Res2, Res3;
+  ComponentInfo Ground, Res1, Res2, Coup;
   WireInfo WI;
-  NodeInfo NI;
+  QStringList ConnectionNodes;
 
   Components.clear();
   // Design equations
-  double L = pow(10, .1 * Specs.Attenuation);
-  double R2 = (2 * sqrt(Specs.Zin * Specs.Zout * L)) / (L - 1);
-  double R1 = Specs.Zin * ((L + 1) / (L - 1)) - R2;
-  double R3 = Specs.Zout * ((L + 1) / (L - 1)) - R2;
+  double L = pow(10, -.05 * Specs.Attenuation);
+  double Ri = Specs.Zin * (1 - L) / (1 + L);
 
-  // Power dissipation
-  Pdiss.R1 = Specs.Pin * R1 / Specs.Zin;
-  Pdiss.R2 = Specs.Pin * (R1 - Specs.Zin) * (R1 - Specs.Zin) / (R2 * Specs.Zin);
-  Pdiss.R3 = Specs.Pin * R3 * (R1 + R2 - Specs.Zin) * (R1 + R2 - Specs.Zin) /
-             (Specs.Zin * R2 * R2);
+  // Power dissipation calculation
+  Pdiss.R1 = .5 * Specs.Pin * (1 - pow(10, -0.1 * Specs.Attenuation));
+  Pdiss.R2 = Pdiss.R1;
 
   // Circuit implementation
   TermSpar1.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, 180,
@@ -43,56 +39,59 @@ void AttenuatorDesigner::TeeAttenuator() {
   TermSpar1.val["Z"] = num2str(Specs.Zin, Resistance);
   Components.append(TermSpar1);
 
-  // 1st series resistor
-  Res1.setParams(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, 90,
-                 50, 0, "N0", "N1");
-  Res1.val["R"] = num2str(R1, Resistance);
+  // 1st shunt resistor
+  Res1.setParams(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, 0,
+                 50, 100, "NR1", "gnd");
+  Res1.val["R"] = num2str(Ri, Resistance);
   Components.append(Res1);
 
-  // Node
-  NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), 100, 0);
-  Nodes.append(NI);
-
-  WI.setParams(TermSpar1.ID, 0, Res1.ID, 0);
-  Wires.append(WI);
-
-  WI.setParams(Res1.ID, 1, NI.ID, 0);
-  Wires.append(WI);
-
-  // Shunt resistor
-  Res2.setParams(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, 0,
-                 100, 50, "N1", "gnd");
-  Res2.val["R"] = num2str(R2, Resistance);
-  Components.append(Res2);
-
-  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0, 100,
-                   100, "", "");
+  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0, 50,
+                   150, "", "");
   Components.append(Ground);
 
-  WI.setParams(Res2.ID, 1, NI.ID, 0);
+  WI.setParams(Res1.ID, 2, Ground.ID, 0);
+  Wires.append(WI);
+
+  // Coupler
+  ConnectionNodes.clear();
+  ConnectionNodes.append(QString("N0"));
+  ConnectionNodes.append(QString("NR1"));
+  ConnectionNodes.append(QString("NR2"));
+  ConnectionNodes.append(QString("N1"));
+  Coup.setParams(QString("COUP%1").arg(++NumberComponents[Coupler]), Coupler, 0,
+                 100, 25, ConnectionNodes);
+  Coup.val["k"] = num2str(0.7071, NoUnits);
+  Coup.val["phi"] = num2str(90, NoUnits);
+  Components.append(Coup);
+
+  WI.setParams(Res1.ID, 1, Coup.ID, 2);
+  Wires.append(WI);
+
+  // 2nd shunt resistor
+  Res2.setParams(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, 0,
+                 150, 100, "NR2", "gnd");
+  Res2.val["R"] = num2str(Ri, Resistance);
+  Components.append(Res2);
+
+  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0, 150,
+                   150, "", "");
+  Components.append(Ground);
+
+  WI.setParams(Res2.ID, 1, Coup.ID, 3);
   Wires.append(WI);
 
   WI.setParams(Res2.ID, 0, Ground.ID, 0);
   Wires.append(WI);
 
-  // 2nd series resistor
-  Res3.setParams(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, 90,
-                 150, 0, "N1", "N2");
-  Res3.val["R"] = num2str(R3, Resistance);
-  Components.append(Res3);
-
-  WI.setParams(Res2.ID, 1, NI.ID, 0);
-  Wires.append(WI);
-
-  WI.setParams(Res3.ID, 0, NI.ID, 0);
-  Wires.append(WI);
-
   TermSpar2.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, 0,
-                      200, 0, "N2", "gnd");
+                      200, 0, "N1", "gnd");
   TermSpar2.val["Z"] = num2str(Specs.Zout, Resistance);
   Components.append(TermSpar2);
 
-  WI.setParams(TermSpar2.ID, 0, Res3.ID, 1);
+  WI.setParams(TermSpar1.ID, 0, Coup.ID, 0);
+  Wires.append(WI);
+
+  WI.setParams(TermSpar2.ID, 0, Coup.ID, 1);
   Wires.append(WI);
 
   displaygraphs.clear();

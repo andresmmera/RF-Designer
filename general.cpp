@@ -89,6 +89,8 @@ QString num2str(double Num, Units CompType) {
   case Resistance:
     unit = QString("Ohm");
     break;
+  case Degrees:
+    unit = QString("º");
   default:
     break;
   }

@@ -33,6 +33,8 @@ void AttenuatorDesigner::synthesize() {
     TeeAttenuator();
   if (Specs.Topology == "Bridged Tee")
     BridgedTeeAttenuator();
+  if (Specs.Topology == "Reflection Attenuator")
+    ReflectionAttenuator();
 
   // Build Qucs netlist
   QucsNetlist.clear();

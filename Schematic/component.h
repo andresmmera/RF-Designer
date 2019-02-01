@@ -40,7 +40,8 @@ enum ComponentType {
   TransmissionLine,
   OpenStub,
   ShortStub,
-  CoupledLines
+  CoupledLines,
+  Coupler
 };
 
 class ComponentInfo {
@@ -119,6 +120,9 @@ public:
     case Resistor:
       code = "R";
       break;
+    case Coupler:
+      code = "Coupler";
+      break;
     default:
       break;
     }
@@ -129,12 +133,12 @@ public:
     QString prop; // Temporal variable to translate the internal property names
                   // to Qucs property names
     while (it != val.end()) {
+      prop = it->first;
       switch (Type) {
       case OpenStub:
       case ShortStub:
       case TransmissionLine:
       case CoupledLines:
-        prop = it->first;
         if (prop == "Length")
           prop = "L";
         if (prop == "Z0")
@@ -143,11 +147,12 @@ public:
         break;
 
       case Term:
-        prop = it->first;
         if (prop == "Z0")
           prop = "Z";
         code += QString(" %1=\"%2\"").arg(prop).arg(it->second);
         break;
+
+      case Coupler:
       default:
         code += QString(" %1=\"%2\"").arg(it->first).arg(it->second);
       }
@@ -254,6 +259,7 @@ private:
   void paintOpenStub(QPainter *);
   void paintShortStub(QPainter *);
   void paintCoupledLines(QPainter *);
+  void paintCoupler(QPainter *);
 
 signals:
   void DoubleClicked(struct ComponentInfo);

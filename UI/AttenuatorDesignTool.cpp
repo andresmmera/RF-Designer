@@ -24,7 +24,7 @@ AttenuatorDesignTool::AttenuatorDesignTool() {
   Topology_Combo->addItem("Pi");
   Topology_Combo->addItem("Tee");
   Topology_Combo->addItem("Bridged Tee");
-  Topology_Combo->addItem("Reflection attenuator");
+  Topology_Combo->addItem("Reflection Attenuator");
   Topology_Combo->addItem("Quarter-wave series");
   Topology_Combo->addItem("Quarter-wave shunt");
   AttenuatorDesignLayout->addWidget(Topology_Label, 0, 0);

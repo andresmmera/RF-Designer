@@ -65,7 +65,8 @@ SOURCES += main.cpp \
     AttenuatorDesign/AttenuatorDesigner.cpp \
     AttenuatorDesign/PiAttenuator.cpp \
     AttenuatorDesign/TeeAttenuator.cpp \
-    AttenuatorDesign/BridgedTeeAttenuator.cpp
+    AttenuatorDesign/BridgedTeeAttenuator.cpp \
+    AttenuatorDesign/ReflectionAttenuator.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 

@@ -49,6 +49,7 @@ private:
   void PiAttenuator();
   void TeeAttenuator();
   void BridgedTeeAttenuator();
+  void ReflectionAttenuator();
 };
 
 #endif // ATTENUATORDESIGNER_H
