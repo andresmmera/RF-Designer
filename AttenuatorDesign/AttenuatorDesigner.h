@@ -51,6 +51,7 @@ private:
   void BridgedTeeAttenuator();
   void ReflectionAttenuator();
   void QW_SeriesAttenuator();
+  void QW_ShuntAttenuator();
 };
 
 #endif // ATTENUATORDESIGNER_H

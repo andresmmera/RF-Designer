@@ -37,6 +37,8 @@ void AttenuatorDesigner::synthesize() {
     ReflectionAttenuator();
   if (Specs.Topology == "Quarter-wave series")
     QW_SeriesAttenuator();
+  if (Specs.Topology == "Quarter-wave shunt")
+    QW_ShuntAttenuator();
 
   // Build Qucs netlist
   QucsNetlist.clear();

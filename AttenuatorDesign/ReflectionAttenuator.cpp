@@ -16,8 +16,6 @@
  ***************************************************************************/
 #include "AttenuatorDesign/AttenuatorDesigner.h"
 
-// Reference: RF design guide. Systems, circuits, and equations. Peter
-// Vizmuller. Artech House, 1995
 void AttenuatorDesigner::ReflectionAttenuator() {
   ComponentInfo TermSpar1, TermSpar2;
   ComponentInfo Ground, Res1, Res2, Coup;
