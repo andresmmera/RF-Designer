@@ -46,12 +46,14 @@ private slots:
 private:
   QLabel *Topology_Label, *Attenuation_Label, *dBLabelAtt, *Zin_Label,
       *Ohm_Zin_Label, *Zout_Label, *Ohm_Zout_Label, *Pin_Label, *Pdiss_R1_Label,
-      *Pdiss_R2_Label, *Pdiss_R3_Label, *freqLabel;
+      *Pdiss_R2_Label, *Pdiss_R3_Label, *Pdiss_R4_Label, *freqLabel;
   QDoubleSpinBox *AttenuationSpinBox, *ZinSpinBox, *ZoutSpinBox, *Pin_SpinBox,
       *freqSpinBox;
   QComboBox *Topology_Combo, *Pin_units_Combo, *R1_Pdiss_Units_Combo,
-      *R2_Pdiss_Units_Combo, *R3_Pdiss_Units_Combo, *FreqScaleCombo;
-  QLineEdit *Pdiss_R1_Lineedit, *Pdiss_R2_Lineedit, *Pdiss_R3_Lineedit;
+      *R2_Pdiss_Units_Combo, *R3_Pdiss_Units_Combo, *R4_Pdiss_Units_Combo,
+      *FreqScaleCombo;
+  QLineEdit *Pdiss_R1_Lineedit, *Pdiss_R2_Lineedit, *Pdiss_R3_Lineedit,
+      *Pdiss_R4_Lineedit;
   QCheckBox *LumpedImplementationCheckbox;
   struct PdissAtt
       Pdiss; // Power dissipated by the resistors. It is calculated in the

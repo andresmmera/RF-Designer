@@ -138,8 +138,17 @@ AttenuatorDesignTool::AttenuatorDesignTool() {
   AttenuatorDesignLayout->addWidget(Pdiss_R3_Lineedit, 9, 1);
   AttenuatorDesignLayout->addWidget(R3_Pdiss_Units_Combo, 9, 2);
 
-  connect(Topology_Combo, SIGNAL(currentIndexChanged(QString)), this,
-          SLOT(UpdateDesignParameters()));
+  Pdiss_R4_Label = new QLabel("Pdiss. R4");
+  Pdiss_R4_Lineedit = new QLineEdit();
+  Pdiss_R4_Lineedit->setReadOnly(true);
+  R4_Pdiss_Units_Combo = new QComboBox();
+  R4_Pdiss_Units_Combo->addItems(power_units);
+  AttenuatorDesignLayout->addWidget(Pdiss_R4_Label, 10, 0);
+  AttenuatorDesignLayout->addWidget(Pdiss_R4_Lineedit, 10, 1);
+  AttenuatorDesignLayout->addWidget(R4_Pdiss_Units_Combo, 10, 2);
+
+  connect(Topology_Combo, SIGNAL(currentIndexChanged(int)), this,
+          SLOT(on_TopoCombo_currentIndexChanged(int)));
   connect(AttenuationSpinBox, SIGNAL(valueChanged(double)), this,
           SLOT(UpdateDesignParameters()));
   connect(ZinSpinBox, SIGNAL(valueChanged(double)), this,
@@ -162,10 +171,11 @@ AttenuatorDesignTool::AttenuatorDesignTool() {
           SLOT(UpdatePowerDissipationData()));
   connect(R3_Pdiss_Units_Combo, SIGNAL(currentIndexChanged(QString)), this,
           SLOT(UpdatePowerDissipationData()));
-  /* connect(R4_Pdiss_Units_Combo, SIGNAL(currentIndexChanged(QString)), this,
-           SLOT(UpdatePowerDissipationData()));
- **/
+  connect(R4_Pdiss_Units_Combo, SIGNAL(currentIndexChanged(QString)), this,
+          SLOT(UpdatePowerDissipationData()));
   this->setLayout(AttenuatorDesignLayout);
+
+  on_TopoCombo_currentIndexChanged(0);
 }
 
 AttenuatorDesignTool::~AttenuatorDesignTool() {
@@ -192,6 +202,9 @@ AttenuatorDesignTool::~AttenuatorDesignTool() {
   delete Pdiss_R3_Label;
   delete Pdiss_R3_Lineedit;
   delete R3_Pdiss_Units_Combo;
+  delete Pdiss_R4_Label;
+  delete Pdiss_R4_Lineedit;
+  delete R4_Pdiss_Units_Combo;
   delete freqLabel;
   delete freqSpinBox;
   delete FreqScaleCombo;
@@ -225,7 +238,124 @@ void AttenuatorDesignTool::UpdateDesignParameters() {
   emit simulateNetwork(SchInfo);
 }
 
-void AttenuatorDesignTool::on_TopoCombo_currentIndexChanged(int index) {}
+// This function is triggered by a change in the current selected combo item
+void AttenuatorDesignTool::on_TopoCombo_currentIndexChanged(int index) {
+  switch (index) {
+  case 0: // Pi attenuator
+  case 1: // Tee attenuator
+    Zin_Label->setText(QString("Zin"));
+    // Show Zout input
+    Zout_Label->show();
+    ZoutSpinBox->show();
+    Ohm_Zout_Label->show();
+
+    // Hide frequency input
+    freqLabel->hide();
+    freqSpinBox->hide();
+    FreqScaleCombo->hide();
+
+    // Hide Pdiss for R4
+    Pdiss_R4_Label->hide();
+    Pdiss_R4_Lineedit->hide();
+    R4_Pdiss_Units_Combo->hide();
+
+    // Show Pdiss for R3
+    Pdiss_R3_Label->show();
+    Pdiss_R3_Lineedit->show();
+    R3_Pdiss_Units_Combo->show();
+
+    // Hide lumped component checkbox
+    LumpedImplementationCheckbox->hide();
+    break;
+
+  case 2: // Bridged Tee
+    // Show Pdiss for R3
+    Pdiss_R3_Label->show();
+    Pdiss_R3_Lineedit->show();
+    R3_Pdiss_Units_Combo->show();
+
+    // Show R4
+    Pdiss_R4_Label->show();
+    Pdiss_R4_Lineedit->show();
+    R4_Pdiss_Units_Combo->show();
+
+    // Hide lumped component checkbox
+    LumpedImplementationCheckbox->hide();
+
+    // Hide Zout
+    Zout_Label->hide();
+    ZoutSpinBox->hide();
+    Ohm_Zout_Label->hide();
+
+    // Replace Zin by Z0
+    Zin_Label->setText(QString("Z0"));
+
+    // Hide frequency input
+    freqLabel->hide();
+    freqSpinBox->hide();
+    FreqScaleCombo->hide();
+    break;
+
+  case 3: // Reflection attenuator
+    // Hide Pdiss for R3
+    Pdiss_R3_Label->hide();
+    Pdiss_R3_Lineedit->hide();
+    R3_Pdiss_Units_Combo->hide();
+
+    // Hide Pdiss for R4
+    Pdiss_R4_Label->hide();
+    Pdiss_R4_Lineedit->hide();
+    R4_Pdiss_Units_Combo->hide();
+
+    // Replace Zin by Z0
+    Zin_Label->setText(QString("Z0"));
+
+    // Hide Zout
+    Zout_Label->hide();
+    ZoutSpinBox->hide();
+    Ohm_Zout_Label->hide();
+
+    // Hide frequency input
+    freqLabel->hide();
+    freqSpinBox->hide();
+    FreqScaleCombo->hide();
+
+    // Hide lumped component checkbox
+    LumpedImplementationCheckbox->hide();
+    break;
+
+  case 4: // Quarter-wave series
+  case 5: // Quarter-wave shunt
+    // Show lumped component checkbox
+    LumpedImplementationCheckbox->show();
+
+    // Replace Zin by Z0
+    Zin_Label->setText(QString("Z0"));
+
+    // Hide Zout
+    Zout_Label->hide();
+    ZoutSpinBox->hide();
+    Ohm_Zout_Label->hide();
+
+    // Shows Pdiss for R3
+    Pdiss_R3_Label->show();
+    Pdiss_R3_Lineedit->show();
+    R3_Pdiss_Units_Combo->show();
+
+    // Hide Pdiss for R4
+    Pdiss_R4_Label->hide();
+    Pdiss_R4_Lineedit->hide();
+    R4_Pdiss_Units_Combo->hide();
+
+    // Show frequency
+    freqLabel->show();
+    freqSpinBox->show();
+    FreqScaleCombo->show();
+  default:
+    break;
+  }
+  UpdateDesignParameters();
+}
 
 // The purpose of this function is to trigger a design from the main application
 void AttenuatorDesignTool::design() { UpdateDesignParameters(); }
@@ -284,6 +414,7 @@ double AttenuatorDesignTool::ConvertPowerFromW(double Pin, unsigned int index) {
     Pin = 10 * log10(Pin) + 76.99; // W -> dBmV [50Ohm]
     break;
   }
+  return Pin;
 }
 
 // This function scales the frequency according to 'FreqScaleCombo' combobox
@@ -320,8 +451,8 @@ void AttenuatorDesignTool::UpdatePowerDissipationData() {
       ConvertPowerFromW(Pdiss.R3, R3_Pdiss_Units_Combo->currentIndex())));
 
   // Update R4
-  /*  Pdiss_R4_Lineedit->setText(QString("%1").arg(
-        getPowerW(Pdiss.R4, R4_Pdiss_Units_Combo->currentIndex())));*/
+  Pdiss_R4_Lineedit->setText(QString("%1").arg(
+      ConvertPowerFromW(Pdiss.R4, R4_Pdiss_Units_Combo->currentIndex())));
 }
 
 void AttenuatorDesignTool::setPdiss(struct PdissAtt Pdiss_) { Pdiss = Pdiss_; }
