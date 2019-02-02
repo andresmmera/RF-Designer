@@ -70,7 +70,7 @@ AttenuatorDesignTool::AttenuatorDesignTool() {
   Pin_Label = new QLabel("Input power");
   Pin_SpinBox = new QDoubleSpinBox();
   Pin_SpinBox->setMinimum(-150);   // dBm
-  Pin_SpinBox->setMaximum(100);    // dBm
+  Pin_SpinBox->setMaximum(200);    // dBm
   Pin_SpinBox->setSingleStep(0.1); // dB
   Pin_SpinBox->setValue(30);       // dBm
   Pin_units_Combo = new QComboBox();
@@ -84,6 +84,7 @@ AttenuatorDesignTool::AttenuatorDesignTool() {
       << QString("dBmV [75%1]").arg(QChar(0xa9, 0x03))
       << QString("dBmV [50%1]").arg(QChar(0xa9, 0x03));
   Pin_units_Combo->addItems(power_units);
+  Pin_units_Combo->setCurrentIndex(2); // dBm
   AttenuatorDesignLayout->addWidget(Pin_Label, 4, 0);
   AttenuatorDesignLayout->addWidget(Pin_SpinBox, 4, 1);
   AttenuatorDesignLayout->addWidget(Pin_units_Combo, 4, 2);
@@ -229,7 +230,8 @@ void AttenuatorDesignTool::on_TopoCombo_currentIndexChanged(int index) {}
 // The purpose of this function is to trigger a design from the main application
 void AttenuatorDesignTool::design() { UpdateDesignParameters(); }
 
-// This function returns the input power in Watts
+// Given a power data in mW, dBm or dBuV[Z0], this function returns the power
+// data in Watts
 double AttenuatorDesignTool::getPowerW(double Pin, unsigned int index) {
   switch (index) {
   default:
@@ -252,6 +254,34 @@ double AttenuatorDesignTool::getPowerW(double Pin, unsigned int index) {
     break;
   case 6:                                // dBmV 50Ohm
     Pin = pow(10, (0.1 * Pin - 6)) / 50; // dBmV [50Ohm] -> W
+    break;
+  }
+}
+
+// Given a power data in W, this function converts the power
+// to mW, dBm or dBuV[Z0]
+double AttenuatorDesignTool::ConvertPowerFromW(double Pin, unsigned int index) {
+  switch (index) {
+  default:
+  case 0:            // mW
+    Pin = Pin * 1e3; // mW -> W
+    break;
+  case 1: // W
+    break;
+  case 2:                       // dBm
+    Pin = 10 * log10(Pin) + 30; // W -> dBm
+    break;
+  case 3:                           // dBuV 75Ohm
+    Pin = 10 * log10(Pin) + 138.75; // W -> dBuV [75Ohm]
+    break;
+  case 4:                           // dBuV 50Ohm
+    Pin = 10 * log10(Pin) + 136.99; // W -> dBuV [50Ohm]
+    break;
+  case 5:                          // dBmV 75Ohm
+    Pin = 10 * log10(Pin) + 78.75; // W -> dBmV [75Ohm]
+    break;
+  case 6:                          // dBmV 50Ohm
+    Pin = 10 * log10(Pin) + 76.99; // W -> dBmV [50Ohm]
     break;
   }
 }
@@ -279,15 +309,15 @@ double AttenuatorDesignTool::getFreq() {
 void AttenuatorDesignTool::UpdatePowerDissipationData() {
   // Update R1
   Pdiss_R1_Lineedit->setText(QString("%1").arg(
-      getPowerW(Pdiss.R1, R1_Pdiss_Units_Combo->currentIndex())));
+      ConvertPowerFromW(Pdiss.R1, R1_Pdiss_Units_Combo->currentIndex())));
 
   // Update R2
   Pdiss_R2_Lineedit->setText(QString("%1").arg(
-      getPowerW(Pdiss.R2, R2_Pdiss_Units_Combo->currentIndex())));
+      ConvertPowerFromW(Pdiss.R2, R2_Pdiss_Units_Combo->currentIndex())));
 
   // Update R3
   Pdiss_R3_Lineedit->setText(QString("%1").arg(
-      getPowerW(Pdiss.R3, R3_Pdiss_Units_Combo->currentIndex())));
+      ConvertPowerFromW(Pdiss.R3, R3_Pdiss_Units_Combo->currentIndex())));
 
   // Update R4
   /*  Pdiss_R4_Lineedit->setText(QString("%1").arg(

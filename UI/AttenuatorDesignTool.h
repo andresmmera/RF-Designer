@@ -59,6 +59,8 @@ private:
 
   double getFreq();
   double getPowerW(double, unsigned int);
+  double ConvertPowerFromW(double, unsigned int);
+
   QString netlist;
   SchematicInfo SchInfo; // Schematic representation
 
