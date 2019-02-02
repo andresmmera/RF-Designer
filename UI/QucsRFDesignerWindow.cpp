@@ -22,13 +22,11 @@ QucsRFDesignerWindow::QucsRFDesignerWindow() {
   dock_Setup = new QDockWidget("");
   dock_DisplayWindow1 = new QDockWidget("Plot window");
   dock_DisplayWindow2 = new QDockWidget("Plot window");
-  dock_Smith = new QDockWidget("Smith chart");
 
   dock_Schematic->setAllowedAreas(Qt::AllDockWidgetAreas);
   dock_Setup->setAllowedAreas(Qt::AllDockWidgetAreas);
   dock_DisplayWindow1->setAllowedAreas(Qt::AllDockWidgetAreas);
   dock_DisplayWindow2->setAllowedAreas(Qt::AllDockWidgetAreas);
-  dock_Smith->setAllowedAreas(Qt::AllDockWidgetAreas);
   //******************************* End of the dock setup
 
   //******************* Setup panel ******************************
@@ -77,9 +75,6 @@ QucsRFDesignerWindow::QucsRFDesignerWindow() {
             SLOT(simulate()));
   }
 
-  Smith_plot = new SmithChart();
-  Smith_plot->showLine(true);
-  Smith_plot->setMinimumSize(200, 350);
   //*********************************** End of the plot window region
 
   SchematicWidget = new GraphWidget(dock_Schematic); // Schematic window
@@ -93,7 +88,7 @@ QucsRFDesignerWindow::QucsRFDesignerWindow() {
   dock_DisplayWindow1->setWidget(DisplayWindow[0]);
   dock_DisplayWindow2->setWidget(DisplayWindow[1]);
   dock_Schematic->setWidget(SchematicWidget);
-  dock_Smith->setWidget(Smith_plot);
+  ;
 
   addDockWidget(Qt::LeftDockWidgetArea, dock_Setup);
   addDockWidget(Qt::RightDockWidgetArea, dock_DisplayWindow1);
@@ -181,20 +176,12 @@ void QucsRFDesignerWindow::createActions() {
   PreferencesAction->setStatusTip("Set up preferences");
   connect(PreferencesAction, SIGNAL(triggered()), this,
           SLOT(PreferencesWindow()));
-
-  SmithAction = new QAction("Smith Chart", this);
-  SmithAction->setStatusTip("Show Smith Chart plot");
-  connect(SmithAction, SIGNAL(changed()), this, SLOT(ShowSmithChart()));
 }
 
 void QucsRFDesignerWindow::createMenus() {
   RFToolBar = addToolBar(tr("RFtools"));
   PreferencesAction->setIcon(QIcon(":/bitmaps/Settings.png"));
   RFToolBar->addAction(PreferencesAction);
-
-  SmithAction->setIcon(QIcon(":/bitmaps/SmithChartIcon.png"));
-  SmithAction->setCheckable(true);
-  RFToolBar->addAction(SmithAction);
 }
 
 // This function updates the content of the schematic window and the display
@@ -233,15 +220,6 @@ void QucsRFDesignerWindow::updateGraph(
   DisplayWindow[DisplayID]->yAxis->setTicker(fixedTickerY);
 
   DisplayWindow[DisplayID]->replot();
-
-  // Update Smith Chart
-  /*  std::complex<double> Z;
-  Smith_plot->clear();
-  for(unsigned int i = 0; i < S11_.size(); i++)
-  {
-      Z = ((std::complex<double>(1, 0)+S11_.at(i)))/(std::complex<double>(1,
-  0)-S11_.at(i)); Smith_plot->setData(Z.real(),Z.imag());
-  }*/
 }
 
 void QucsRFDesignerWindow::updateGraph(int DisplayID, vector<double> Pin_,
@@ -381,12 +359,6 @@ QucsRFDesignerWindow::loadQucsDataSet(QString dataset_path) {
   return data;
 }
 
-void QucsRFDesignerWindow::ShowSmithChart() {
-  if (SmithAction->isChecked()) {
-    Smith_plot->show();
-  }
-}
-
 void QucsRFDesignerWindow::ReceiveNetworkFromDesignTools(
     struct SchematicInfo SI) {
   SchInfo = SI;
@@ -400,10 +372,7 @@ void QucsRFDesignerWindow::simulate() {
     SimulateSPAR();
 }
 
-void QucsRFDesignerWindow::PlotImpedanceTransformations() {
-  Smith_plot->clear();
-  Smith_plot->setData(SchInfo.ImpedanceTrace);
-}
+void QucsRFDesignerWindow::PlotImpedanceTransformations() {}
 
 // S-parameter simulation using the built-in ladder SPAR simulator. This is used
 // only for SPAR simulations relying on the input/output port (complex)

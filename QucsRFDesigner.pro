@@ -10,7 +10,6 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     SPAR/sparengine.h \
     SPAR/mat.h \
     UI/QucsRFDesignerWindow.h \
-    UI/smithchart.h \
     Filtering/DirectCoupledFilters.h \
     Filtering/LowpassPrototypeCoeffs.h \
     UI/FilterDesignTool.h \
@@ -37,7 +36,6 @@ SOURCES += main.cpp \
     SPAR/sparengine.cpp \
     SPAR/mat.cpp \
     UI/QucsRFDesignerWindow.cpp \
-    UI/smithchart.cpp \
     Filtering/DirectCoupledFilters.cpp \
     Filtering/LowpassPrototypeCoeffs.cpp \
     UI/FilterDesignTool.cpp \

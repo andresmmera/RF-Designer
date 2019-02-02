@@ -36,7 +36,6 @@
 #include "Schematic/graphwidget.h"
 #include "UI/QucsRFDesignerWindow.h"
 #include "UI/preferencesdialog.h"
-#include "UI/smithchart.h"
 #include "qcustomplot.h"
 
 // Tools
@@ -75,7 +74,6 @@ private slots: // Functions to launch the actions
   void PreferencesWindow();
   void ReceiveSettings(ToolSettings);
   QMap<QString, vector<complex<double>>> loadQucsDataSet(QString);
-  void ShowSmithChart();
   void ReceiveNetworkFromDesignTools(
       struct SchematicInfo); // Simulates the network after changing the design
                              // goals
@@ -97,8 +95,7 @@ private: // Actions
   void UpdateWindows();
   QToolBar *RFToolBar;
 
-  QAction *PreferencesAction, *SmithAction;
-  bool SmithWindowVisible;
+  QAction *PreferencesAction;
   QString netlist;
   // ************************* Widgets *******************************
   GraphWidget *SchematicWidget;
@@ -107,11 +104,9 @@ private: // Actions
   PowerCombiningTool *PowerCombining_Tool; // Widget for power combiner design
   AttenuatorDesignTool *AttenuatorDesign_Tool;
 
-  SmithChart *Smith_plot;
-
   // ************************** Docks ********************************
   QDockWidget *dock_Schematic, *dock_Setup, *dock_DisplayWindow1,
-      *dock_DisplayWindow2, *dock_Smith;
+      *dock_DisplayWindow2;
 
   // ************************ SIMULATION SETTINGS ********************
   SP_Analysis SPAR_Settings;
