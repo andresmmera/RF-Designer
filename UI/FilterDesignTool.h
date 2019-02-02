@@ -40,6 +40,17 @@
 #include "Filtering/QuarterWaveFilters.h"
 #include "Filtering/SteppedImpedanceFilter.h"
 
+#define LC_LADDER 0
+#define LC_DIRECT_COUPLED 1
+#define QUARTERWAVE 2
+#define STEPPED_IMPEDANCE 3
+#define END_COUPLED 4
+#define CAPACITIVELY_COUPLED_RESONATORS 5
+#define SEMILUMPED_ELLIPTIC 6
+#define SEMILUMPED_CANONICAL 7
+#define COUPLED_LINE 8
+#define COUPLED_LINE_SIR 9
+
 class FilterDesignTool : public QWidget {
   Q_OBJECT
 public:
@@ -54,7 +65,7 @@ public:
 private slots:
   void UpdateDesignParameters();
   void ResposeComboChanged();
-  void ImplementationComboChanged();
+  void ImplementationComboChanged(int);
   void EllipticTypeChanged();
   // Zverev mode slots
   void SwitchZverevTablesMode(bool);
