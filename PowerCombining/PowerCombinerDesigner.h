@@ -17,6 +17,7 @@
 #ifndef POWERCOMBINERDESIGNER_H
 #define POWERCOMBINERDESIGNER_H
 #include "Filtering/Network.h"
+#include "Schematic/SchematicContent.h"
 #include "general.h"
 #include <QPen>
 
@@ -37,12 +38,14 @@ public:
   QMap<QString, QPen> displaygraphs;
   void synthesize();
   QString getQucsNetlist() { return QucsNetlist; };
+  SchematicContent getSchematic();
 
 private:
   PowerCombinerParams Specs;
   QList<ComponentInfo> Components;
   QList<WireInfo> Wires;
   QList<NodeInfo> Nodes;
+  SchematicContent Schematic;
 
   QString QucsNetlist;
   QMap<ComponentType, int>

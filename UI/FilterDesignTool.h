@@ -57,7 +57,7 @@ public:
   FilterDesignTool();
   ~FilterDesignTool();
   QString getQucsNetlist();
-  SchematicInfo getSchematic();
+  SchematicContent getSchematic();
   SP_Analysis
       SPAR_Settings; // The simulation settings vary depending on the design
   void design();
@@ -99,7 +99,7 @@ private:
   QStringList DefaultFilterResponses;
   struct FilterSpecifications Filter_SP; // User specifications
   QString netlist;
-  SchematicInfo SchInfo; // Schematic representation
+  SchematicContent SchContent;
 
   // *********************** ZVEREV DATABASE ***************************
   QSqlDatabase db;
@@ -110,7 +110,7 @@ private:
   void synthesize();
 
 signals:
-  void simulateNetwork(struct SchematicInfo);
+  void simulateNetwork(SchematicContent);
 };
 
 #endif // FILTERDESIGNTOOL_H

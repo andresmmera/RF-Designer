@@ -209,15 +209,11 @@ void PowerCombiningTool::UpdateDesignParameters() {
 
   PowerCombinerDesigner *PowCombD = new PowerCombinerDesigner(Specs);
   PowCombD->synthesize();
-  SchInfo.netlist = PowCombD->getQucsNetlist();
-  SchInfo.Comps = PowCombD->getComponents();
-  SchInfo.Wires = PowCombD->getWires();
-  SchInfo.Nodes = PowCombD->getNodes();
-  SchInfo.displayGraphs = PowCombD->displaygraphs;
-  SchInfo.Description = "NOT LADDER";
+  SchContent = PowCombD->getSchematic();
+  SchContent.setDescription(QString("NOT LADDER"));
   delete PowCombD;
   // EMIT SIGNAL TO SIMULATE
-  emit simulateNetwork(SchInfo);
+  emit simulateNetwork(SchContent);
 }
 
 //---------------------------------------------------------------------------
@@ -338,3 +334,5 @@ void PowerCombiningTool::on_TopoCombo_currentIndexChanged(int index) {
 
 // The purpose of this function is to trigger a design from the main application
 void PowerCombiningTool::design() { UpdateDesignParameters(); }
+
+SchematicContent PowerCombiningTool::getSchematic() { return SchContent; }

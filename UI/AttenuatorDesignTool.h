@@ -29,6 +29,7 @@
 
 #include "AttenuatorDesign/AttenuatorDesigner.h"
 #include "Filtering/Network.h"
+#include "Schematic/SchematicContent.h"
 
 class AttenuatorDesignTool : public QWidget {
   Q_OBJECT
@@ -64,10 +65,10 @@ private:
   double ConvertPowerFromW(double, unsigned int);
 
   QString netlist;
-  SchematicInfo SchInfo; // Schematic representation
+  SchematicContent SchContent; // Schematic representation
 
 signals:
-  void simulateNetwork(struct SchematicInfo);
+  void simulateNetwork(SchematicContent);
 };
 
 #endif // ATTENUATORDESIGNTOOL_H

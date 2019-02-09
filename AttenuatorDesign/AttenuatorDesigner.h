@@ -17,6 +17,7 @@
 #ifndef ATTENUATORDESIGNER_H
 #define ATTENUATORDESIGNER_H
 #include "Filtering/Network.h"
+#include "Schematic/SchematicContent.h"
 #include "general.h"
 #include "math.h"
 
@@ -34,12 +35,14 @@ public:
   void synthesize();
   QString getQucsNetlist() { return QucsNetlist; };
   struct PdissAtt Pdiss; // Power dissipated by the resistors
+  SchematicContent getSchematic();
 
 private:
   AttenuatorDesignParameters Specs;
   QList<ComponentInfo> Components;
   QList<WireInfo> Wires;
   QList<NodeInfo> Nodes;
+  SchematicContent Schematic;
 
   QString QucsNetlist;
   QMap<ComponentType, int>

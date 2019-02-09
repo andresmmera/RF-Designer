@@ -19,6 +19,7 @@
 
 #include "Filtering/LowpassPrototypeCoeffs.h"
 #include "Filtering/Network.h"
+#include "Schematic/SchematicContent.h"
 #include "Schematic/component.h"
 #include "general.h"
 #include <QPen>
@@ -27,28 +28,18 @@ public:
   CanonicalFilter();
   virtual ~CanonicalFilter();
   CanonicalFilter(FilterSpecifications);
-  QList<ComponentInfo> getComponents();
-  QList<WireInfo> getWires();
-  QList<NodeInfo> getNodes();
   void synthesize();
-  NetworkInfo getLadder();
-  QString getQucsNetlist() { return QucsNetlist; }
-  QMap<QString, QPen> displaygraphs;
   void setSemilumpedMode(bool);
+  SchematicContent getSchematic();
 
 private:
   struct FilterSpecifications Specification;
-  QList<ComponentInfo> Components;
-  QList<WireInfo> Wires;
-  QList<NodeInfo> Nodes;
   bool semilumped = false; // Activate semilumped implementation mode
 
-  QString QucsNetlist;
+  SchematicContent Schematic; // This object contains all the circuit data of
+                              // the filter, i.e. components and nets and it
+                              // returns data for the simulation
 
-  QMap<ComponentType, int>
-      NumberComponents; // List for assigning IDs to the filter components
-  std::vector<std::complex<double>> Poles;
-  std::vector<std::complex<double>> Zeros;
   std::deque<double> gi;
 
   //***********  Schematic synthesis ********************

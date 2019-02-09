@@ -19,6 +19,7 @@
 
 #include "Filtering/LowpassPrototypeCoeffs.h"
 #include "Filtering/Network.h"
+#include "Schematic/component.h"
 #include "general.h"
 #include <QPen>
 

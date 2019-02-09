@@ -1,5 +1,5 @@
 /***************************************************************************
-                                Network.h
+                                component.h
                                 ----------
     copyright            :  QUCS team
     author                :  2019 Andres Martinez-Mera
@@ -17,19 +17,32 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#include <QFile>
-#include <QList>
 #include <QMap>
+#include <QPen>
+#include <QString>
 #include <QStringList>
-#include <cmath>
 #include <complex>
 #include <deque>
-#include <list>
 #include <vector>
 
-#include "Schematic/component.h"
-#include <QDebug>
-#include <QtSql>
+class SchematicContent;
+class WireInfo;
+class NodeInfo;
+class ComponentInfo;
+
+enum ComponentType {
+  Capacitor,
+  Inductor,
+  Term,
+  GND,
+  ConnectionNodes,
+  Resistor,
+  TransmissionLine,
+  OpenStub,
+  ShortStub,
+  CoupledLines,
+  Coupler
+};
 
 enum ResponseType {
   Butterworth,
@@ -97,17 +110,6 @@ struct SP_Analysis {
   std::vector<double> freq;
 };
 
-struct SchematicInfo {
-  struct SP_Analysis SPAR_Settings;
-  QString netlist;
-  QList<struct ComponentInfo> Comps;
-  QList<struct WireInfo> Wires;
-  QList<struct NodeInfo> Nodes;
-  QMap<QString, QPen> displayGraphs;
-  QString Description;
-  QVector<QPointF> ImpedanceTrace;
-};
-
 struct PowerCombinerParams {
   QString Type; // Wilkinson, branchlines, Bagley, etc.
   int Noutputs; // Number of output branches
@@ -130,12 +132,9 @@ struct AttenuatorDesignParameters {
   bool Lumped_TL;     // Use the lumped equivalent of a QW transmission line
 };
 
+// Inherited by the network implementation classes
 class Network {
 public:
-  virtual QList<ComponentInfo> getComponents() = 0;
-  virtual QList<WireInfo> getWires() = 0;
-  virtual QList<NodeInfo> getNodes() = 0;
   virtual void synthesize() = 0;
 };
-
-#endif // NETWORK_H
+#endif

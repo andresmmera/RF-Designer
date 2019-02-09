@@ -49,3 +49,5 @@ void AttenuatorDesigner::synthesize() {
       QucsNetlist += codestr;
   }
 }
+
+SchematicContent AttenuatorDesigner::getSchematic() { return Schematic; }

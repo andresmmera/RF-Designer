@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
                                 component.h
                                 ----------
     copyright            :  QUCS team
@@ -23,26 +23,15 @@
 #include <cmath>
 
 #include "Filtering/Network.h"
+
+#include "Schematic/SchematicContent.h"
+#include "Schematic/component.h"
 #include "Schematic/graphwidget.h"
 #include "Schematic/symbol.h"
 #include "Schematic/wire.h"
 #include "general.h"
 
 class Wire;
-
-enum ComponentType {
-  Capacitor,
-  Inductor,
-  Term,
-  GND,
-  ConnectionNodes,
-  Resistor,
-  TransmissionLine,
-  OpenStub,
-  ShortStub,
-  CoupledLines,
-  Coupler
-};
 
 class ComponentInfo {
 public:
@@ -264,6 +253,4 @@ private:
 signals:
   void DoubleClicked(struct ComponentInfo);
 };
-//! [0]
-
 #endif

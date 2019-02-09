@@ -75,8 +75,8 @@ private slots: // Functions to launch the actions
   void ReceiveSettings(ToolSettings);
   QMap<QString, vector<complex<double>>> loadQucsDataSet(QString);
   void ReceiveNetworkFromDesignTools(
-      struct SchematicInfo); // Simulates the network after changing the design
-                             // goals
+      SchematicContent); // Simulates the network after changing the design
+                         // goals
   void simulate(); // Rerun simulation when the user does some action over the
                    // display
   void
@@ -111,7 +111,7 @@ private: // Actions
   // ************************ SIMULATION SETTINGS ********************
   SP_Analysis SPAR_Settings;
   NetworkInfo NWI; // Synthesized network
-  SchematicInfo SchInfo;
+  SchematicContent SchContent;
 
   // ************************ TOOL SETTINGS *************************
   ToolSettings Tool_Settings;

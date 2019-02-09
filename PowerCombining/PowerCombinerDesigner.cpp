@@ -74,3 +74,5 @@ TwoWayWilkinsonParams PowerCombinerDesigner::CalculateWilkinson() {
   WilkinsonParams.R3 = Specs.Z0 / K;
   return WilkinsonParams;
 }
+
+SchematicContent PowerCombinerDesigner::getSchematic() { return Schematic; }

@@ -15,6 +15,7 @@
  *
  ***************************************************************************/
 #include "AttenuatorDesignTool.h"
+#include "Schematic/component.h"
 
 AttenuatorDesignTool::AttenuatorDesignTool() {
   QGridLayout *AttenuatorDesignLayout = new QGridLayout();
@@ -223,19 +224,15 @@ void AttenuatorDesignTool::UpdateDesignParameters() {
 
   AttenuatorDesigner *AttDesigner = new AttenuatorDesigner(Specs);
   AttDesigner->synthesize();
-  SchInfo.netlist = AttDesigner->getQucsNetlist();
-  SchInfo.Comps = AttDesigner->getComponents();
-  SchInfo.Wires = AttDesigner->getWires();
-  SchInfo.Nodes = AttDesigner->getNodes();
-  SchInfo.displayGraphs = AttDesigner->displaygraphs;
-  SchInfo.Description = "NOT LADDER";
+  SchContent = AttDesigner->getSchematic();
+  SchContent.setDescription(QString("NOT LADDER"));
 
   // Update power dissipation data
   setPdiss(AttDesigner->Pdiss);
   UpdatePowerDissipationData();
   delete AttDesigner;
   // EMIT SIGNAL TO SIMULATE
-  emit simulateNetwork(SchInfo);
+  emit simulateNetwork(SchContent);
 }
 
 // This function is triggered by a change in the current selected combo item

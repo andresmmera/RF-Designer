@@ -126,12 +126,12 @@ QucsRFDesignerWindow::QucsRFDesignerWindow() {
   DisplayWindow[0]->yAxis->setRange(Tool_Settings.ymin, Tool_Settings.ymax);
 
   connect(TabWidget, SIGNAL(currentChanged(int)), this, SLOT(SwitchTabs(int)));
-  connect(Filter_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)), this,
-          SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
-  connect(PowerCombining_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)),
-          this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
-  connect(AttenuatorDesign_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)),
-          this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
+  connect(Filter_Tool, SIGNAL(simulateNetwork(SchematicContent)), this,
+          SLOT(ReceiveNetworkFromDesignTools(SchematicContent)));
+  connect(PowerCombining_Tool, SIGNAL(simulateNetwork(SchematicContent)), this,
+          SLOT(ReceiveNetworkFromDesignTools(SchematicContent)));
+  connect(AttenuatorDesign_Tool, SIGNAL(simulateNetwork(SchematicContent)),
+          this, SLOT(ReceiveNetworkFromDesignTools(SchematicContent)));
 
   Filter_Tool->design();
 }
@@ -197,7 +197,7 @@ void QucsRFDesignerWindow::updateGraph(
 
   QVector<double> freq =
       QVector<double>::fromStdVector(freq_); // Get frequency axis
-  QMapIterator<QString, QPen> MapIT(SchInfo.displayGraphs);
+  QMapIterator<QString, QPen> MapIT(SchContent.getDisplayGraphs());
 
   while (MapIT.hasNext()) {
     MapIT.next();
@@ -359,14 +359,13 @@ QucsRFDesignerWindow::loadQucsDataSet(QString dataset_path) {
   return data;
 }
 
-void QucsRFDesignerWindow::ReceiveNetworkFromDesignTools(
-    struct SchematicInfo SI) {
-  SchInfo = SI;
+void QucsRFDesignerWindow::ReceiveNetworkFromDesignTools(SchematicContent SI) {
+  SchContent = SI;
   simulate();
 }
 
 void QucsRFDesignerWindow::simulate() {
-  if (!SchInfo.Description.contains("NOT LADDER"))
+  if (!SchContent.getDescription().contains("NOT LADDER"))
     SimulateLadderSPAR();
   else
     SimulateSPAR();
@@ -395,14 +394,14 @@ void QucsRFDesignerWindow::SimulateLadderSPAR() {
   SPARSettings.n_points = SPAR_Settings.n_points;
   SPARSim.setSimulationSettings(SPARSettings);
 
+  // Convert SchematicContent object data into NetworkInfo for SPAR simulation
   NetworkInfo NWI;
   std::vector<complex<double>> ZS(1), ZL(1);
-  ZS[0] = Str2Complex(SchInfo.Comps[0].val["Z"]); // Port 1 impedance
-  ZL[0] = Str2Complex(
-      SchInfo.Comps[SchInfo.Comps.size() - 1].val["Z"]); // Port 2 impedance
+  ZS[0] = Str2Complex(SchContent.getZinString());  // Port 1 impedance
+  ZL[0] = Str2Complex(SchContent.getZoutString()); // Port 2 impedance
   NWI.ZS = ZS;
   NWI.ZL = ZL;
-  NWI.Ladder = SchInfo.Comps;
+  NWI.Ladder = SchContent.getComponents();
   SPARSim.setNetwork(NWI);
   SPARSim.run();
 
@@ -418,7 +417,7 @@ void QucsRFDesignerWindow::SimulateLadderSPAR() {
   }
 
   SchematicWidget->clear(); // Remove the components in the scene
-  SchematicWidget->setSchematic(SchInfo);
+  SchematicWidget->setSchematic(SchContent);
 
   QMap<QString, vector<complex<double>>> data = SPARSim.getData();
   updateGraph(0, SPARSim.getFreq(), data);
@@ -450,7 +449,7 @@ void QucsRFDesignerWindow::SimulateSPAR() {
 
   SchematicWidget->clear(); // Remove the components in the scene
 
-  netlist = SchInfo.netlist;
+  netlist = SchContent.getQucsNetlist();
   netlist +=
       QString(
           ".SP:SP1 Type=\"lin\" Start=\"%1 Hz\" Stop=\"%2 Hz\" Points=\"%3\"\n")
@@ -466,7 +465,7 @@ void QucsRFDesignerWindow::SimulateSPAR() {
   system("qucsator -i netlist -o data.dat");
 
   // Update schematic window
-  SchematicWidget->setSchematic(SchInfo);
+  SchematicWidget->setSchematic(SchContent);
 
   // Load info from Qucs dataset and update graph
   QMap<QString, vector<complex<double>>> data = loadQucsDataSet("data.dat");

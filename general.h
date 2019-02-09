@@ -16,10 +16,10 @@
  ***************************************************************************/
 #ifndef GENERAL_H
 #define GENERAL_H
-#include "Filtering/Network.h"
-#include "Schematic/component.h"
+
 #include <QString>
 #include <cmath>
+#include <complex>
 enum Units { Capacitance, Inductance, Length, Resistance, Degrees, NoUnits };
 
 QString RoundVariablePrecision(double);

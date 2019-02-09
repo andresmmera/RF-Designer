@@ -17,33 +17,26 @@
 #ifndef ELLIPTICFILTER_H
 #define ELLIPTICFILTER_H
 #include "Filtering/Network.h"
+#include "Schematic/component.h"
 #include "general.h"
 #include <QPen>
+class ComponentInfo;
+class WireInfo;
 
 class EllipticFilter : public Network {
 public:
   EllipticFilter();
   EllipticFilter(FilterSpecifications);
   virtual ~EllipticFilter();
-  QList<ComponentInfo> getComponents();
-  QList<WireInfo> getWires();
-  QList<NodeInfo> getNodes();
+  SchematicContent getSchematic();
   void synthesize();
-  NetworkInfo getLadder();
-  QString getQucsNetlist() { return QucsNetlist; }
-  QMap<QString, QPen> displaygraphs;
   void setSemilumpedMode(bool);
 
 private:
   struct FilterSpecifications Specification;
-  QList<ComponentInfo> Components;
-  QList<WireInfo> Wires;
-  QList<NodeInfo> Nodes;
 
-  QString QucsNetlist;
+  SchematicContent Schematic;
 
-  QMap<ComponentType, int>
-      NumberComponents; // List for assigning IDs to the filter components
   std::vector<double> *Cseries_LP, *Lseries_LP,
       *Cshunt_LP;          // Elliptic network parameters
   double RL;               // Load resistance
