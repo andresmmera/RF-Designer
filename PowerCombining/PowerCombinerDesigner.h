@@ -33,24 +33,12 @@ struct TwoWayWilkinsonParams {
 class PowerCombinerDesigner {
 public:
   PowerCombinerDesigner(PowerCombinerParams);
-  QList<ComponentInfo> getComponents();
-  QList<WireInfo> getWires();
-  QList<NodeInfo> getNodes();
-  QMap<QString, QPen> displaygraphs;
   void synthesize();
-  QString getQucsNetlist() { return QucsNetlist; };
-  SchematicContent getSchematic();
+  SchematicContent getSchematic() { return Schematic; }
 
 private:
   PowerCombinerParams Specs;
-  QList<ComponentInfo> Components;
-  QList<WireInfo> Wires;
-  QList<NodeInfo> Nodes;
   SchematicContent Schematic;
-
-  QString QucsNetlist;
-  QMap<ComponentType, int>
-      NumberComponents; // List for assigning IDs to the filter components
 
   // Power combiner design functions
   void Wilkinson();
