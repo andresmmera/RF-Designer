@@ -28,7 +28,7 @@ public:
   virtual ~DirectCoupledFilters();
   DirectCoupledFilters(FilterSpecifications);
   void synthesize();
-  SchematicContent getSchematic();
+  SchematicContent getSchematic() { return Schematic; }
 
 private:
   struct FilterSpecifications Specification;

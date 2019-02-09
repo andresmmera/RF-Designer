@@ -569,5 +569,3 @@ void CanonicalFilter::SynthesizeBSF() {
   Schematic.appendComponent(TermSpar2);
   Schematic.appendWire(ConnectionAux, 1, TermSpar2.ID, 0);
 }
-
-SchematicContent CanonicalFilter::getSchematic() { return Schematic; }

@@ -30,7 +30,7 @@ public:
   CanonicalFilter(FilterSpecifications);
   void synthesize();
   void setSemilumpedMode(bool);
-  SchematicContent getSchematic();
+  SchematicContent getSchematic() { return Schematic; }
 
 private:
   struct FilterSpecifications Specification;

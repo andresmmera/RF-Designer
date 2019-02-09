@@ -28,7 +28,7 @@ public:
   EllipticFilter();
   EllipticFilter(FilterSpecifications);
   virtual ~EllipticFilter();
-  SchematicContent getSchematic();
+  SchematicContent getSchematic() { return Schematic; }
   void synthesize();
   void setSemilumpedMode(bool);
 

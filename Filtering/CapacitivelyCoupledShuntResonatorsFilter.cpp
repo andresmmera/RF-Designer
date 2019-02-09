@@ -17,66 +17,29 @@
 #include "CapacitivelyCoupledShuntResonatorsFilter.h"
 
 CapacitivelyCoupledShuntResonatorsFilter::
-    CapacitivelyCoupledShuntResonatorsFilter() {
-  // Initialize list of components
-  NumberComponents[Capacitor] = 0;
-  NumberComponents[Inductor] = 0;
-  NumberComponents[Term] = 0;
-  NumberComponents[GND] = 0;
-  NumberComponents[ConnectionNodes] = 0;
-}
+    CapacitivelyCoupledShuntResonatorsFilter() {}
 
 CapacitivelyCoupledShuntResonatorsFilter::
     CapacitivelyCoupledShuntResonatorsFilter(FilterSpecifications FS) {
   Specification = FS;
-  // Initialize list of components
-  NumberComponents[Capacitor] = 0;
-  NumberComponents[Inductor] = 0;
-  NumberComponents[Term] = 0;
-  NumberComponents[GND] = 0;
-  NumberComponents[ConnectionNodes] = 0;
 }
 
 CapacitivelyCoupledShuntResonatorsFilter::
     ~CapacitivelyCoupledShuntResonatorsFilter() {}
 
-void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
-  LowpassPrototypeCoeffs LP_coeffs(Specification);
-  gi = LP_coeffs.getCoefficients();
-
-  Synthesize_CCSRF();
-
-  // Build Qucs netlist
-  QucsNetlist.clear();
-  QString codestr;
-  for (int i = 0; i < Components.length(); i++) {
-    codestr = Components[i].getQucs();
-    if (!codestr.isEmpty())
-      QucsNetlist += codestr;
-  }
-
-  // Ideally, the user should be the one which controls the style of the traces
-  // as well the traces to be shown However, in favour of a simpler
-  // implementation, it'll be the design code responsible for this... by the
-  // moment...
-  displaygraphs.clear();
-  displaygraphs[QString("S[2,1]")] = QPen(Qt::red, 1, Qt::SolidLine);
-  displaygraphs[QString("S[1,1]")] = QPen(Qt::blue, 1, Qt::SolidLine);
-}
-
 // This function synthesizes a capacitively coupled resonators bandpass filter
 // implementation Reference: Microwave Engineering. David M. Pozar. 4th Edition.
 // 2012. John Wiley and Sons.Page 443-448.
-void CapacitivelyCoupledShuntResonatorsFilter::Synthesize_CCSRF() {
+void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
+  LowpassPrototypeCoeffs LP_coeffs(Specification);
+  std::deque<double> gi = LP_coeffs.getCoefficients();
+
   ComponentInfo SC_Stub, Cseries;
-  WireInfo WI;
-  NodeInfo NI;
 
   int N = Specification.order; // Number of elements
   int posx = 0;
   QString PreviousComponent, NextNode;
   QString PreviousNode = QString("NS"), CurrentNode;
-  Components.clear();
 
   double delta = Specification.bw / Specification.fc; // Fractional bandwidth
   double w0 = 2 * M_PI * Specification.fc;
@@ -85,10 +48,11 @@ void CapacitivelyCoupledShuntResonatorsFilter::Synthesize_CCSRF() {
   double J[N + 1], C[N + 1], deltaC[N], l[N];
 
   // Add Term 1
-  ComponentInfo TermSpar1(QString("T%1").arg(++NumberComponents[Term]), Term,
-                          180, posx, 0, "N0", "gnd");
+  ComponentInfo TermSpar1(
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
+      0, "N0", "gnd");
   TermSpar1.val["Z"] = num2str(Specification.ZS, Resistance);
-  Components.append(TermSpar1);
+  Schematic.appendComponent(TermSpar1);
   PreviousComponent = TermSpar1.ID;
 
   posx += 50;
@@ -102,15 +66,15 @@ void CapacitivelyCoupledShuntResonatorsFilter::Synthesize_CCSRF() {
       // Series capacitor
       NextNode = QString("N%1").arg(k + 1);
       Cseries.Connections.clear();
-      Cseries.setParams(QString("C%1").arg(++NumberComponents[Capacitor]),
-                        Capacitor, 90, posx, 0, CurrentNode, NextNode);
+      Cseries.setParams(
+          QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
+          Capacitor, 90, posx, 0, CurrentNode, NextNode);
       Cseries.val["C"] = num2str(C[k], Capacitance);
-      Components.append(Cseries);
+      Schematic.appendComponent(Cseries);
       posx += 50;
 
       // Wire: Series capacitor to SPAR term
-      WI.setParams(Cseries.ID, 0, TermSpar1.ID, 0);
-      Wires.append(WI);
+      Schematic.appendWire(Cseries.ID, 0, TermSpar1.ID, 0);
       PreviousComponent = Cseries.ID;
       continue;
     }
@@ -125,28 +89,27 @@ void CapacitivelyCoupledShuntResonatorsFilter::Synthesize_CCSRF() {
     // Short stub
     SC_Stub.Connections.clear();
     SC_Stub.setParams(
-        QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), ShortStub,
-        0, posx, 25, CurrentNode, QString("gnd"));
+        QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
+        ShortStub, 0, posx, 25, CurrentNode, QString("gnd"));
     SC_Stub.val["Z0"] = num2str(Z0, Resistance);
     SC_Stub.val["Length"] = ConvertLengthFromM("mm", l[k - 1]);
-    Components.append(SC_Stub);
+    Schematic.appendComponent(SC_Stub);
     posx += 50;
 
     // Wire: Series capacitor to SPAR term
-    WI.setParams(SC_Stub.ID, 1, PreviousComponent, 1);
-    Wires.append(WI);
+    Schematic.appendWire(SC_Stub.ID, 1, PreviousComponent, 1);
 
     // Series capacitor
     NextNode = QString("N%1").arg(k + 1);
     Cseries.Connections.clear();
-    Cseries.setParams(QString("C%1").arg(++NumberComponents[Capacitor]),
-                      Capacitor, 90, posx, 0, CurrentNode, NextNode);
+    Cseries.setParams(
+        QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
+        90, posx, 0, CurrentNode, NextNode);
     Cseries.val["C"] = num2str(C[k], Capacitance);
-    Components.append(Cseries);
+    Schematic.appendComponent(Cseries);
 
     // Wire: Series capacitor to transmission line
-    WI.setParams(SC_Stub.ID, 1, Cseries.ID, 0);
-    Wires.append(WI);
+    Schematic.appendWire(SC_Stub.ID, 1, Cseries.ID, 0);
 
     PreviousComponent = Cseries.ID;
     posx += 50;
@@ -163,27 +126,25 @@ void CapacitivelyCoupledShuntResonatorsFilter::Synthesize_CCSRF() {
 
   // Short stub
   SC_Stub.Connections.clear();
-  SC_Stub.setParams(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
-                    ShortStub, 0, posx, 25, CurrentNode, QString("gnd"));
+  SC_Stub.setParams(
+      QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
+      ShortStub, 0, posx, 25, CurrentNode, QString("gnd"));
   SC_Stub.val["Z0"] = num2str(Z0, Resistance);
   SC_Stub.val["Length"] = ConvertLengthFromM("mm", l[N - 1]);
-  Components.append(SC_Stub);
+  Schematic.appendComponent(SC_Stub);
   posx += 50;
 
   // Series capacitor
   NextNode = QString("N%1").arg(N + 1);
   Cseries.Connections.clear();
-  Cseries.setParams(QString("C%1").arg(++NumberComponents[Capacitor]),
+  Cseries.setParams(QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
                     Capacitor, 90, posx, 0, CurrentNode, NextNode);
   Cseries.val["C"] = num2str(C[N], Capacitance);
-  Components.append(Cseries);
+  Schematic.appendComponent(Cseries);
   posx += 50;
 
-  WI.setParams(SC_Stub.ID, 1, PreviousComponent, 1);
-  Wires.append(WI);
-
-  WI.setParams(SC_Stub.ID, 1, Cseries.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(SC_Stub.ID, 1, PreviousComponent, 1);
+  Schematic.appendWire(SC_Stub.ID, 1, Cseries.ID, 0);
 
   // Add Term 2
   double k = Specification.ZS;
@@ -192,23 +153,15 @@ void CapacitivelyCoupledShuntResonatorsFilter::Synthesize_CCSRF() {
   else
     (Specification.isCLC) ? k /= gi[N + 1] : k *= gi[N + 1];
 
-  ComponentInfo TermSpar2(QString("T%1").arg(++NumberComponents[Term]), Term, 0,
-                          posx, 0, QString("N%1").arg(N + 1), "gnd");
+  ComponentInfo TermSpar2(
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0,
+      QString("N%1").arg(N + 1), "gnd");
   TermSpar2.val["Z"] = num2str(k, Resistance);
-  Components.append(TermSpar2);
+  Schematic.appendComponent(TermSpar2);
 
-  WI.setParams(TermSpar2.ID, 0, Cseries.ID, 1);
-  Wires.append(WI);
-}
+  Schematic.appendWire(TermSpar2.ID, 0, Cseries.ID, 1);
 
-QList<ComponentInfo> CapacitivelyCoupledShuntResonatorsFilter::getComponents() {
-  return Components;
-}
-
-QList<WireInfo> CapacitivelyCoupledShuntResonatorsFilter::getWires() {
-  return Wires;
-}
-
-QList<NodeInfo> CapacitivelyCoupledShuntResonatorsFilter::getNodes() {
-  return Nodes;
+  Schematic.clearGraphs();
+  Schematic.appendGraph(QString("S[2,1]"), QPen(Qt::red, 1, Qt::SolidLine));
+  Schematic.appendGraph(QString("S[1,1]"), QPen(Qt::blue, 1, Qt::SolidLine));
 }

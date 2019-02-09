@@ -2378,5 +2378,3 @@ void EllipticFilter::Insert_Bandstop_1_Section(
       (j == Specification.order - 1))
     Ni--;
 }
-
-SchematicContent EllipticFilter::getSchematic() { return Schematic; }

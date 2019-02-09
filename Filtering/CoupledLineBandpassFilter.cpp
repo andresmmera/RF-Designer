@@ -16,55 +16,21 @@
  ***************************************************************************/
 #include "CoupledLineBandpassFilter.h"
 
-CoupledLineBandpassFilter::CoupledLineBandpassFilter() {
-  // Initialize list of components
-  NumberComponents[Capacitor] = 0;
-  NumberComponents[Inductor] = 0;
-  NumberComponents[Term] = 0;
-  NumberComponents[GND] = 0;
-  NumberComponents[ConnectionNodes] = 0;
-}
+CoupledLineBandpassFilter::CoupledLineBandpassFilter() {}
 
 CoupledLineBandpassFilter::CoupledLineBandpassFilter(FilterSpecifications FS) {
   Specification = FS;
-  // Initialize list of components
-  NumberComponents[Capacitor] = 0;
-  NumberComponents[Inductor] = 0;
-  NumberComponents[Term] = 0;
-  NumberComponents[GND] = 0;
-  NumberComponents[ConnectionNodes] = 0;
 }
 
 CoupledLineBandpassFilter::~CoupledLineBandpassFilter() {}
 
-void CoupledLineBandpassFilter::synthesize() {
-  LowpassPrototypeCoeffs LP_coeffs(Specification);
-  gi = LP_coeffs.getCoefficients();
-
-  Synthesize_CLBPF();
-
-  // Build Qucs netlist
-  QucsNetlist.clear();
-  QString codestr;
-  for (int i = 0; i < Components.length(); i++) {
-    codestr = Components[i].getQucs();
-    if (!codestr.isEmpty())
-      QucsNetlist += codestr;
-  }
-
-  // Ideally, the user should be the one which controls the style of the traces
-  // as well the traces to be shown However, in favour of a simpler
-  // implementation, it'll be the design code responsible for this... by the
-  // moment...
-  displaygraphs.clear();
-  displaygraphs[QString("S[2,1]")] = QPen(Qt::red, 1, Qt::SolidLine);
-  displaygraphs[QString("S[1,1]")] = QPen(Qt::blue, 1, Qt::SolidLine);
-}
-
 // This function synthesizes a coupled line bandpass filter
 // implementation Reference: Microwave Engineering. David M. Pozar. 4th Edition.
 // 2012. John Wiley and Sons.Page 430-437.
-void CoupledLineBandpassFilter::Synthesize_CLBPF() {
+void CoupledLineBandpassFilter::synthesize() {
+  LowpassPrototypeCoeffs LP_coeffs(Specification);
+  std::deque<double> gi = LP_coeffs.getCoefficients();
+
   ComponentInfo Coupled_Lines;
   WireInfo WI;
   QStringList ConnectionNodes;
@@ -74,7 +40,6 @@ void CoupledLineBandpassFilter::Synthesize_CLBPF() {
   int Nopen = 0;
   QString PreviousComponent, NextNode;
   QString PreviousNode, CurrentNode = QString("N0");
-  Components.clear();
 
   double delta = Specification.bw / Specification.fc; // Fractional bandwidth
   double Z0 = Specification.ZS;
@@ -83,10 +48,11 @@ void CoupledLineBandpassFilter::Synthesize_CLBPF() {
   double J[N + 1], Z0e[N + 1], Z0o[N + 1];
 
   // Add Term 1
-  ComponentInfo TermSpar1(QString("T%1").arg(++NumberComponents[Term]), Term,
-                          180, posx, 0, CurrentNode, "gnd");
+  ComponentInfo TermSpar1(
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
+      0, CurrentNode, "gnd");
   TermSpar1.val["Z"] = num2str(Specification.ZS, Resistance);
-  Components.append(TermSpar1);
+  Schematic.appendComponent(TermSpar1);
   PreviousComponent = TermSpar1.ID;
   PreviousNode = CurrentNode;
   posx += 50;
@@ -108,18 +74,17 @@ void CoupledLineBandpassFilter::Synthesize_CLBPF() {
       ConnectionNodes.append(QString("%1").arg(NextNode));
       ConnectionNodes.append(QString("NOPEN%1").arg(Nopen)), Nopen++;
       Coupled_Lines.setParams(
-          QString("COUPL%1").arg(++NumberComponents[CoupledLines]),
+          QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
           CoupledLines, 90, posx, posy, ConnectionNodes);
       Coupled_Lines.val["Ze"] = num2str(Z0e[k], Resistance);
       Coupled_Lines.val["Zo"] = num2str(Z0o[k], Resistance);
       Coupled_Lines.val["Length"] = ConvertLengthFromM("mm", l4);
-      Components.append(Coupled_Lines);
+      Schematic.appendComponent(Coupled_Lines);
       posx += 75;
       posy += 20;
 
       // Wire: Series capacitor to SPAR term
-      WI.setParams(Coupled_Lines.ID, 2, TermSpar1.ID, 0);
-      Wires.append(WI);
+      Schematic.appendWire(Coupled_Lines.ID, 2, TermSpar1.ID, 0);
       PreviousComponent = Coupled_Lines.ID;
       PreviousNode = NextNode;
       continue;
@@ -136,16 +101,15 @@ void CoupledLineBandpassFilter::Synthesize_CLBPF() {
     ConnectionNodes[2] = QString("%1").arg(NextNode);
     ConnectionNodes[3] = QString("NOPEN%1").arg(Nopen), Nopen++;
     Coupled_Lines.setParams(
-        QString("COUPL%1").arg(++NumberComponents[CoupledLines]), CoupledLines,
-        90, posx, posy, ConnectionNodes);
+        QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
+        CoupledLines, 90, posx, posy, ConnectionNodes);
     Coupled_Lines.val["Ze"] = num2str(Z0e[k], Resistance);
     Coupled_Lines.val["Zo"] = num2str(Z0o[k], Resistance);
     Coupled_Lines.val["Length"] = ConvertLengthFromM("mm", l4);
-    Components.append(Coupled_Lines);
+    Schematic.appendComponent(Coupled_Lines);
 
     // Wire: Series capacitor to SPAR term
-    WI.setParams(Coupled_Lines.ID, 2, PreviousComponent, 1);
-    Wires.append(WI);
+    Schematic.appendWire(Coupled_Lines.ID, 2, PreviousComponent, 1);
 
     PreviousComponent = Coupled_Lines.ID;
     PreviousNode = NextNode;
@@ -167,17 +131,16 @@ void CoupledLineBandpassFilter::Synthesize_CLBPF() {
   ConnectionNodes[2] = QString("%1").arg(NextNode);
   ConnectionNodes[3] = QString("NOPEN%1").arg(Nopen), Nopen++;
   Coupled_Lines.setParams(
-      QString("COUPL%1").arg(++NumberComponents[CoupledLines]), CoupledLines,
-      90, posx, posy, ConnectionNodes);
+      QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
+      CoupledLines, 90, posx, posy, ConnectionNodes);
   Coupled_Lines.val["Ze"] = num2str(Z0e[N], Resistance);
   Coupled_Lines.val["Zo"] = num2str(Z0o[N], Resistance);
   Coupled_Lines.val["Length"] = ConvertLengthFromM("mm", l4);
-  Components.append(Coupled_Lines);
+  Schematic.appendComponent(Coupled_Lines);
 
   posx += 50;
   posy += 10;
-  WI.setParams(PreviousComponent, 1, Coupled_Lines.ID, 2);
-  Wires.append(WI);
+  Schematic.appendWire(PreviousComponent, 1, Coupled_Lines.ID, 2);
 
   // Add Term 2
   double k = Specification.ZS;
@@ -186,19 +149,15 @@ void CoupledLineBandpassFilter::Synthesize_CLBPF() {
   else
     (Specification.isCLC) ? k /= gi[N + 1] : k *= gi[N + 1];
 
-  ComponentInfo TermSpar2(QString("T%1").arg(++NumberComponents[Term]), Term, 0,
-                          posx, posy, NextNode, "gnd");
+  ComponentInfo TermSpar2(
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx,
+      posy, NextNode, "gnd");
   TermSpar2.val["Z"] = num2str(k, Resistance);
-  Components.append(TermSpar2);
+  Schematic.appendComponent(TermSpar2);
 
-  WI.setParams(Coupled_Lines.ID, 1, TermSpar2.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(Coupled_Lines.ID, 1, TermSpar2.ID, 0);
+
+  Schematic.clearGraphs();
+  Schematic.appendGraph(QString("S[2,1]"), QPen(Qt::red, 1, Qt::SolidLine));
+  Schematic.appendGraph(QString("S[1,1]"), QPen(Qt::blue, 1, Qt::SolidLine));
 }
-
-QList<ComponentInfo> CoupledLineBandpassFilter::getComponents() {
-  return Components;
-}
-
-QList<WireInfo> CoupledLineBandpassFilter::getWires() { return Wires; }
-
-QList<NodeInfo> CoupledLineBandpassFilter::getNodes() { return Nodes; }

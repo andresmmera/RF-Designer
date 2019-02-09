@@ -372,5 +372,3 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators() {
   // Last series inductor to the previous node
   Schematic.appendWire(TermSpar2.ID, 0, Lseries.ID, 0);
 }
-
-SchematicContent DirectCoupledFilters::getSchematic() { return Schematic; }

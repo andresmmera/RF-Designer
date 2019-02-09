@@ -19,51 +19,29 @@
 
 QuarterWaveFilters::QuarterWaveFilters() {
   // Initialize list of components
-  NumberComponents[Capacitor] = 0;
-  NumberComponents[Inductor] = 0;
-  NumberComponents[Term] = 0;
-  NumberComponents[GND] = 0;
-  NumberComponents[ConnectionNodes] = 0;
+  Schematic.NumberComponents[Capacitor] = 0;
+  Schematic.NumberComponents[Inductor] = 0;
+  Schematic.NumberComponents[Term] = 0;
+  Schematic.NumberComponents[GND] = 0;
+  Schematic.NumberComponents[ConnectionNodes] = 0;
 }
 
 QuarterWaveFilters::QuarterWaveFilters(FilterSpecifications FS) {
   Specification = FS;
   // Initialize list of components
-  NumberComponents[Capacitor] = 0;
-  NumberComponents[Inductor] = 0;
-  NumberComponents[Term] = 0;
-  NumberComponents[GND] = 0;
-  NumberComponents[ConnectionNodes] = 0;
+  Schematic.NumberComponents[Capacitor] = 0;
+  Schematic.NumberComponents[Inductor] = 0;
+  Schematic.NumberComponents[Term] = 0;
+  Schematic.NumberComponents[GND] = 0;
+  Schematic.NumberComponents[ConnectionNodes] = 0;
 }
 
 QuarterWaveFilters::~QuarterWaveFilters() {}
 
 void QuarterWaveFilters::synthesize() {
   LowpassPrototypeCoeffs LP_coeffs(Specification);
-  gi = LP_coeffs.getCoefficients();
+  std::deque<double> gi = LP_coeffs.getCoefficients();
 
-  Synthesize_QW(Specification.FilterType);
-
-  // Build Qucs netlist
-  QucsNetlist.clear();
-  QString codestr;
-  for (int i = 0; i < Components.length(); i++) {
-    codestr = Components[i].getQucs();
-    if (!codestr.isEmpty())
-      QucsNetlist += codestr;
-  }
-
-  // Ideally, the user should be the one which controls the style of the traces
-  // as well the traces to be shown However, in favour of a simpler
-  // implementation, it'll be the design code responsible for this... by the
-  // moment...
-  displaygraphs.clear();
-  displaygraphs[QString("S[2,1]")] = QPen(Qt::red, 1, Qt::SolidLine);
-  displaygraphs[QString("S[1,1]")] = QPen(Qt::blue, 1, Qt::SolidLine);
-}
-
-void QuarterWaveFilters::Synthesize_QW(FilterClass response) {
-  WireInfo WI;
   ComponentInfo QW_TL, OC_Stub, SC_Stub;
   NodeInfo NI;
   double lambda4 = SPEED_OF_LIGHT / (4. * Specification.fc);
@@ -83,12 +61,12 @@ void QuarterWaveFilters::Synthesize_QW(FilterClass response) {
   int posx = 0, Ni = 0;
   QString PreviousNode = "NS", CurrentNode;
   QString PreviousComp;
-  Components.clear();
 
-  ComponentInfo TermSpar1(QString("T%1").arg(++NumberComponents[Term]), Term,
-                          180, posx, 0, "NS", "gnd");
+  ComponentInfo TermSpar1(
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
+      0, "NS", "gnd");
   TermSpar1.val["Z"] = num2str(Z0, Resistance);
-  Components.append(TermSpar1);
+  Schematic.appendComponent(TermSpar1);
   PreviousComp = TermSpar1.ID;
   posx -= 50;
 
@@ -97,58 +75,56 @@ void QuarterWaveFilters::Synthesize_QW(FilterClass response) {
     CurrentNode = QString("N%1").arg(k);
     // Quarter-wave transmission line
     QW_TL.Connections.clear();
-    QW_TL.setParams(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
-                    TransmissionLine, 90, posx, 0,
-                    QString("%1").arg(PreviousNode), CurrentNode);
+    QW_TL.setParams(
+        QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
+        TransmissionLine, 90, posx, 0, QString("%1").arg(PreviousNode),
+        CurrentNode);
     QW_TL.val["Z0"] = num2str(Z0, Resistance);
     QW_TL.val["Length"] = ConvertLengthFromM("mm", lambda4);
-    Components.append(QW_TL);
+    Schematic.appendComponent(QW_TL);
 
     // Node
-    NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]),
-                 posx + 50, 0);
-    Nodes.append(NI);
+    NI.setParams(
+        QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]),
+        posx + 50, 0);
+    Schematic.appendNode(NI);
 
     // Wire: Connect the QW transmission line to the previous element (Term1 or
     // a node)
-    WI.setParams(PreviousComp, 0, QW_TL.ID, 0);
-    Wires.append(WI);
+    Schematic.appendWire(PreviousComp, 0, QW_TL.ID, 0);
 
     // Wire: Connect the QW transmission line to the node
-    WI.setParams(NI.ID, 0, QW_TL.ID, 1);
-    Wires.append(WI);
+    Schematic.appendWire(NI.ID, 0, QW_TL.ID, 1);
 
     // Stubs
-    switch (response) {
+    switch (Specification.FilterType) {
     default:
     case Bandpass:
       Z = (M_PI * Z0 * bw) / (4 * gi[k]);
       SC_Stub.Connections.clear();
       SC_Stub.setParams(
-          QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
+          QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
           ShortStub, 0, posx + 50, 50, CurrentNode, QString("gnd"));
       SC_Stub.val["Z0"] = num2str(Z, Resistance);
       SC_Stub.val["Length"] = ConvertLengthFromM("mm", lambda4);
-      Components.append(SC_Stub);
+      Schematic.appendComponent(SC_Stub);
 
       // Wire: Node to stub
-      WI.setParams(NI.ID, 0, SC_Stub.ID, 1);
-      Wires.append(WI);
+      Schematic.appendWire(NI.ID, 0, SC_Stub.ID, 1);
       break;
 
     case Bandstop:
       Z = (4 * Z0) / (M_PI * bw * gi[k]);
       OC_Stub.Connections.clear();
       OC_Stub.setParams(
-          QString("TLIN%1").arg(++NumberComponents[TransmissionLine]), OpenStub,
-          0, posx + 50, 50, CurrentNode, QString("NOPEN%1").arg(k));
+          QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
+          OpenStub, 0, posx + 50, 50, CurrentNode, QString("NOPEN%1").arg(k));
       OC_Stub.val["Z0"] = num2str(Z, Resistance);
       OC_Stub.val["Length"] = ConvertLengthFromM("mm", lambda4);
-      Components.append(OC_Stub);
+      Schematic.appendComponent(OC_Stub);
 
       // Wire: Node to stub
-      WI.setParams(NI.ID, 0, OC_Stub.ID, 1);
-      Wires.append(WI);
+      Schematic.appendWire(NI.ID, 0, OC_Stub.ID, 1);
 
       break;
     }
@@ -158,29 +134,27 @@ void QuarterWaveFilters::Synthesize_QW(FilterClass response) {
   posx += 100;
   // Quarter-wave transmission line
   QW_TL.Connections.clear();
-  QW_TL.setParams(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
-                  TransmissionLine, 90, posx, 0,
-                  QString("%1").arg(PreviousNode), QString("N%1").arg(N));
+  QW_TL.setParams(
+      QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
+      TransmissionLine, 90, posx, 0, QString("%1").arg(PreviousNode),
+      QString("N%1").arg(N));
   QW_TL.val["Z0"] = num2str(Z0, Resistance);
   QW_TL.val["Length"] = ConvertLengthFromM("mm", lambda4);
-  Components.append(QW_TL);
+  Schematic.appendComponent(QW_TL);
 
-  ComponentInfo TermSpar2(QString("T%1").arg(++NumberComponents[Term]), Term, 0,
-                          posx + 50, 0, QString("N%1").arg(N), "gnd");
+  ComponentInfo TermSpar2(
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0,
+      posx + 50, 0, QString("N%1").arg(N), "gnd");
   TermSpar2.val["Z"] = num2str(Z0, Resistance);
-  Components.append(TermSpar2);
+  Schematic.appendComponent(TermSpar2);
 
   // Wire: Connect  QW line to the previous node
-  WI.setParams(NI.ID, 0, QW_TL.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(NI.ID, 0, QW_TL.ID, 0);
 
   // Wire: Connect QW line to the SPAR term
-  WI.setParams(TermSpar2.ID, 0, QW_TL.ID, 1);
-  Wires.append(WI);
+  Schematic.appendWire(TermSpar2.ID, 0, QW_TL.ID, 1);
+
+  Schematic.clearGraphs();
+  Schematic.appendGraph(QString("S[2,1]"), QPen(Qt::red, 1, Qt::SolidLine));
+  Schematic.appendGraph(QString("S[1,1]"), QPen(Qt::blue, 1, Qt::SolidLine));
 }
-
-QList<ComponentInfo> QuarterWaveFilters::getComponents() { return Components; }
-
-QList<WireInfo> QuarterWaveFilters::getWires() { return Wires; }
-
-QList<NodeInfo> QuarterWaveFilters::getNodes() { return Nodes; }
