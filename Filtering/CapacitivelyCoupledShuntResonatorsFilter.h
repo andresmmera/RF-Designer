@@ -18,7 +18,7 @@
 #define CAPACITIVELYCOUPLEDSHUNTRESONATORS_H
 
 #include "Filtering/LowpassPrototypeCoeffs.h"
-#include "Filtering/Network.h"
+#include "Schematic/Network.h"
 #include "Schematic/component.h"
 #include "general.h"
 #include <QPen>
@@ -28,12 +28,10 @@ public:
   CapacitivelyCoupledShuntResonatorsFilter();
   virtual ~CapacitivelyCoupledShuntResonatorsFilter();
   CapacitivelyCoupledShuntResonatorsFilter(FilterSpecifications);
-  SchematicContent getSchematic() { return Schematic; }
   void synthesize();
 
 private:
   struct FilterSpecifications Specification;
-  SchematicContent Schematic;
 };
 
 #endif // CAPACITIVELYCOUPLEDSHUNTRESONATORS_H

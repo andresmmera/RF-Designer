@@ -16,8 +16,9 @@
  ***************************************************************************/
 #ifndef POWERCOMBINERDESIGNER_H
 #define POWERCOMBINERDESIGNER_H
-#include "Filtering/Network.h"
+#include "Schematic/Network.h"
 #include "Schematic/SchematicContent.h"
+#include "Schematic/structures.h"
 #include "general.h"
 #include <QPen>
 

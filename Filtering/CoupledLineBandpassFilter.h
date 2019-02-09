@@ -18,7 +18,7 @@
 #define COUPLEDLINEBANDPASSFILTER_H
 
 #include "Filtering/LowpassPrototypeCoeffs.h"
-#include "Filtering/Network.h"
+#include "Schematic/Network.h"
 #include "Schematic/component.h"
 #include "general.h"
 #include <QPen>
@@ -29,11 +29,9 @@ public:
   virtual ~CoupledLineBandpassFilter();
   CoupledLineBandpassFilter(FilterSpecifications);
   void synthesize();
-  SchematicContent getSchematic() { return Schematic; }
 
 private:
   struct FilterSpecifications Specification;
-  SchematicContent Schematic;
 };
 
 #endif // COUPLEDLINEBANDPASSFILTER_H

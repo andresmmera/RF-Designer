@@ -1,34 +1,11 @@
-/***************************************************************************
-                                component.h
-                                ----------
-    copyright            :  QUCS team
-    author                :  2019 Andres Martinez-Mera
-    email                  :  andresmmera@protonmail.com
- ***************************************************************************/
+#ifndef STRUCTURES_H
+#define STRUCTURES_H
 
-/***************************************************************************
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- *
- ***************************************************************************/
-#ifndef NETWORK_H
-#define NETWORK_H
-
-#include <QMap>
-#include <QPen>
 #include <QString>
 #include <QStringList>
 #include <complex>
 #include <deque>
 #include <vector>
-
-class SchematicContent;
-class WireInfo;
-class NodeInfo;
-class ComponentInfo;
 
 enum ComponentType {
   Capacitor,
@@ -103,13 +80,6 @@ struct NetworkInfo {
       Ladder; // Contains the ID of the components and their properties
 };
 
-struct SP_Analysis {
-  unsigned int n_points;
-  double fstart;
-  double fstop;
-  std::vector<double> freq;
-};
-
 struct PowerCombinerParams {
   QString Type; // Wilkinson, branchlines, Bagley, etc.
   int Noutputs; // Number of output branches
@@ -132,9 +102,4 @@ struct AttenuatorDesignParameters {
   bool Lumped_TL;     // Use the lumped equivalent of a QW transmission line
 };
 
-// Inherited by the network implementation classes
-class Network {
-public:
-  virtual void synthesize() = 0;
-};
-#endif
+#endif // STRUCTURES_H

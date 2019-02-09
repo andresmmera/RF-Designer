@@ -31,8 +31,8 @@
 #include <QWidget>
 #include <QtSql>
 
-#include "Filtering/Network.h"
 #include "PowerCombining/PowerCombinerDesigner.h"
+#include "Schematic/Network.h"
 #include "Schematic/SchematicContent.h"
 
 class BagleyValidator : public QValidator {

@@ -370,14 +370,14 @@ void FilterDesignTool::synthesize() {
       EllipticFilter *EF;
       EF = new EllipticFilter(Filter_SP);
       EF->synthesize();
-      SchContent = EF->getSchematic();
+      SchContent = EF->Schematic;
       SchContent.setDescription(QString("NOT LADDER"));
       delete EF;
     } else {
       CanonicalFilter *CF;
       CF = new CanonicalFilter(Filter_SP);
       CF->synthesize();
-      SchContent = CF->getSchematic();
+      SchContent = CF->Schematic;
       if (FilterClassCombo->currentText() ==
           "Bandstop") { // The bandstop configuration contains a shunt resonator
                         // which cannot be handled with the internal simulator
@@ -392,14 +392,14 @@ void FilterDesignTool::synthesize() {
     DirectCoupledFilters *DCF;
     DCF = new DirectCoupledFilters(Filter_SP);
     DCF->synthesize();
-    SchContent = DCF->getSchematic();
+    SchContent = DCF->Schematic;
     delete DCF;
   }
   if (FilterImplementationCombo->currentText() == "Quarter-wavelength") {
     QuarterWaveFilters *QWF;
     QWF = new QuarterWaveFilters(Filter_SP);
     QWF->synthesize();
-    SchContent = QWF->getSchematic();
+    SchContent = QWF->Schematic;
     SchContent.setDescription(QString("NOT LADDER"));
     delete QWF;
   }
@@ -407,7 +407,7 @@ void FilterDesignTool::synthesize() {
     SteppedImpedanceFilter *STIF;
     STIF = new SteppedImpedanceFilter(Filter_SP);
     STIF->synthesize();
-    SchContent = STIF->getSchematic();
+    SchContent = STIF->Schematic;
     delete STIF;
   }
 
@@ -415,7 +415,7 @@ void FilterDesignTool::synthesize() {
     EndCoupled *ECF;
     ECF = new EndCoupled(Filter_SP);
     ECF->synthesize();
-    SchContent = ECF->getSchematic();
+    SchContent = ECF->Schematic;
     delete ECF;
   }
 
@@ -424,7 +424,7 @@ void FilterDesignTool::synthesize() {
     CapacitivelyCoupledShuntResonatorsFilter *CCSRF;
     CCSRF = new CapacitivelyCoupledShuntResonatorsFilter(Filter_SP);
     CCSRF->synthesize();
-    SchContent = CCSRF->getSchematic();
+    SchContent = CCSRF->Schematic;
     delete CCSRF;
   }
   if (FilterImplementationCombo->currentText() == "Semilumped Elliptic") {
@@ -432,7 +432,7 @@ void FilterDesignTool::synthesize() {
     SMLEF = new EllipticFilter(Filter_SP);
     SMLEF->setSemilumpedMode(true);
     SMLEF->synthesize();
-    SchContent = SMLEF->getSchematic();
+    SchContent = SMLEF->Schematic;
     SchContent.setDescription(QString("NOT LADDER"));
     delete SMLEF;
   }
@@ -442,7 +442,7 @@ void FilterDesignTool::synthesize() {
     SMLCF = new CanonicalFilter(Filter_SP);
     SMLCF->setSemilumpedMode(true);
     SMLCF->synthesize();
-    SchContent = SMLCF->getSchematic();
+    SchContent = SMLCF->Schematic;
     SchContent.setDescription(QString(""));
     delete SMLCF;
   }
@@ -450,7 +450,7 @@ void FilterDesignTool::synthesize() {
     CoupledLineBandpassFilter *CLBPF;
     CLBPF = new CoupledLineBandpassFilter(Filter_SP);
     CLBPF->synthesize();
-    SchContent = CLBPF->getSchematic();
+    SchContent = CLBPF->Schematic;
     SchContent.setDescription(QString("NOT LADDER"));
     delete CLBPF;
   }
@@ -459,7 +459,7 @@ void FilterDesignTool::synthesize() {
     CoupledLineHarmonicRejectionSIRBandpassFilter *CLSIRF;
     CLSIRF = new CoupledLineHarmonicRejectionSIRBandpassFilter(Filter_SP);
     CLSIRF->synthesize();
-    SchContent = CLSIRF->getSchematic();
+    SchContent = CLSIRF->Schematic;
     SchContent.setDescription(QString("NOT LADDER"));
     delete CLSIRF;
   }

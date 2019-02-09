@@ -17,8 +17,20 @@
 
 #ifndef SCHEMATICCONTENT_H
 #define SCHEMATICCONTENT_H
-#include "Filtering/Network.h"
-#include "Schematic/component.h"
+
+#include "Schematic/infoclasses.h"
+#include "Schematic/structures.h"
+#include "general.h"
+#include <QPen>
+
+struct SP_Analysis {
+  unsigned int n_points;
+  double fstart;
+  double fstop;
+  std::vector<double> freq;
+};
+
+class Component;
 
 class SchematicContent {
 public:

@@ -383,6 +383,7 @@ double AttenuatorDesignTool::getPowerW(double Pin, unsigned int index) {
     Pin = pow(10, (0.1 * Pin - 6)) / 50; // dBmV [50Ohm] -> W
     break;
   }
+  return Pin;
 }
 
 // Given a power data in W, this function converts the power

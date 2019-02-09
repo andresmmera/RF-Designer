@@ -18,7 +18,7 @@
 #define CoupledLineHarmonicRejectionSIRBandpassFilter_H
 
 #include "Filtering/LowpassPrototypeCoeffs.h"
-#include "Filtering/Network.h"
+#include "Schematic/Network.h"
 #include "Schematic/component.h"
 #include "general.h"
 #include <QPen>
@@ -28,12 +28,10 @@ public:
   CoupledLineHarmonicRejectionSIRBandpassFilter();
   virtual ~CoupledLineHarmonicRejectionSIRBandpassFilter();
   CoupledLineHarmonicRejectionSIRBandpassFilter(FilterSpecifications);
-  SchematicContent getSchematic() { return Schematic; }
   void synthesize();
 
 private:
   struct FilterSpecifications Specification;
-  SchematicContent Schematic;
 };
 
 #endif // CoupledLineHarmonicRejectionSIRBandpassFilter_H

@@ -18,7 +18,7 @@
 #define CANONICALFILTER_H
 
 #include "Filtering/LowpassPrototypeCoeffs.h"
-#include "Filtering/Network.h"
+#include "Schematic/Network.h"
 #include "Schematic/SchematicContent.h"
 #include "Schematic/component.h"
 #include "general.h"
@@ -30,15 +30,10 @@ public:
   CanonicalFilter(FilterSpecifications);
   void synthesize();
   void setSemilumpedMode(bool);
-  SchematicContent getSchematic() { return Schematic; }
 
 private:
   struct FilterSpecifications Specification;
   bool semilumped = false; // Activate semilumped implementation mode
-
-  SchematicContent Schematic; // This object contains all the circuit data of
-                              // the filter, i.e. components and nets and it
-                              // returns data for the simulation
 
   std::deque<double> gi;
 

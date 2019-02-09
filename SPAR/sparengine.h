@@ -18,7 +18,8 @@
 #define SPARENGINE_H
 
 #include "MathOperations.h"
-#include "Schematic/component.h"
+#include "Schematic/Network.h"
+#include "Schematic/structures.h"
 #include <set>
 #include <string.h>
 

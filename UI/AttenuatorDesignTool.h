@@ -28,7 +28,7 @@
 #include <QWidget>
 
 #include "AttenuatorDesign/AttenuatorDesigner.h"
-#include "Filtering/Network.h"
+#include "Schematic/Network.h"
 #include "Schematic/SchematicContent.h"
 
 class AttenuatorDesignTool : public QWidget {

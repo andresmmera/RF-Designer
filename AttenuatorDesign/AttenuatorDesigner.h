@@ -16,8 +16,9 @@
  ***************************************************************************/
 #ifndef ATTENUATORDESIGNER_H
 #define ATTENUATORDESIGNER_H
-#include "Filtering/Network.h"
+#include "Schematic/Network.h"
 #include "Schematic/SchematicContent.h"
+#include "Schematic/structures.h"
 #include "general.h"
 #include "math.h"
 

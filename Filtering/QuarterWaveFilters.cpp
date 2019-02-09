@@ -48,17 +48,15 @@ void QuarterWaveFilters::synthesize() {
 
   int N = Specification.order;
   double Z;
-  double r = gi[N + 1];
   gi.pop_back();
   gi.pop_front();
   double fc = Specification.fc;
-  double wc = 2 * M_PI * fc;
   double BW = Specification.bw;
   double bw = BW / fc;
   double Z0 = Specification.ZS;
 
   // Build schematic
-  int posx = 0, Ni = 0;
+  int posx = 0;
   QString PreviousNode = "NS", CurrentNode;
   QString PreviousComp;
 

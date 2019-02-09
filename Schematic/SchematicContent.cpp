@@ -29,6 +29,7 @@ NetworkInfo SchematicContent::getLadder() {
   NWI.ZS = ZS;
   NWI.ZL = ZL;
   NWI.Ladder = Comps;
+  return NWI;
 }
 
 QString SchematicContent::getQucsNetlist() {

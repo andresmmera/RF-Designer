@@ -16,10 +16,12 @@
  ***************************************************************************/
 #ifndef ELLIPTICFILTER_H
 #define ELLIPTICFILTER_H
-#include "Filtering/Network.h"
+#include "Schematic/Network.h"
 #include "Schematic/component.h"
+#include "Schematic/structures.h"
 #include "general.h"
 #include <QPen>
+
 class ComponentInfo;
 class WireInfo;
 
@@ -28,21 +30,16 @@ public:
   EllipticFilter();
   EllipticFilter(FilterSpecifications);
   virtual ~EllipticFilter();
-  SchematicContent getSchematic() { return Schematic; }
   void synthesize();
   void setSemilumpedMode(bool);
 
 private:
   struct FilterSpecifications Specification;
 
-  SchematicContent Schematic;
-
   std::vector<double> *Cseries_LP, *Lseries_LP,
       *Cshunt_LP;          // Elliptic network parameters
   double RL;               // Load resistance
   bool semilumped = false; // Activate semilumped implementation mode
-  std::vector<std::complex<double>> Poles;
-  std::vector<std::complex<double>> Zeros;
   unsigned int virtual_nodes;
 
   // Lowpass prototype

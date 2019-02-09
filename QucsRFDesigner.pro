@@ -4,7 +4,7 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     Schematic/wire.h \
     UI/preferencesdialog.h \
     Filtering/CanonicalFilter.h \
-    Filtering/Network.h \
+    Schematic/Network.h \
     Filtering/EllipticFilter.h \
     SPAR/MathOperations.h \
     SPAR/sparengine.h \
@@ -24,7 +24,9 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     Filtering/CoupledLineHarmonicRejectionSIRBandpassFilter.h \
     UI/AttenuatorDesignTool.h \
     AttenuatorDesign/AttenuatorDesigner.h \
-    Schematic/SchematicContent.h
+    Schematic/SchematicContent.h \
+    Schematic/structures.h \
+    Schematic/infoclasses.h
 
 
 SOURCES += main.cpp \

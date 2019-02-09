@@ -41,17 +41,13 @@
 #ifndef GRAPHWIDGET_H
 #define GRAPHWIDGET_H
 
+#include "Schematic/SchematicContent.h"
+#include "Schematic/structures.h"
 #include <QMap>
 #include <QtGui/QGraphicsView>
 #include <deque>
 
-#include "Schematic/SchematicContent.h"
-#include "Schematic/component.h"
-#include "Schematic/node.h"
-#include "Schematic/wire.h"
-
 class Node;
-class Component;
 class Wire;
 
 //! [0]

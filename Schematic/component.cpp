@@ -667,8 +667,6 @@ void Component::paintCoupler(QPainter *painter) {
     painter->rotate(Rotation);
   }
 
-  int w = 15, shiftx = 10;
-
   // Terms
   painter->drawLine(QPoint(-10, -25), QPoint(-10, -20));
   painter->drawLine(QPoint(-10, 20), QPoint(-10, 25));

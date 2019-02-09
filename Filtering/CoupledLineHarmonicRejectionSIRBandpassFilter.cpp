@@ -48,7 +48,6 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
   double delta = Specification.bw / Specification.fc; // Fractional bandwidth
   double Z0 = Specification.ZS;
   double lambda0 = SPEED_OF_LIGHT / Specification.fc;
-  double l4 = 0.25 * lambda0;
   double J[N + 1], Z0e[N + 1], Z0o[N + 1];
 
   double K = Specification.ImpedanceRatio;
