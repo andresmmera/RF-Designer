@@ -19,7 +19,7 @@
 ReflectionAttenuator::ReflectionAttenuator() {}
 
 ReflectionAttenuator::ReflectionAttenuator(AttenuatorDesignParameters AS) {
-  Specification = AS;
+  Specs = AS;
 }
 
 ReflectionAttenuator::~ReflectionAttenuator() {}
@@ -53,8 +53,7 @@ void ReflectionAttenuator::synthesize() {
                    0, 50, 150, "", "");
   Schematic.appendComponent(Ground);
 
-  WI.setParams(Res1.ID, 2, Ground.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(Res1.ID, 2, Ground.ID, 0);
 
   // Coupler
   ConnectionNodes.clear();

@@ -24,11 +24,11 @@ class QW_SeriesAttenuator : public Network {
 public:
   QW_SeriesAttenuator();
   virtual ~QW_SeriesAttenuator();
-  QW_SeriesAttenuator(FilterSpecifications);
+  QW_SeriesAttenuator(AttenuatorDesignParameters);
   void synthesize();
   struct PdissAtt Pdiss;
 
 private:
-  struct AttenuatorDesignParameters Specification;
+  struct AttenuatorDesignParameters Specs;
 };
 #endif // QW_SERIESATTENUATOR_H

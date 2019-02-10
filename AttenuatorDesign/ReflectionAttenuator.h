@@ -24,11 +24,11 @@ class ReflectionAttenuator : public Network {
 public:
   ReflectionAttenuator();
   virtual ~ReflectionAttenuator();
-  ReflectionAttenuator(FilterSpecifications);
+  ReflectionAttenuator(AttenuatorDesignParameters);
   void synthesize();
   struct PdissAtt Pdiss;
 
 private:
-  struct AttenuatorDesignParameters Specification;
+  AttenuatorDesignParameters Specs;
 };
 #endif // REFLECTIONATTENUATOR_H

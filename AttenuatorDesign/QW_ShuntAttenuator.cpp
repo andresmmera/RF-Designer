@@ -15,6 +15,13 @@
  *
  ***************************************************************************/
 #include "AttenuatorDesign/QW_ShuntAttenuator.h"
+QW_ShuntAttenuator::QW_ShuntAttenuator() {}
+
+QW_ShuntAttenuator::QW_ShuntAttenuator(AttenuatorDesignParameters AS) {
+  Specs = AS;
+}
+
+QW_ShuntAttenuator::~QW_ShuntAttenuator() {}
 
 void QW_ShuntAttenuator::synthesize() {
   ComponentInfo TermSpar1, TermSpar2;

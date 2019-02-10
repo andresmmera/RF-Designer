@@ -24,12 +24,12 @@ class BridgedTeeAttenuator : public Network {
 public:
   BridgedTeeAttenuator();
   virtual ~BridgedTeeAttenuator();
-  BridgedTeeAttenuator(FilterSpecifications);
+  BridgedTeeAttenuator(AttenuatorDesignParameters);
   void synthesize();
   struct PdissAtt Pdiss;
 
 private:
-  struct AttenuatorDesignParameters Specification;
+  struct AttenuatorDesignParameters Specs;
 };
 
 #endif // BRIDGEDTEEATTENUATOR_H

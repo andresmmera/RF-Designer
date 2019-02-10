@@ -18,7 +18,7 @@
 QW_SeriesAttenuator::QW_SeriesAttenuator() {}
 
 QW_SeriesAttenuator::QW_SeriesAttenuator(AttenuatorDesignParameters AS) {
-  Specification = AS;
+  Specs = AS;
 }
 
 QW_SeriesAttenuator::~QW_SeriesAttenuator() {}

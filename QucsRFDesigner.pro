@@ -25,13 +25,13 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     UI/AttenuatorDesignTool.h \
     Schematic/SchematicContent.h \
     Schematic/structures.h \
-    Schematic/infoclasses.h \
-    AttenuatorDesign/PiAttenuator.h \
     AttenuatorDesign/TeeAttenuator.h \
+    AttenuatorDesign/PiAttenuator.h \
     AttenuatorDesign/BridgedTeeAttenuator.h \
     AttenuatorDesign/ReflectionAttenuator.h \
     AttenuatorDesign/QW_SeriesAttenuator.h \
-    AttenuatorDesign/QW_ShuntAttenuator.h
+    AttenuatorDesign/QW_ShuntAttenuator.h \
+    Schematic/infoclasses.h \
 
 
 SOURCES += main.cpp \
@@ -68,8 +68,8 @@ SOURCES += main.cpp \
     Filtering/CoupledLineBandpassFilter.cpp \
     Filtering/CoupledLineHarmonicRejectionSIRBandpassFilter.cpp \
     UI/AttenuatorDesignTool.cpp \
-    AttenuatorDesign/PiAttenuator.cpp \
     AttenuatorDesign/TeeAttenuator.cpp \
+    AttenuatorDesign/PiAttenuator.cpp \
     AttenuatorDesign/BridgedTeeAttenuator.cpp \
     AttenuatorDesign/ReflectionAttenuator.cpp \
     AttenuatorDesign/QW_SeriesAttenuator.cpp \

@@ -18,9 +18,7 @@
 
 PiAttenuator::PiAttenuator() {}
 
-PiAttenuator::PiAttenuator(AttenuatorDesignParameters AS) {
-  Specification = AS;
-}
+PiAttenuator::PiAttenuator(AttenuatorDesignParameters AS) { Specs = AS; }
 
 PiAttenuator::~PiAttenuator() {}
 
@@ -75,8 +73,7 @@ void PiAttenuator::synthesize() {
   Res2.val["R"] = num2str(R2, Resistance);
   Schematic.appendComponent(Res2);
 
-  WI.setParams(Res2.ID, 0, NI.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(Res2.ID, 0, NI.ID, 0);
 
   // 2nd shunt resistor
   Res3.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),

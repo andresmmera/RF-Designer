@@ -19,7 +19,7 @@
 BridgedTeeAttenuator::BridgedTeeAttenuator() {}
 
 BridgedTeeAttenuator::BridgedTeeAttenuator(AttenuatorDesignParameters AS) {
-  Specification = AS;
+  Specs = AS;
 }
 
 BridgedTeeAttenuator::~BridgedTeeAttenuator() {}
@@ -66,7 +66,7 @@ void BridgedTeeAttenuator::synthesize() {
   // Node
   NI.setParams(
       QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 50, 0);
-  Nodes.append(NI);
+  Schematic.appendNode(NI);
 
   Schematic.appendWire(TermSpar1.ID, 0, NI.ID, 0);
   Schematic.appendWire(Res2.ID, 1, NI.ID, 0);

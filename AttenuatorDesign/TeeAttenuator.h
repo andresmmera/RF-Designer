@@ -17,17 +17,18 @@
 #ifndef TEEATTENUATOR_H
 #define TEEATTENUATOR_H
 #include "Schematic/Network.h"
-#include "Schematic/SchematicContent.h"
-#include "Schematic/component.h"
+//#include "Schematic/SchematicContent.h"
+//#include "Schematic/component.h"
 
 class TeeAttenuator : public Network {
 public:
   TeeAttenuator();
   virtual ~TeeAttenuator();
-  TeeAttenuator(FilterSpecifications);
+  TeeAttenuator(AttenuatorDesignParameters);
   void synthesize();
   struct PdissAtt Pdiss;
 
 private:
-  struct AttenuatorDesignParameters Specification;
+  struct AttenuatorDesignParameters Specs;
+};
 #endif // TEEATTENUATOR_H

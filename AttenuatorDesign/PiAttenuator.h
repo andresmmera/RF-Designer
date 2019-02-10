@@ -24,11 +24,11 @@ class PiAttenuator : public Network {
 public:
   PiAttenuator();
   virtual ~PiAttenuator();
-  PiAttenuator(FilterSpecifications);
+  PiAttenuator(AttenuatorDesignParameters);
   void synthesize();
   struct PdissAtt Pdiss;
 
 private:
-  struct AttenuatorDesignParameters Specification;
+  struct AttenuatorDesignParameters Specs;
 };
 #endif // PIATTENUATOR_H

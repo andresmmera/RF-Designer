@@ -18,9 +18,7 @@
 
 TeeAttenuator::TeeAttenuator() {}
 
-TeeAttenuator::TeeAttenuator(AttenuatorDesignParameters AS) {
-  Specification = AS;
-}
+TeeAttenuator::TeeAttenuator(AttenuatorDesignParameters AS) { Specs = AS; }
 
 TeeAttenuator::~TeeAttenuator() {}
 

@@ -225,12 +225,14 @@ void AttenuatorDesignTool::UpdateDesignParameters() {
   if (Specs.Topology == "Pi") {
     PiAttenuator *PI = new PiAttenuator(Specs);
     PI->synthesize();
+    setPdiss(PI->Pdiss);
     SchContent = PI->Schematic;
     delete PI;
   }
   if (Specs.Topology == "Tee") {
     TeeAttenuator *Tee = new TeeAttenuator(Specs);
     Tee->synthesize();
+    setPdiss(Tee->Pdiss);
     SchContent = Tee->Schematic;
     delete Tee;
   }
@@ -238,6 +240,7 @@ void AttenuatorDesignTool::UpdateDesignParameters() {
     BridgedTeeAttenuator *BT = new BridgedTeeAttenuator(Specs);
     BT->synthesize();
     SchContent = BT->Schematic;
+    setPdiss(BT->Pdiss);
     SchContent.setDescription(QString("NOT LADDER"));
     delete BT;
   }
@@ -245,6 +248,7 @@ void AttenuatorDesignTool::UpdateDesignParameters() {
     ReflectionAttenuator *RA = new ReflectionAttenuator(Specs);
     RA->synthesize();
     SchContent = RA->Schematic;
+    setPdiss(RA->Pdiss);
     SchContent.setDescription(QString("NOT LADDER"));
     delete RA;
   }
@@ -252,6 +256,7 @@ void AttenuatorDesignTool::UpdateDesignParameters() {
     QW_SeriesAttenuator *QWSer = new QW_SeriesAttenuator(Specs);
     QWSer->synthesize();
     SchContent = QWSer->Schematic;
+    setPdiss(QWSer->Pdiss);
     SchContent.setDescription(QString("NOT LADDER"));
     delete QWSer;
   }
@@ -259,12 +264,11 @@ void AttenuatorDesignTool::UpdateDesignParameters() {
     QW_ShuntAttenuator *QWShu = new QW_ShuntAttenuator(Specs);
     QWShu->synthesize();
     SchContent = QWShu->Schematic;
+    setPdiss(QWShu->Pdiss);
     SchContent.setDescription(QString("NOT LADDER"));
     delete QWShu;
   }
 
-  // Update power dissipation data
-  setPdiss(AttDesigner->Pdiss);
   UpdatePowerDissipationData();
   // EMIT SIGNAL TO SIMULATE
   emit simulateNetwork(SchContent);
