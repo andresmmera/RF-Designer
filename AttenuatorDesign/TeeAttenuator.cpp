@@ -14,17 +14,23 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
-#include "AttenuatorDesign/AttenuatorDesigner.h"
+#include "AttenuatorDesign/TeeAttenuator.h"
+
+TeeAttenuator::TeeAttenuator() {}
+
+TeeAttenuator::TeeAttenuator(AttenuatorDesignParameters AS) {
+  Specification = AS;
+}
+
+TeeAttenuator::~TeeAttenuator() {}
 
 // Reference: RF design guide. Systems, circuits, and equations. Peter
 // Vizmuller. Artech House, 1995
-void AttenuatorDesigner::TeeAttenuator() {
+void TeeAttenuator::synthesize() {
   ComponentInfo TermSpar1, TermSpar2;
   ComponentInfo Ground, Res1, Res2, Res3;
-  WireInfo WI;
   NodeInfo NI;
 
-  Components.clear();
   // Design equations
   double L = pow(10, .1 * Specs.Attenuation);
   double R2 = (2 * sqrt(Specs.Zin * Specs.Zout * L)) / (L - 1);
@@ -38,64 +44,56 @@ void AttenuatorDesigner::TeeAttenuator() {
              (Specs.Zin * R2 * R2);
 
   // Circuit implementation
-  TermSpar1.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, 180,
-                      0, 0, "N0", "gnd");
+  TermSpar1.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
+                      Term, 180, 0, 0, "N0", "gnd");
   TermSpar1.val["Z"] = num2str(Specs.Zin, Resistance);
-  Components.append(TermSpar1);
+  Schematic.appendComponent(TermSpar1);
 
   // 1st series resistor
-  Res1.setParams(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, 90,
-                 50, 0, "N0", "N1");
+  Res1.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
+                 Resistor, 90, 50, 0, "N0", "N1");
   Res1.val["R"] = num2str(R1, Resistance);
-  Components.append(Res1);
+  Schematic.appendComponent(Res1);
 
   // Node
-  NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), 100, 0);
-  Nodes.append(NI);
+  NI.setParams(
+      QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 100,
+      0);
+  Schematic.appendNode(NI);
 
-  WI.setParams(TermSpar1.ID, 0, Res1.ID, 0);
-  Wires.append(WI);
-
-  WI.setParams(Res1.ID, 1, NI.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(TermSpar1.ID, 0, Res1.ID, 0);
+  Schematic.appendWire(Res1.ID, 1, NI.ID, 0);
 
   // Shunt resistor
-  Res2.setParams(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, 0,
-                 100, 50, "N1", "gnd");
+  Res2.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
+                 Resistor, 0, 100, 50, "N1", "gnd");
   Res2.val["R"] = num2str(R2, Resistance);
-  Components.append(Res2);
+  Schematic.appendComponent(Res2);
 
-  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0, 100,
-                   100, "", "");
-  Components.append(Ground);
+  Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND,
+                   0, 100, 100, "", "");
+  Schematic.appendComponent(Ground);
 
-  WI.setParams(Res2.ID, 1, NI.ID, 0);
-  Wires.append(WI);
-
-  WI.setParams(Res2.ID, 0, Ground.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(Res2.ID, 1, NI.ID, 0);
+  Schematic.appendWire(Res2.ID, 0, Ground.ID, 0);
 
   // 2nd series resistor
-  Res3.setParams(QString("R%1").arg(++NumberComponents[Resistor]), Resistor, 90,
-                 150, 0, "N1", "N2");
+  Res3.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
+                 Resistor, 90, 150, 0, "N1", "N2");
   Res3.val["R"] = num2str(R3, Resistance);
-  Components.append(Res3);
+  Schematic.appendComponent(Res3);
 
-  WI.setParams(Res2.ID, 1, NI.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(Res2.ID, 1, NI.ID, 0);
+  Schematic.appendWire(Res3.ID, 0, NI.ID, 0);
 
-  WI.setParams(Res3.ID, 0, NI.ID, 0);
-  Wires.append(WI);
-
-  TermSpar2.setParams(QString("T%1").arg(++NumberComponents[Term]), Term, 0,
-                      200, 0, "N2", "gnd");
+  TermSpar2.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
+                      Term, 0, 200, 0, "N2", "gnd");
   TermSpar2.val["Z"] = num2str(Specs.Zout, Resistance);
-  Components.append(TermSpar2);
+  Schematic.appendComponent(TermSpar2);
 
-  WI.setParams(TermSpar2.ID, 0, Res3.ID, 1);
-  Wires.append(WI);
+  Schematic.appendWire(TermSpar2.ID, 0, Res3.ID, 1);
 
-  displaygraphs.clear();
-  displaygraphs[QString("S[2,1]")] = QPen(Qt::red, 1, Qt::SolidLine);
-  displaygraphs[QString("S[1,1]")] = QPen(Qt::blue, 1, Qt::SolidLine);
+  Schematic.clearGraphs();
+  Schematic.appendGraph(QString("S[2,1]"), QPen(Qt::red, 1, Qt::SolidLine));
+  Schematic.appendGraph(QString("S[1,1]"), QPen(Qt::blue, 1, Qt::SolidLine));
 }

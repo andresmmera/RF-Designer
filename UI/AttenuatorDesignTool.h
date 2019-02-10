@@ -27,9 +27,15 @@
 #include <QRadioButton>
 #include <QWidget>
 
-#include "AttenuatorDesign/AttenuatorDesigner.h"
 #include "Schematic/Network.h"
 #include "Schematic/SchematicContent.h"
+
+#include "AttenuatorDesign/BridgedTeeAttenuator.h"
+#include "AttenuatorDesign/PiAttenuator.h"
+#include "AttenuatorDesign/QW_SeriesAttenuator.h"
+#include "AttenuatorDesign/QW_ShuntAttenuator.h"
+#include "AttenuatorDesign/ReflectionAttenuator.h"
+#include "AttenuatorDesign/TeeAttenuator.h"
 
 class AttenuatorDesignTool : public QWidget {
   Q_OBJECT

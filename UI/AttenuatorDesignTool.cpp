@@ -222,15 +222,50 @@ void AttenuatorDesignTool::UpdateDesignParameters() {
   Specs.Pin = getPowerW(Pin_SpinBox->value(), Pin_units_Combo->currentIndex());
   Specs.Lumped_TL = LumpedImplementationCheckbox->isChecked();
 
-  AttenuatorDesigner *AttDesigner = new AttenuatorDesigner(Specs);
-  AttDesigner->synthesize();
-  SchContent = AttDesigner->getSchematic();
-  SchContent.setDescription(QString("NOT LADDER"));
+  if (Specs.Topology == "Pi") {
+    PiAttenuator *PI = new PiAttenuator(Specs);
+    PI->synthesize();
+    SchContent = PI->Schematic;
+    delete PI;
+  }
+  if (Specs.Topology == "Tee") {
+    TeeAttenuator *Tee = new TeeAttenuator(Specs);
+    Tee->synthesize();
+    SchContent = Tee->Schematic;
+    delete Tee;
+  }
+  if (Specs.Topology == "Bridged Tee") {
+    BridgedTeeAttenuator *BT = new BridgedTeeAttenuator(Specs);
+    BT->synthesize();
+    SchContent = BT->Schematic;
+    SchContent.setDescription(QString("NOT LADDER"));
+    delete BT;
+  }
+  if (Specs.Topology == "Reflection Attenuator") {
+    ReflectionAttenuator *RA = new ReflectionAttenuator(Specs);
+    RA->synthesize();
+    SchContent = RA->Schematic;
+    SchContent.setDescription(QString("NOT LADDER"));
+    delete RA;
+  }
+  if (Specs.Topology == "Quarter-wave series") {
+    QW_SeriesAttenuator *QWSer = new QW_SeriesAttenuator(Specs);
+    QWSer->synthesize();
+    SchContent = QWSer->Schematic;
+    SchContent.setDescription(QString("NOT LADDER"));
+    delete QWSer;
+  }
+  if (Specs.Topology == "Quarter-wave shunt") {
+    QW_ShuntAttenuator *QWShu = new QW_ShuntAttenuator(Specs);
+    QWShu->synthesize();
+    SchContent = QWShu->Schematic;
+    SchContent.setDescription(QString("NOT LADDER"));
+    delete QWShu;
+  }
 
   // Update power dissipation data
   setPdiss(AttDesigner->Pdiss);
   UpdatePowerDissipationData();
-  delete AttDesigner;
   // EMIT SIGNAL TO SIMULATE
   emit simulateNetwork(SchContent);
 }
