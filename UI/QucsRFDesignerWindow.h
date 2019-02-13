@@ -48,16 +48,6 @@
 
 struct ToolSettings {
   QString PathToQucsator;
-  double fstart;
-  double fstop;
-  double Npoints;
-  std::vector<bool> ShowTraces;
-  std::vector<QColor> TraceColor;
-  double xstep;
-  double ymin;
-  double ymax;
-  double ystep;
-  bool FixedAxes;
 };
 
 class QucsRFDesignerWindow : public QMainWindow {

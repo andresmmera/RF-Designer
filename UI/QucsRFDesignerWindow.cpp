@@ -104,26 +104,12 @@ QucsRFDesignerWindow::QucsRFDesignerWindow() {
   SPAR_Settings.fstop = 1.5e9;  // 2GHz
   SPAR_Settings.n_points = 500; // points
 
-  //***********  Set default tool settings ****************************
-  Tool_Settings.ShowTraces.push_back(true);  // Show S21
-  Tool_Settings.ShowTraces.push_back(true);  // Show S11
-  Tool_Settings.ShowTraces.push_back(false); // Do not show S22 by default
-
-  Tool_Settings.TraceColor.push_back(Qt::red);       // S21 -> red
-  Tool_Settings.TraceColor.push_back(Qt::blue);      // S11 -> blue
-  Tool_Settings.TraceColor.push_back(Qt::darkGreen); // S22 -> green
-
-  Tool_Settings.fstart = 5e8;
-  Tool_Settings.fstop = 2e9;
-  Tool_Settings.xstep = 1e8;
-  Tool_Settings.ymin = -50;
-  Tool_Settings.ymax = 0;
-  Tool_Settings.ystep = 5;
-  Tool_Settings.FixedAxes = true;
-
   DisplayWindow[0]->xAxis->setRange(SPAR_Settings.fstart / 1e6,
                                     SPAR_Settings.fstop / 1e6);
-  DisplayWindow[0]->yAxis->setRange(Tool_Settings.ymin, Tool_Settings.ymax);
+  DisplayWindow[0]->yAxis->setRange(-50, 0);
+  QSharedPointer<QCPAxisTickerFixed> fixedTickerY(new QCPAxisTickerFixed);
+  fixedTickerY->setTickStep(5);
+  DisplayWindow[0]->yAxis->setTicker(fixedTickerY);
 
   connect(TabWidget, SIGNAL(currentChanged(int)), this, SLOT(SwitchTabs(int)));
   connect(Filter_Tool, SIGNAL(simulateNetwork(SchematicContent)), this,
@@ -162,10 +148,6 @@ void QucsRFDesignerWindow::PreferencesWindow() {
 }
 
 void QucsRFDesignerWindow::ReceiveSettings(ToolSettings TS) {
-  SPAR_Settings.fstart = TS.fstart;
-  SPAR_Settings.fstop = TS.fstop;
-  SPAR_Settings.n_points = TS.Npoints;
-
   Tool_Settings = TS;
   UpdateWindows();
 }
@@ -209,15 +191,6 @@ void QucsRFDesignerWindow::updateGraph(
     DisplayWindow[DisplayID]->graph()->setPen(MapIT.value());
     DisplayWindow[DisplayID]->graph()->setData(freq, trace);
   }
-
-  // X axis step
-  QSharedPointer<QCPAxisTickerFixed> fixedTickerX(new QCPAxisTickerFixed);
-  fixedTickerX->setTickStep(Tool_Settings.xstep / k);
-  DisplayWindow[DisplayID]->xAxis->setTicker(fixedTickerX);
-  // Y axis step
-  QSharedPointer<QCPAxisTickerFixed> fixedTickerY(new QCPAxisTickerFixed);
-  fixedTickerY->setTickStep(Tool_Settings.ystep);
-  DisplayWindow[DisplayID]->yAxis->setTicker(fixedTickerY);
 
   DisplayWindow[DisplayID]->replot();
 }

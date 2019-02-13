@@ -18,14 +18,11 @@
 #define PREFERENCESDIALOG_H
 
 #include "UI/QucsRFDesignerWindow.h"
-#include <QCheckBox>
-#include <QColorDialog>
-#include <QComboBox>
+
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
-#include <QLineEdit>
 #include <QPushButton>
 #include <QWidget>
 
@@ -36,29 +33,10 @@ public:
 private slots:
   void Qucsactorbrowse();
   void Save();
-  // Color handlers
-  void S21ColorHandler();
-  void S11ColorHandler();
-  void S22ColorHandler();
 
 private:
-  // S parameter simulation settings
-  QLineEdit *fstartLineedit, *fstopLineedit, *NpointsLineedit;
-  QComboBox *fstartScaleCombo, *fstopScaleCombo;
+  QString path_qucsator;
 
-  // Trace settings
-  QCheckBox *S21Checkbox, *S11Checkbox, *S22Checkbox;
-  QPushButton *S21ColorButton, *S11ColorButton, *S22ColorButton;
-  std::vector<QColor> TracesColor;
-
-  // Graph settings
-  QCheckBox *FixedScaleCheckbox;
-  QLineEdit *GraphYminLineedit, *GraphYmaxLineedit, *GraphYstepLineedit,
-      *GraphFstepLineedit;
-  QComboBox *XscaleStepCombobox;
-
-  // Frequency scale
-  double getScale(QString);
 signals:
   void sendSettings(struct ToolSettings);
 };
