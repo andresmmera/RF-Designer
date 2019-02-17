@@ -133,7 +133,7 @@ void PowerCombinerDesigner::Lim_Eom() {
       "N4", "gnd");
   TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar3);
-  Schematic.appendWire(TermSpar3.ID, 1, N4.ID, 0);
+  Schematic.appendWire(TermSpar3.ID, 0, N4.ID, 0);
 
   ComponentInfo TL5(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),

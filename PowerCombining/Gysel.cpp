@@ -21,10 +21,14 @@ void PowerCombinerDesigner::Gysel() {
   double lambda2 = lambda4 * 2;
 
   ComponentInfo TermSpar1(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, 0, 0,
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, -20, 0,
       "N0", "gnd");
   TermSpar1.val["Z0"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar1);
+
+  NodeInfo NSP1(
+      QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 0, 0);
+  Schematic.appendNode(NSP1);
 
   ComponentInfo TL1(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
@@ -35,7 +39,8 @@ void PowerCombinerDesigner::Gysel() {
   TL1.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL1);
 
-  Schematic.appendWire(TL1.ID, 0, TermSpar1.ID, 0);
+  Schematic.appendWire(NSP1.ID, 0, TermSpar1.ID, 0);
+  Schematic.appendWire(TL1.ID, 0, NSP1.ID, 0);
 
   ComponentInfo TL2(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
@@ -46,7 +51,7 @@ void PowerCombinerDesigner::Gysel() {
   TL2.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL2);
 
-  Schematic.appendWire(TL2.ID, 1, TermSpar1.ID, 0);
+  Schematic.appendWire(TL2.ID, 1, NSP1.ID, 0);
 
   ComponentInfo TL3(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
@@ -56,13 +61,19 @@ void PowerCombinerDesigner::Gysel() {
   Schematic.appendComponent(TL3);
 
   ComponentInfo TermSpar2(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, 0, -75,
-      "N1", "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, -20,
+      -75, "N1", "gnd");
   TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar2);
 
-  Schematic.appendWire(TL1.ID, 1, TermSpar2.ID, 0);
-  Schematic.appendWire(TL3.ID, 0, TermSpar2.ID, 0);
+  NodeInfo NSP2(
+      QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 0,
+      -75);
+  Schematic.appendNode(NSP2);
+
+  Schematic.appendWire(NSP2.ID, 0, TermSpar2.ID, 0);
+  Schematic.appendWire(TL1.ID, 1, NSP2.ID, 0);
+  Schematic.appendWire(TL3.ID, 0, NSP2.ID, 0);
 
   ComponentInfo TL4(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
@@ -72,13 +83,18 @@ void PowerCombinerDesigner::Gysel() {
   Schematic.appendComponent(TL4);
 
   ComponentInfo TermSpar3(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, 0, 75,
-      "N4", "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, -20,
+      75, "N4", "gnd");
   TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar3);
 
-  Schematic.appendWire(TL2.ID, 0, TermSpar3.ID, 0);
-  Schematic.appendWire(TL4.ID, 0, TermSpar3.ID, 0);
+  NodeInfo NSP3(
+      QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 0, 75);
+  Schematic.appendNode(NSP3);
+
+  Schematic.appendWire(NSP3.ID, 0, TermSpar3.ID, 0);
+  Schematic.appendWire(TL2.ID, 0, NSP3.ID, 0);
+  Schematic.appendWire(TL4.ID, 0, NSP3.ID, 0);
 
   // Node
   NodeInfo N1(QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]),
@@ -110,7 +126,7 @@ void PowerCombinerDesigner::Gysel() {
   Schematic.appendWire(Ri1.ID, 1, N2.ID, 0);
   Schematic.appendWire(TL5.ID, 0, N2.ID, 0);
   Schematic.appendWire(TL4.ID, 1, N2.ID, 0);
-  Schematic.appendWire(TL5.ID, 1, TL3.ID, 1);
+  Schematic.appendWire(TL5.ID, 1, N1.ID, 1);
 
   ComponentInfo Ri2(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
                     Resistor, 0, 200, -50, "N2", "gnd");
@@ -122,6 +138,7 @@ void PowerCombinerDesigner::Gysel() {
   Schematic.appendComponent(Ground2);
   Schematic.appendWire(Ri2.ID, 0, Ground2.ID, 0);
   Schematic.appendWire(Ri2.ID, 1, N1.ID, 0);
+  Schematic.appendWire(TL3.ID, 1, N1.ID, 0);
 
   Schematic.clearGraphs();
   Schematic.appendGraph(QString("S[2,1]"), QPen(Qt::red, 1, Qt::SolidLine));

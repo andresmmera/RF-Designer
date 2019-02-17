@@ -53,7 +53,7 @@ void ReflectionAttenuator::synthesize() {
                    0, 50, 150, "", "");
   Schematic.appendComponent(Ground);
 
-  Schematic.appendWire(Res1.ID, 2, Ground.ID, 0);
+  Schematic.appendWire(Res1.ID, 0, Ground.ID, 0);
 
   // Coupler
   ConnectionNodes.clear();
@@ -67,7 +67,7 @@ void ReflectionAttenuator::synthesize() {
   Coup.val["phi"] = num2str(90, NoUnits);
   Schematic.appendComponent(Coup);
 
-  Schematic.appendWire(Res1.ID, 1, Coup.ID, 2);
+  Schematic.appendWire(Res1.ID, 1, Coup.ID, 0);
 
   // 2nd shunt resistor
   Res2.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
@@ -87,8 +87,8 @@ void ReflectionAttenuator::synthesize() {
   TermSpar2.val["Z"] = num2str(Specs.Zout, Resistance);
   Schematic.appendComponent(TermSpar2);
 
-  Schematic.appendWire(TermSpar1.ID, 0, Coup.ID, 0);
-  Schematic.appendWire(TermSpar2.ID, 0, Coup.ID, 1);
+  Schematic.appendWire(TermSpar1.ID, 0, Coup.ID, 1);
+  Schematic.appendWire(TermSpar2.ID, 0, Coup.ID, 2);
 
   Schematic.clearGraphs();
   Schematic.appendGraph(QString("S[2,1]"), QPen(Qt::red, 1, Qt::SolidLine));

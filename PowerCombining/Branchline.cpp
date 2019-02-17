@@ -24,21 +24,21 @@ void PowerCombinerDesigner::Branchline() {
   double ZB = Specs.Z0 * sqrt(K);
 
   ComponentInfo TermSpar1(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 0, -50,
-      "N0", "gnd");
-  TermSpar1.val["Z0"] = num2str(Specs.Z0, Resistance);
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, -20,
+      -50, "N0", "gnd");
+  TermSpar1.val["Z"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar1);
 
   ComponentInfo TermSpar2(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 100, -50,
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 120, -50,
       "N1", "gnd");
-  TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
+  TermSpar2.val["Z"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar2);
 
   ComponentInfo TermSpar3(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 100, 50,
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 120, 50,
       "N2", "gnd");
-  TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
+  TermSpar3.val["Z"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar3);
 
   ComponentInfo Riso(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
@@ -78,14 +78,37 @@ void PowerCombinerDesigner::Branchline() {
   TL4.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL4);
 
-  Schematic.appendWire(TermSpar1.ID, 0, TL1.ID, 0);
-  Schematic.appendWire(TermSpar2.ID, 0, TL1.ID, 1);
-  Schematic.appendWire(TermSpar2.ID, 0, TL4.ID, 1);
-  Schematic.appendWire(TermSpar3.ID, 0, TL4.ID, 0);
-  Schematic.appendWire(TermSpar3.ID, 0, TL2.ID, 1);
-  Schematic.appendWire(TermSpar1.ID, 0, TL3.ID, 1);
-  Schematic.appendWire(Riso.ID, 1, TL2.ID, 0);
-  Schematic.appendWire(Riso.ID, 1, TL3.ID, 0);
+  NodeInfo N1(QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]),
+              0, -50);
+  Schematic.appendNode(N1);
+
+  NodeInfo N2(QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]),
+              100, -50);
+  Schematic.appendNode(N2);
+
+  NodeInfo N3(QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]),
+              100, 50);
+  Schematic.appendNode(N3);
+
+  NodeInfo N4(QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]),
+              0, 50);
+  Schematic.appendNode(N4);
+
+  Schematic.appendWire(TermSpar1.ID, 0, N1.ID, 0);
+  Schematic.appendWire(TermSpar2.ID, 0, N2.ID, 0);
+  Schematic.appendWire(TermSpar3.ID, 0, N3.ID, 0);
+
+  Schematic.appendWire(N1.ID, 0, TL1.ID, 0);
+  Schematic.appendWire(N2.ID, 0, TL1.ID, 1);
+
+  Schematic.appendWire(N2.ID, 0, TL4.ID, 1);
+  Schematic.appendWire(N3.ID, 0, TL4.ID, 0);
+  Schematic.appendWire(N3.ID, 0, TL2.ID, 1);
+  Schematic.appendWire(N1.ID, 0, TL3.ID, 1);
+
+  Schematic.appendWire(Riso.ID, 1, N4.ID, 0);
+  Schematic.appendWire(N4.ID, 0, TL2.ID, 0);
+  Schematic.appendWire(N4.ID, 0, TL3.ID, 0);
   Schematic.appendWire(Riso.ID, 0, Ground.ID, 0);
 
   Schematic.clearGraphs();

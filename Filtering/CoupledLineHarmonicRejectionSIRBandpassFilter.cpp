@@ -113,9 +113,9 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
       posy += 10;
 
       // Wire: Series capacitor to SPAR term
-      Schematic.appendWire(Coupled_Lines.ID, 2, TermSpar1.ID, 0);
+      Schematic.appendWire(Coupled_Lines.ID, 0, TermSpar1.ID, 0);
       // Wire: Coupled line to transmission line
-      Schematic.appendWire(Coupled_Lines.ID, 1, TL.ID, 0);
+      Schematic.appendWire(Coupled_Lines.ID, 2, TL.ID, 0);
 
       PreviousComponent = TL.ID;
       PreviousNode = NextNode;
@@ -159,10 +159,10 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
     Schematic.appendComponent(TL);
 
     // Wire: Coupled line to previous section
-    Schematic.appendWire(Coupled_Lines.ID, 2, PreviousComponent, 1);
+    Schematic.appendWire(Coupled_Lines.ID, 0, PreviousComponent, 1);
 
     // Wire: Coupled line to transmission line
-    Schematic.appendWire(Coupled_Lines.ID, 1, TL.ID, 0);
+    Schematic.appendWire(Coupled_Lines.ID, 2, TL.ID, 0);
 
     PreviousComponent = TL.ID;
     PreviousNode = NextNode;
@@ -201,7 +201,7 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
   posy += 10;
 
   // Previous component to coupled lines
-  Schematic.appendWire(PreviousComponent, 1, Coupled_Lines.ID, 2);
+  Schematic.appendWire(PreviousComponent, 1, Coupled_Lines.ID, 0);
 
   // Add Term 2
   double k = Specification.ZS;
@@ -216,7 +216,7 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
   TermSpar2.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar2);
 
-  Schematic.appendWire(Coupled_Lines.ID, 1, TermSpar2.ID, 0);
+  Schematic.appendWire(Coupled_Lines.ID, 2, TermSpar2.ID, 0);
 
   Schematic.clearGraphs();
   Schematic.appendGraph(QString("S[2,1]"), QPen(Qt::red, 1, Qt::SolidLine));

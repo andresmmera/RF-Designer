@@ -918,10 +918,7 @@ void EllipticFilter::Insert_LowpassMinC_Section(
     posx += 50;
 
     UnconnectedComponents.clear();
-    if (Lseries_LP_MINC != 0)
-      UnconnectedComponents[Lseries.ID] = 1;
-    else
-      UnconnectedComponents[NI.ID] = 0;
+    UnconnectedComponents[NI.ID] = 0;
   } else {
     //***** Inductor to node *****
     if (mapIT.hasNext())
@@ -1120,10 +1117,7 @@ void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
     posx += 50;
 
     UnconnectedComponents.clear();
-    if (Lseries_LP_MINC != 0)
-      UnconnectedComponents[Lseries.ID] = 0;
-    else
-      UnconnectedComponents[NI.ID] = 0;
+    UnconnectedComponents[NI.ID] = 0;
   } else {
     //***** Inductor to node *****
     if (mapIT.hasNext())
@@ -1271,10 +1265,7 @@ void EllipticFilter::Insert_HighpassMinL_Section(
     posx += 50;
 
     UnconnectedComponents.clear();
-    if (Cshunt_LP->at(j) != 0)
-      UnconnectedComponents[Cseries.ID] = 0;
-    else
-      UnconnectedComponents[NI.ID] = 0;
+    UnconnectedComponents[NI.ID] = 0;
   } else {
     //***** Inductor to node *****
     if (mapIT.hasNext())
@@ -1432,10 +1423,7 @@ void EllipticFilter::Insert_HighpassSemilumpedMinL_Section(
     posx += 50;
 
     UnconnectedComponents.clear();
-    if (Cshunt_LP->at(j) != 0)
-      UnconnectedComponents[Cseries.ID] = 0;
-    else
-      UnconnectedComponents[NI.ID] = 0;
+    UnconnectedComponents[NI.ID] = 0;
   } else {
     //***** Inductor to node *****
     if (mapIT.hasNext())
@@ -1879,8 +1867,20 @@ void EllipticFilter::Insert_Bandpass_2_Section(
   Schematic.appendWire(Lshunt2.ID, 0, Ground.ID, 0);
 
   if (Lseries_BP_T2 != 0) {
-    Schematic.appendWire(Lshunt1.ID, 0, Lshunt2.ID, 1);
-    Schematic.appendWire(Lshunt1.ID, 0, Cshunt2.ID, 1);
+    // Add a node
+    // Node
+    NodeInfo NodeShunt;
+    NodeShunt.setParams(
+        QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]),
+        posx + 75, 130);
+    Schematic.appendNode(NodeShunt);
+
+    // Connect Lshunt1 to the node
+    Schematic.appendWire(Lshunt1.ID, 0, NodeShunt.ID, 0);
+    // Connect the parallel shunt elements to the node
+    Schematic.appendWire(NodeShunt.ID, 0, Lshunt2.ID, 1);
+    Schematic.appendWire(NodeShunt.ID, 0, Cshunt2.ID, 1);
+    // Finally, connect the shunt series capacitor to the main line node
     Schematic.appendWire(Cshunt1.ID, 1, NI.ID, 1);
   } else {
     Schematic.appendWire(NI.ID, 1, Cshunt2.ID, 1);
@@ -2110,11 +2110,11 @@ void EllipticFilter::Insert_Bandstop_2_Section(
   } else { // Here it connects all the two resonators to the previous node
     if (mapIT.hasNext())
       mapIT.next();
-    Schematic.appendWire(mapIT.key(), mapIT.value(), Lseries1.ID, 0, Qt::red);
+    Schematic.appendWire(mapIT.key(), mapIT.value(), Lseries1.ID, 0);
     if (Cshunt_BS_T2 != 0) {
       if (mapIT.hasNext())
         mapIT.next();
-      Schematic.appendWire(mapIT.key(), mapIT.value(), Lseries2.ID, 0, Qt::red);
+      Schematic.appendWire(mapIT.key(), mapIT.value(), Lseries2.ID, 0);
     }
     if (mapIT.hasNext())
       mapIT.next();
@@ -2158,7 +2158,6 @@ void EllipticFilter::Insert_Bandstop_1_Section(
     bool flip, bool CentralSection) {
   ComponentInfo Ground, Cshunt1, Cshunt2, Lshunt1, Lshunt2, Lseries, Cseries;
   NodeInfo NI;
-  WireInfo WI;
   QMapIterator<QString, unsigned int> mapIT(UnconnectedComponents);
 
   double Kl = Specification.ZS / (2 * M_PI * Specification.fc);
@@ -2329,9 +2328,20 @@ void EllipticFilter::Insert_Bandstop_1_Section(
                      GND, 0, posx + 110, 200, "", "");
     Schematic.appendComponent(Ground);
 
+    // Insert a node
+    NodeInfo NodeShunt;
+    NodeShunt.setParams(
+        QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]),
+        posx + 75, 130);
+    Schematic.appendNode(NodeShunt);
+
+    // Connect shunt element to node
+    Schematic.appendWire(Lshunt1.ID, 0, NodeShunt.ID, 1);
+
+    // Connect parallel shunt components to the node
     Schematic.appendWire(Lshunt2.ID, 0, Ground.ID, 0);
-    Schematic.appendWire(Lshunt1.ID, 0, Lshunt2.ID, 1);
-    Schematic.appendWire(Lshunt1.ID, 0, Cshunt2.ID, 1);
+    Schematic.appendWire(NodeShunt.ID, 0, Lshunt2.ID, 1);
+    Schematic.appendWire(NodeShunt.ID, 0, Cshunt2.ID, 1);
   } else { // Cshunt -> +infty and Lshunt -> 0
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),

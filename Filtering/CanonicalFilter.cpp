@@ -434,7 +434,6 @@ void CanonicalFilter::SynthesizeBSF() {
   // Synthesize CLC of LCL network
   int N = Specification.order; // Number of elements
   int posx = 0;
-  QString ConnectionAux = "";
 
   // Add Term 1
   ComponentInfo TermSpar1(
@@ -443,7 +442,8 @@ void CanonicalFilter::SynthesizeBSF() {
   TermSpar1.val["Z"] = num2str(Specification.ZS, Resistance);
   Schematic.appendComponent(TermSpar1);
 
-  ConnectionAux = TermSpar1.ID;
+  QMap<QString, unsigned int> UnconnectedComponents;
+  UnconnectedComponents[TermSpar1.ID] = 0;
 
   unsigned int Ni = 0;
   double wc = 2 * M_PI * Specification.fc;
@@ -496,11 +496,17 @@ void CanonicalFilter::SynthesizeBSF() {
       Schematic.appendWire(Ground1.ID, 0, Cshunt.ID, 0);
 
       //***** Capacitor to the previous Lseries *****
-      if (!ConnectionAux.isEmpty()) {
-        Schematic.appendWire(ConnectionAux, 1, NI.ID, 1);
+      QMap<QString, unsigned int>::const_iterator i =
+          UnconnectedComponents.constBegin();
+      while (i != UnconnectedComponents.constEnd()) {
+        Schematic.appendWire(i.key(), i.value(), NI.ID, 1);
+        ++i;
       }
 
-      //   ConnectionAux = NI.ID; // The series inductor of the next section
+      UnconnectedComponents.clear();
+      UnconnectedComponents[NI.ID] = 0;
+
+      // The series inductor of the next section
       //   must be
       // connected to this node
     } else {
@@ -543,14 +549,23 @@ void CanonicalFilter::SynthesizeBSF() {
       Schematic.appendNode(Node2);
 
       // Wiring
-      // Intermediate series inductance => Connect port 0 to the previous Cshunt
-      // and port 1 to the next Cshunt
-      Schematic.appendWire(ConnectionAux, 0, Node1.ID, 0);
+      // Intermediate series inductance => Connect port 0 to the previous
+      // Cshunt and port 1 to the next Cshunt
+
+      QMap<QString, unsigned int>::const_iterator i =
+          UnconnectedComponents.constBegin();
+      while (i != UnconnectedComponents.constEnd()) {
+        Schematic.appendWire(i.key(), i.value(), Node1.ID, 0);
+        ++i;
+      }
+
       Schematic.appendWire(Node1.ID, 0, Lseries.ID, 1);
       Schematic.appendWire(Node1.ID, 0, Cseries.ID, 0);
       Schematic.appendWire(Node2.ID, 0, Lseries.ID, 0);
       Schematic.appendWire(Node2.ID, 0, Cseries.ID, 1);
-      ConnectionAux = Node2.ID;
+
+      UnconnectedComponents.clear();
+      UnconnectedComponents[Node2.ID] = 0;
     }
     posx += 100;
   }
@@ -567,5 +582,11 @@ void CanonicalFilter::SynthesizeBSF() {
       QString("N%1").arg(last_node), "gnd");
   TermSpar2.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar2);
-  Schematic.appendWire(ConnectionAux, 1, TermSpar2.ID, 0);
+
+  QMap<QString, unsigned int>::const_iterator i =
+      UnconnectedComponents.constBegin();
+  while (i != UnconnectedComponents.constEnd()) {
+    Schematic.appendWire(i.key(), i.value(), TermSpar2.ID, 0);
+    ++i;
+  }
 }

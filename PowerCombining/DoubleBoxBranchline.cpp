@@ -27,27 +27,46 @@ void PowerCombinerDesigner::DoubleBoxBranchline() {
   double ZB = Specs.Z0 * sqrt(r - (r * r) / (t * t));
 
   ComponentInfo TermSpar1(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, 0, -50,
-      "N0", "gnd");
-  TermSpar1.val["Z0"] = num2str(Specs.Z0, Resistance);
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, -20,
+      -50, "N0", "gnd");
+  TermSpar1.val["Z"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar1);
 
+  NodeInfo NSP1(
+      QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 0,
+      -50);
+  Schematic.appendNode(NSP1);
+
   ComponentInfo TermSpar2(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 200, -50,
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 220, -50,
       "N2", "gnd");
-  TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
+  TermSpar2.val["Z"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar2);
 
+  NodeInfo NSP2(
+      QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 200,
+      -50);
+  Schematic.appendNode(NSP2);
+
   ComponentInfo TermSpar3(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 200, 50,
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 220, 50,
       "N3", "gnd");
-  TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
+  TermSpar3.val["Z"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar3);
+
+  NodeInfo NSP3(
+      QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 200,
+      50);
+  Schematic.appendNode(NSP3);
 
   ComponentInfo Riso(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
                      Resistor, 0, 0, 75, "N5", "gnd");
   Riso.val["R"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(Riso);
+
+  NodeInfo NIso(
+      QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 0, 50);
+  Schematic.appendNode(NIso);
 
   ComponentInfo Ground(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
                        GND, 0, 0, 120, "", "");
@@ -112,14 +131,19 @@ void PowerCombinerDesigner::DoubleBoxBranchline() {
   TL7.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL7);
 
-  Schematic.appendWire(TermSpar1.ID, 0, TL1.ID, 0);
-  Schematic.appendWire(TermSpar2.ID, 0, TL5.ID, 1);
-  Schematic.appendWire(TermSpar2.ID, 0, TL7.ID, 1);
-  Schematic.appendWire(TermSpar3.ID, 0, TL7.ID, 0);
-  Schematic.appendWire(TermSpar3.ID, 0, TL6.ID, 1);
-  Schematic.appendWire(TermSpar1.ID, 0, TL3.ID, 1);
-  Schematic.appendWire(Riso.ID, 1, TL2.ID, 0);
-  Schematic.appendWire(Riso.ID, 1, TL3.ID, 0);
+  Schematic.appendWire(TermSpar1.ID, 0, NSP1.ID, 0);
+  Schematic.appendWire(TermSpar2.ID, 0, NSP2.ID, 0);
+  Schematic.appendWire(TermSpar3.ID, 0, NSP3.ID, 0);
+  Schematic.appendWire(Riso.ID, 1, NIso.ID, 0);
+
+  Schematic.appendWire(NSP1.ID, 0, TL1.ID, 0);
+  Schematic.appendWire(NSP2.ID, 0, TL5.ID, 1);
+  Schematic.appendWire(NSP2.ID, 0, TL7.ID, 1);
+  Schematic.appendWire(NSP3.ID, 0, TL7.ID, 0);
+  Schematic.appendWire(NSP3.ID, 0, TL6.ID, 1);
+  Schematic.appendWire(NSP1.ID, 0, TL3.ID, 1);
+  Schematic.appendWire(NIso.ID, 1, TL2.ID, 0);
+  Schematic.appendWire(NIso.ID, 1, TL3.ID, 0);
   Schematic.appendWire(Riso.ID, 0, Ground.ID, 0);
 
   // Connect transmission lines to the central nodes

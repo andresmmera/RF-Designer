@@ -21,11 +21,16 @@ void PowerCombinerDesigner::Bagley() {
   double lambda4 = SPEED_OF_LIGHT / (4 * Specs.freq);
   double lambda2 = lambda4 * 2;
   double Zbranch = 2 * Specs.Z0 / sqrt(Specs.Noutputs);
+  NodeInfo NI;
 
   ComponentInfo TermSpar(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                         Term, 90, (Specs.Noutputs - 1) * 50, 0, "N0", "gnd");
-  TermSpar.val["Z0"] = num2str(Specs.Z0, Resistance);
+                         Term, 0, (Specs.Noutputs - 1) * 50, -30, "N0", "gnd");
+  TermSpar.val["Z"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar);
+
+  NodeInfo N1(QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]),
+              (Specs.Noutputs - 1) * 50, 0);
+  Schematic.appendNode(N1);
 
   ComponentInfo TL1(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
@@ -42,16 +47,23 @@ void PowerCombinerDesigner::Bagley() {
   TL2.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL2);
 
-  Schematic.appendWire(TL1.ID, 1, TermSpar.ID, 0);
-  Schematic.appendWire(TL2.ID, 1, TermSpar.ID, 0);
+  Schematic.appendWire(TL1.ID, 1, N1.ID, 0);
+  Schematic.appendWire(TL2.ID, 1, N1.ID, 0);
+  Schematic.appendWire(TermSpar.ID, 0, N1.ID, 0);
 
   TermSpar.Connections.clear();
   TermSpar.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                     Term, 90, 0, 100, "N1", "gnd");
-  TermSpar.val["Z0"] = num2str(Specs.Z0, Resistance);
+                     Term, 90, 0, 120, "N1", "gnd");
+  TermSpar.val["Z"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar);
 
-  Schematic.appendWire(TermSpar.ID, 0, TL2.ID, 0);
+  NI.setParams(
+      QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 0,
+      100);
+  Schematic.appendNode(NI);
+
+  Schematic.appendWire(TermSpar.ID, 0, NI.ID, 0);
+  Schematic.appendWire(TL2.ID, 0, NI.ID, 0);
 
   ComponentInfo TL;
   int posx = -50;
@@ -66,18 +78,25 @@ void PowerCombinerDesigner::Bagley() {
     TL.val["Length"] = ConvertLengthFromM(Specs.units, lambda2);
     Schematic.appendComponent(TL);
 
-    Schematic.appendWire(TermSpar.ID, 0, TL.ID, 0);
+    Schematic.appendWire(NI.ID, 0, TL.ID, 0);
 
     TermSpar.Connections.clear();
     TermSpar.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                       Term, 90, posx + 50, 100, QString("N%1").arg(i + 1),
+                       Term, 90, posx + 50, 120, QString("N%1").arg(i + 1),
                        "gnd");
-    TermSpar.val["Z0"] = num2str(Specs.Z0, Resistance);
+    TermSpar.val["Z"] = num2str(Specs.Z0, Resistance);
     Schematic.appendComponent(TermSpar);
-    Schematic.appendWire(TermSpar.ID, 0, TL.ID, 1);
+
+    NI.setParams(
+        QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]),
+        posx + 50, 100);
+    Schematic.appendNode(NI);
+
+    Schematic.appendWire(NI.ID, 0, TL.ID, 1);
+    Schematic.appendWire(NI.ID, 0, TermSpar.ID, 0);
   }
 
-  Schematic.appendWire(TL1.ID, 0, TermSpar.ID, 0);
+  Schematic.appendWire(TL1.ID, 0, NI.ID, 0);
 
   Schematic.clearGraphs();
   // Input matching

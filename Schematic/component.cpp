@@ -248,20 +248,37 @@ QPoint Component::getPortLocation(int port_number) {
     break;
 
   case Coupler:
+    switch (port_number) {
+    case 0:
+    default:
+      P = QPoint(-10, 25);
+      break;
+    case 1:
+      P = QPoint(-10, -25);
+      break;
+    case 2:
+      P = QPoint(10, -25);
+      break;
+    case 3:
+      P = QPoint(10, 25);
+      break;
+    }
+    break;
+
   case CoupledLines:
     switch (port_number) {
     case 0:
     default:
-      P = QPoint(-10, -25);
-      break;
-    case 1:
-      P = QPoint(10, -25);
-      break;
-    case 2:
       P = QPoint(-10, 25);
       break;
-    case 3:
+    case 1:
       P = QPoint(10, 25);
+      break;
+    case 2:
+      P = QPoint(10, -25);
+      break;
+    case 3:
+      P = QPoint(-10, -25);
       break;
     }
   }

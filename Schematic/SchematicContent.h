@@ -41,6 +41,9 @@ public:
                // restricted to ladder networks
   QString getQucsNetlist();
 
+private:
+  void assignNetToWiresConnectedToNode(QString, QString);
+
 public:
   // Setter getter functions
 
@@ -71,6 +74,7 @@ public:
   QMap<QString, QPen> getDisplayGraphs();
   QMap<ComponentType, int>
       NumberComponents; // List for assigning IDs to the filter components
+  unsigned int NumberWires;
 
   // Frequency sweep
   struct SP_Analysis getSPAR_Sweep();

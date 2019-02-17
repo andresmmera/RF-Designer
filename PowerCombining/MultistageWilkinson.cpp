@@ -24,8 +24,7 @@ void PowerCombinerDesigner::MultistageWilkinson() {
   ComponentInfo Ground;
   ComponentInfo Cshunt, Lseries;
   ComponentInfo TL, TL_Upper, TL_Lower;
-  WireInfo WI;
-  NodeInfo NI, Nupper, Nlower;
+  NodeInfo NI, Nupper, Nlower, Nupper_, Nlower_;
 
   QString PreviousNode; // Auxiliar variable for connecting the current stage to
                         // the previous one in the for loop
@@ -86,7 +85,7 @@ void PowerCombinerDesigner::MultistageWilkinson() {
     Schematic.appendNode(NI);
 
     Schematic.appendWire(Cshunt.ID, 1, NI.ID, 0);
-    Schematic.appendWire(Cshunt.ID, 1, TermSpar1.ID, 0);
+    Schematic.appendWire(NI.ID, 1, TermSpar1.ID, 0);
 
     posx += 20;
   } else { // Ideal transmission lines
@@ -162,11 +161,20 @@ void PowerCombinerDesigner::MultistageWilkinson() {
           posx + 50, -75);
       Schematic.appendNode(Nupper);
 
-      // Capacitor to node
-      Schematic.appendWire(Cshunt.ID, 1, Nupper.ID, 0);
+      // Node
+      Nupper_.setParams(
+          QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]),
+          posx, -75);
+      Schematic.appendNode(Nupper_);
 
-      // Inductor to capacitor
-      Schematic.appendWire(Cshunt.ID, 1, Lseries.ID, 0);
+      // Capacitor to node
+      Schematic.appendWire(Cshunt.ID, 1, Nupper_.ID, 0);
+
+      // Inductor to node
+      Schematic.appendWire(Nupper_.ID, 0, Lseries.ID, 0);
+
+      // Nupper to Nupper_
+      Schematic.appendWire(Nupper_.ID, 0, Nupper.ID, 0);
 
       posx -= 50;
       // Lower branch
@@ -207,11 +215,19 @@ void PowerCombinerDesigner::MultistageWilkinson() {
           posx + 50, 75);
       Schematic.appendNode(Nlower);
 
+      Nlower_.setParams(
+          QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]),
+          posx, 75);
+      Schematic.appendNode(Nlower_);
+
       // Capacitor to node
-      Schematic.appendWire(Cshunt.ID, 1, Nlower.ID, 0);
+      Schematic.appendWire(Cshunt.ID, 1, Nlower_.ID, 0);
 
       // Inductor to capacitor
-      Schematic.appendWire(Cshunt.ID, 1, Lseries.ID, 0);
+      Schematic.appendWire(Nlower_.ID, 0, Lseries.ID, 0);
+
+      // Nlower to Nlower_
+      Schematic.appendWire(Nlower_.ID, 0, Nlower.ID, 0);
 
     } else { // Ideal TL
       posx += 50;

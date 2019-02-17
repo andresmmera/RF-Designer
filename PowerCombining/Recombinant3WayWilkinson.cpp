@@ -33,7 +33,7 @@ void PowerCombinerDesigner::Recombinant3WayWilkinson() {
   ComponentInfo TermSpar1(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, 0, 0,
       "N0", "gnd");
-  TermSpar1.val["Z0"] = num2str(Specs.Z0, Resistance);
+  TermSpar1.val["Z"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar1);
 
   ComponentInfo TL1(
@@ -104,11 +104,11 @@ void PowerCombinerDesigner::Recombinant3WayWilkinson() {
   ComponentInfo TermSpar2(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 300,
       -125, "N4", "gnd");
-  TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
+  TermSpar2.val["Z"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar2);
 
   Schematic.appendWire(TL4.ID, 1, N4.ID, 0);
-  Schematic.appendWire(TermSpar2.ID, 1, N4.ID, 0);
+  Schematic.appendWire(TermSpar2.ID, 0, N4.ID, 0);
 
   ComponentInfo TL5(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
@@ -140,7 +140,7 @@ void PowerCombinerDesigner::Recombinant3WayWilkinson() {
   ComponentInfo TermSpar3(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 300, 0,
       "N5", "gnd");
-  TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
+  TermSpar3.val["Z"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar3);
 
   Schematic.appendWire(N5.ID, 0, N8.ID, 0);
@@ -187,7 +187,7 @@ void PowerCombinerDesigner::Recombinant3WayWilkinson() {
   ComponentInfo TermSpar4(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 300, 125,
       "N6", "gnd");
-  TermSpar4.val["Z0"] = num2str(Specs.Z0, Resistance);
+  TermSpar4.val["Z"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar4);
 
   Schematic.appendWire(TermSpar4.ID, 0, N6.ID, 0);

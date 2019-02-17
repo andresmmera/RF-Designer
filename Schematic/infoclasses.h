@@ -25,7 +25,15 @@ public:
   double Rotation;
   QString Net1, Net2; // ID of the nodes where the component is connected
   std::vector<double> Coordinates;
-
+  int getNumberOfPorts() {
+    switch (Type) {
+    default:
+      return 2;
+    case CoupledLines:
+    case Coupler:
+      return 4;
+    }
+  };
   void setParams(QString ID_, ComponentType Type_, double Rotation_, double x,
                  double y,              // Coordinates
                  QString N1, QString N2 // Nodes
@@ -51,12 +59,12 @@ public:
     Connections = Nodes;
   };
 
-  QString getQucs() {
+  QString getQucsCode() {
     QString code;
     switch (Type) {
     case GND:
-      return QString(""); // Grounds are interpreted as a component in the sense
-                          // they have a graphical representation,
+      return QString(""); // Grounds are interpreted as a component in the
+                          // sense they have a graphical representation,
       // but they have no meaning in terms of the Qucs netlist
     case Capacitor:
       code = "C";
@@ -87,11 +95,13 @@ public:
       break;
     }
     code += QString(":%1").arg(ID);
-    for (int i = 0; i < Connections.size(); i++)
-      code += QString(" %1").arg(Connections[i]);
+    return code;
+  }
+  QString getQucsProperties() {
     std::map<QString, QString>::iterator it = val.begin();
-    QString prop; // Temporal variable to translate the internal property names
-                  // to Qucs property names
+    QString code;
+    QString prop; // Temporal variable to translate the internal property
+                  // names to Qucs property names
     while (it != val.end()) {
       prop = it->first;
       switch (Type) {
@@ -143,11 +153,21 @@ public:
     PortOrigin = OP, PortDestination = DP;
     WireColor = Color;
   };
+  void setID(QString id) { ID = id; };
+  QString getID() { return ID; };
+
+  void setNet(QString net) { Net = net; };
+  QString getNet() { return Net; };
+
   QString OriginID;
   int PortOrigin;
   QString DestinationID;
   int PortDestination;
   QColor WireColor;
+
+private:
+  QString ID;
+  QString Net;
 };
 
 class NodeInfo {
@@ -163,6 +183,7 @@ public:
     Coordinates[1] = y;
   };
   QString ID;
+  QString Net;
   std::vector<double> Coordinates;
 };
 #endif // INFOCLASSES_H

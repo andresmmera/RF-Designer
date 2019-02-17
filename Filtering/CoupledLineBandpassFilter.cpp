@@ -84,7 +84,7 @@ void CoupledLineBandpassFilter::synthesize() {
       posy += 20;
 
       // Wire: Series capacitor to SPAR term
-      Schematic.appendWire(Coupled_Lines.ID, 2, TermSpar1.ID, 0);
+      Schematic.appendWire(Coupled_Lines.ID, 0, TermSpar1.ID, 0);
       PreviousComponent = Coupled_Lines.ID;
       PreviousNode = NextNode;
       continue;
@@ -109,7 +109,7 @@ void CoupledLineBandpassFilter::synthesize() {
     Schematic.appendComponent(Coupled_Lines);
 
     // Wire: Series capacitor to SPAR term
-    Schematic.appendWire(Coupled_Lines.ID, 2, PreviousComponent, 1);
+    Schematic.appendWire(Coupled_Lines.ID, 0, PreviousComponent, 2);
 
     PreviousComponent = Coupled_Lines.ID;
     PreviousNode = NextNode;
@@ -140,7 +140,7 @@ void CoupledLineBandpassFilter::synthesize() {
 
   posx += 50;
   posy += 10;
-  Schematic.appendWire(PreviousComponent, 1, Coupled_Lines.ID, 2);
+  Schematic.appendWire(PreviousComponent, 2, Coupled_Lines.ID, 0);
 
   // Add Term 2
   double k = Specification.ZS;
@@ -155,7 +155,7 @@ void CoupledLineBandpassFilter::synthesize() {
   TermSpar2.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar2);
 
-  Schematic.appendWire(Coupled_Lines.ID, 1, TermSpar2.ID, 0);
+  Schematic.appendWire(Coupled_Lines.ID, 2, TermSpar2.ID, 0);
 
   Schematic.clearGraphs();
   Schematic.appendGraph(QString("S[2,1]"), QPen(Qt::red, 1, Qt::SolidLine));

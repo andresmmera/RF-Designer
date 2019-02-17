@@ -62,8 +62,6 @@ void PowerCombinerDesigner::Wilkinson() {
     Cshunt1.val["C"] = num2str(CC, Capacitance);
     Schematic.appendComponent(Cshunt1);
 
-    Schematic.appendWire(TermSpar1.ID, 0, Cshunt1.ID, 1);
-
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
                      GND, 0, 100, 65, "", "");
     Schematic.appendComponent(Ground);
@@ -76,6 +74,7 @@ void PowerCombinerDesigner::Wilkinson() {
     Schematic.appendNode(N1);
 
     Schematic.appendWire(Cshunt1.ID, 1, N1.ID, 0);
+    Schematic.appendWire(TermSpar1.ID, 0, N1.ID, 1);
 
     // Upper branch
     // Series inductor
@@ -101,10 +100,16 @@ void PowerCombinerDesigner::Wilkinson() {
         -75);
     Schematic.appendNode(N2);
 
+    NodeInfo N2_(
+        QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 200,
+        -75);
+    Schematic.appendNode(N2_);
+
     Schematic.appendWire(N1.ID, 0, Lseries1.ID, 1);
-    Schematic.appendWire(Lseries1.ID, 0, Cshunt2.ID, 1);
+    Schematic.appendWire(Lseries1.ID, 0, N2_.ID, 0);
     Schematic.appendWire(Cshunt2.ID, 0, Ground.ID, 0);
-    Schematic.appendWire(Cshunt2.ID, 1, N2.ID, 0);
+    Schematic.appendWire(Cshunt2.ID, 1, N2_.ID, 0);
+    Schematic.appendWire(N2_.ID, 0, N2.ID, 0);
 
     // Lower branch
     // Series inductor
@@ -130,10 +135,16 @@ void PowerCombinerDesigner::Wilkinson() {
         75);
     Schematic.appendNode(N3);
 
+    NodeInfo N3_(
+        QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 200,
+        75);
+    Schematic.appendNode(N3_);
+
     Schematic.appendWire(N1.ID, 0, Lseries2.ID, 1);
-    Schematic.appendWire(Lseries2.ID, 0, Cshunt3.ID, 1);
+    Schematic.appendWire(Lseries2.ID, 0, N3_.ID, 0);
     Schematic.appendWire(Cshunt3.ID, 0, Ground.ID, 0);
-    Schematic.appendWire(Cshunt3.ID, 1, N3.ID, 0);
+    Schematic.appendWire(Cshunt3.ID, 1, N3_.ID, 0);
+    Schematic.appendWire(N3_.ID, 0, N3.ID, 0);
 
     ComponentInfo Risolation(
         QString("R%1").arg(++Schematic.NumberComponents[Resistor]), Resistor, 0,
@@ -348,7 +359,7 @@ void PowerCombinerDesigner::Wilkinson() {
           -50, "N2", "gnd");
       TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
       Schematic.appendComponent(TermSpar2);
-      Schematic.appendWire(TL2.ID, 1, TermSpar2.ID, 0);
+      Schematic.appendWire(N2.ID, 1, TermSpar2.ID, 0);
 
       // Lower branch term
       TermSpar3.setParams(
@@ -356,7 +367,7 @@ void PowerCombinerDesigner::Wilkinson() {
           50, "N3", "gnd");
       TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
       Schematic.appendComponent(TermSpar3);
-      Schematic.appendWire(TL3.ID, 1, TermSpar3.ID, 0);
+      Schematic.appendWire(N3.ID, 1, TermSpar3.ID, 0);
     }
   }
 
