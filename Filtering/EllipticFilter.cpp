@@ -376,18 +376,15 @@ void EllipticFilter::SynthesizeEllipticFilter() {
 
   // Add Term 1 (Load)
   ComponentInfo TermSpar1(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0,
-      "N0", "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0);
   TermSpar1.val["Z"] = num2str(RL, Resistance);
   Schematic.appendComponent(TermSpar1);
   UnconnectedComponents[TermSpar1.ID] = 0;
   posx -= 100;
-  unsigned int Ni = 0;
 
   // M/2 sections starting from the load
   for (unsigned int j = 0; j < N; j += 2) {
-    InsertEllipticSection(posx, Ni, UnconnectedComponents, j, true, false);
-    Ni++;
+    InsertEllipticSection(posx, UnconnectedComponents, j, true, false);
 
     if ((Specification.FilterType == Lowpass) ||
         (Specification.FilterType == Highpass))
@@ -397,13 +394,12 @@ void EllipticFilter::SynthesizeEllipticFilter() {
   }
 
   // Central shunt capacitor
-  InsertEllipticSection(posx, Ni, UnconnectedComponents, N, false, true);
+  InsertEllipticSection(posx, UnconnectedComponents, N, false, true);
 
   // Now draw the last M/2 sections (after the central capacitor)
   for (unsigned int j = l + 2; j <= M; j += 2) {
-    InsertEllipticSection(posx, Ni, UnconnectedComponents, K, false, false);
+    InsertEllipticSection(posx, UnconnectedComponents, K, false, false);
     K = K - 2;
-    Ni++;
 
     if ((Specification.FilterType == Lowpass) ||
         (Specification.FilterType == Highpass))
@@ -416,7 +412,7 @@ void EllipticFilter::SynthesizeEllipticFilter() {
   // Add Term 2 (Source)
   ComponentInfo TermSpar2(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
-      0, QString("N%1").arg(Ni), "gnd");
+      0);
   TermSpar2.val["Z"] = num2str(Specification.ZS, Resistance);
   Schematic.appendComponent(TermSpar2);
 
@@ -432,60 +428,57 @@ void EllipticFilter::SynthesizeEllipticFilter() {
 // This function just handles the type of elliptic section to implement. That
 // could be done at SynthesizeEllipticFilter() but that'd be a complete mesh
 void EllipticFilter::InsertEllipticSection(
-    int &posx, unsigned int &Ni,
-    QMap<QString, unsigned int> &UnconnectedComponents, int j, bool flip,
-    bool CentralSection) {
+    int &posx, QMap<QString, unsigned int> &UnconnectedComponents, int j,
+    bool flip, bool CentralSection) {
 
   if (semilumped) {
     if (Specification.FilterType == Lowpass)
-      Insert_LowpassSemilumpedMinC_Section(posx, Ni, UnconnectedComponents, j,
-                                           flip, CentralSection);
+      Insert_LowpassSemilumpedMinC_Section(posx, UnconnectedComponents, j, flip,
+                                           CentralSection);
     if (Specification.FilterType == Highpass)
-      Insert_HighpassSemilumpedMinL_Section(posx, Ni, UnconnectedComponents, j,
+      Insert_HighpassSemilumpedMinL_Section(posx, UnconnectedComponents, j,
                                             flip, CentralSection);
     return;
   }
 
   if (Specification.FilterType == Lowpass && Specification.isCLC)
-    Insert_LowpassMinL_Section(posx, Ni, UnconnectedComponents, j, flip,
+    Insert_LowpassMinL_Section(posx, UnconnectedComponents, j, flip,
                                CentralSection);
   if (Specification.FilterType == Highpass && !Specification.isCLC)
-    Insert_HighpassMinC_Section(posx, Ni, UnconnectedComponents, j, flip,
+    Insert_HighpassMinC_Section(posx, UnconnectedComponents, j, flip,
                                 CentralSection);
   if (Specification.FilterType == Lowpass && !Specification.isCLC)
-    Insert_LowpassMinC_Section(posx, Ni, UnconnectedComponents, j, flip,
+    Insert_LowpassMinC_Section(posx, UnconnectedComponents, j, flip,
                                CentralSection);
   if (Specification.FilterType == Highpass && Specification.isCLC)
-    Insert_HighpassMinL_Section(posx, Ni, UnconnectedComponents, j, flip,
+    Insert_HighpassMinL_Section(posx, UnconnectedComponents, j, flip,
                                 CentralSection);
   if (Specification.FilterType == Bandpass && Specification.isCLC)
-    Insert_Bandpass_1_Section(posx, Ni, UnconnectedComponents, j, flip,
+    Insert_Bandpass_1_Section(posx, UnconnectedComponents, j, flip,
                               CentralSection);
   if (Specification.FilterType == Bandpass && !Specification.isCLC)
-    Insert_Bandpass_2_Section(posx, Ni, UnconnectedComponents, j, flip,
+    Insert_Bandpass_2_Section(posx, UnconnectedComponents, j, flip,
                               CentralSection);
   if (Specification.FilterType == Bandstop && Specification.isCLC)
-    Insert_Bandstop_1_Section(posx, Ni, UnconnectedComponents, j, flip,
+    Insert_Bandstop_1_Section(posx, UnconnectedComponents, j, flip,
                               CentralSection);
   if (Specification.FilterType == Bandstop && !Specification.isCLC)
-    Insert_Bandstop_2_Section(posx, Ni, UnconnectedComponents, j, flip,
+    Insert_Bandstop_2_Section(posx, UnconnectedComponents, j, flip,
                               CentralSection);
 }
 
 // Draw and generate the netlist of a lowpass min L elliptic section
 void EllipticFilter::Insert_LowpassMinL_Section(
-    int &posx, unsigned int &Ni,
-    QMap<QString, unsigned int> &UnconnectedComponents, unsigned int j,
-    bool flip, bool CentralSection) {
+    int &posx, QMap<QString, unsigned int> &UnconnectedComponents,
+    unsigned int j, bool flip, bool CentralSection) {
   ComponentInfo Cshunt, Ground, Lseries, Cseries;
   NodeInfo NI;
-  WireInfo WI;
   QMapIterator<QString, unsigned int> mapIT(UnconnectedComponents);
 
   if (CentralSection) {
     Cshunt.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, posx + 50, 50, QString("N%1").arg(Ni), "gnd");
+        0, posx + 50, 50);
     Cshunt.val["C"] = num2str(
         Cshunt_LP->at(j) * 1 / (2 * M_PI * Specification.fc * Specification.ZS),
         Capacitance);
@@ -493,7 +486,7 @@ void EllipticFilter::Insert_LowpassMinL_Section(
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx + 50, 100, "", "");
+                     GND, 0, posx + 50, 100);
     Schematic.appendComponent(Ground);
 
     //***** GND to capacitor *****
@@ -529,19 +522,17 @@ void EllipticFilter::Insert_LowpassMinL_Section(
 
   // Shunt capacitor
   (flip) ? posx += 50 : posx += 50;
-  if (!flip)
-    Ni++;
 
   if (Cshunt_LP->at(j) != 0) {
     Cshunt.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, posx, 50, QString("N%1").arg(Ni), "gnd");
+        0, posx, 50);
     Cshunt.val["C"] = num2str(Cshunt_LP->at(j), Capacitance);
     Schematic.appendComponent(Cshunt);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx, 100, "", "");
+                     GND, 0, posx, 100);
     Schematic.appendComponent(Ground);
   }
   // Node
@@ -554,13 +545,9 @@ void EllipticFilter::Insert_LowpassMinL_Section(
 
   (flip) ? posx -= 50 : posx += 50;
 
-  if (!flip)
-    Ni -= 1;
-
   // Series inductor
   Lseries.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                    Inductor, -90, posx, 0, QString("N%1").arg(Ni),
-                    QString("N%1").arg(Ni + 1));
+                    Inductor, -90, posx, 0);
   Lseries.val["L"] = num2str(Lseries_LP->at(j), Inductance);
   Schematic.appendComponent(Lseries);
 
@@ -568,7 +555,7 @@ void EllipticFilter::Insert_LowpassMinL_Section(
     // Series capacitor
     Cseries.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        90, posx, -80, QString("N%1").arg(Ni), QString("N%1").arg(Ni + 1));
+        90, posx, -80);
     Cseries.val["C"] = num2str(Cseries_LP->at(j), Capacitance);
     Schematic.appendComponent(Cseries);
   }
@@ -644,9 +631,8 @@ void EllipticFilter::Insert_LowpassMinL_Section(
 
 // Draw and generate the netlist of a lowpass min L elliptic section
 void EllipticFilter::Insert_HighpassMinC_Section(
-    int &posx, unsigned int &Ni,
-    QMap<QString, unsigned int> &UnconnectedComponents, unsigned int j,
-    bool flip, bool CentralSection) {
+    int &posx, QMap<QString, unsigned int> &UnconnectedComponents,
+    unsigned int j, bool flip, bool CentralSection) {
   ComponentInfo Lshunt, Ground, Lseries, Cseries;
   NodeInfo NI;
   WireInfo WI;
@@ -657,13 +643,13 @@ void EllipticFilter::Insert_HighpassMinC_Section(
 
   if (CentralSection) {
     Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                     Inductor, 0, posx + 50, 50, QString("N%1").arg(Ni), "gnd");
+                     Inductor, 0, posx + 50, 50);
     Lshunt.val["L"] = num2str(Kl / Cshunt_LP->at(j), Inductance);
     Schematic.appendComponent(Lshunt);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx + 50, 100, "", "");
+                     GND, 0, posx + 50, 100);
     Schematic.appendComponent(Ground);
 
     //***** GND to capacitor *****
@@ -697,18 +683,16 @@ void EllipticFilter::Insert_HighpassMinC_Section(
 
   // Shunt capacitor
   (flip) ? posx += 50 : posx += 50;
-  if (!flip)
-    Ni++;
 
   if (Cshunt_LP->at(j) != 0) {
     Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                     Inductor, 0, posx, 50, QString("N%1").arg(Ni), "gnd");
+                     Inductor, 0, posx, 50);
     Lshunt.val["L"] = num2str(Lshunt_HP, Inductance);
     Schematic.appendComponent(Lshunt);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx, 100, "", "");
+                     GND, 0, posx, 100);
     Schematic.appendComponent(Ground);
   }
   // Node
@@ -721,22 +705,18 @@ void EllipticFilter::Insert_HighpassMinC_Section(
 
   (flip) ? posx -= 50 : posx += 50;
 
-  if (!flip)
-    Ni -= 1;
-
   // Series inductor
   if (Cshunt_LP->at(j) != 0) {
     Lseries.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-        -90, posx, -80, QString("N%1").arg(Ni), QString("N%1").arg(Ni + 1));
+        -90, posx, -80);
     Lseries.val["L"] = num2str(Lseries_HP, Inductance);
     Schematic.appendComponent(Lseries);
   }
 
   // Series capacitor
   Cseries.setParams(QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-                    Capacitor, 90, posx, 0, QString("N%1").arg(Ni),
-                    QString("N%1").arg(Ni + 1));
+                    Capacitor, 90, posx, 0);
   Cseries.val["C"] = num2str(Cseries_HP, Capacitance);
   Schematic.appendComponent(Cseries);
 
@@ -794,12 +774,10 @@ void EllipticFilter::Insert_HighpassMinC_Section(
 }
 
 void EllipticFilter::Insert_LowpassMinC_Section(
-    int &posx, unsigned int &Ni,
-    QMap<QString, unsigned int> &UnconnectedComponents, unsigned int j,
-    bool flip, bool CentralSection) {
+    int &posx, QMap<QString, unsigned int> &UnconnectedComponents,
+    unsigned int j, bool flip, bool CentralSection) {
   ComponentInfo Lshunt, Ground, Lseries, Cshunt;
   NodeInfo NI;
-  WireInfo WI;
 
   double Kl = Specification.ZS / (2 * M_PI * Specification.fc);
   double Kc = 1 / (2 * M_PI * Specification.fc * Specification.ZS);
@@ -809,7 +787,7 @@ void EllipticFilter::Insert_LowpassMinC_Section(
   if (CentralSection) {
     Lseries.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-        -90, posx + 50, 0, QString("N%1").arg(Ni), QString("N%1").arg(Ni + 1));
+        -90, posx + 50, 0);
     Lseries.val["L"] = num2str(Kl * Cshunt_LP->at(j), Inductance);
     Schematic.appendComponent(Lseries);
 
@@ -820,7 +798,6 @@ void EllipticFilter::Insert_LowpassMinC_Section(
     UnconnectedComponents.clear(); // Remove previous section elements
     UnconnectedComponents[Lseries.ID] = 1;
     posx -= 100;
-    Ni++;
 
     return;
   }
@@ -835,7 +812,7 @@ void EllipticFilter::Insert_LowpassMinC_Section(
   if (Lseries_LP_MINC != 0) {
     Lseries.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-        -90, posx, 0, QString("N%1").arg(Ni), QString("N%1").arg(Ni + 1));
+        -90, posx, 0);
     Lseries.val["L"] = num2str(Lseries_LP_MINC, Inductance);
     Schematic.appendComponent(Lseries);
   }
@@ -862,8 +839,7 @@ void EllipticFilter::Insert_LowpassMinC_Section(
   // Shunt inductor
   if (Lshunt_LP_MINC != 0) {
     Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                     Inductor, 0, posx, 30, QString("N%1").arg(Ni + corr),
-                     QString("N%1R").arg(Ni + corr));
+                     Inductor, 0, posx, 30);
     Lshunt.val["L"] = num2str(Lshunt_LP_MINC, Inductance);
     Schematic.appendComponent(Lshunt);
   }
@@ -872,19 +848,18 @@ void EllipticFilter::Insert_LowpassMinC_Section(
   if (Lseries_LP_MINC != 0) {
     Cshunt.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, posx, 100, QString("N%1R").arg(Ni + corr), "gnd");
+        0, posx, 100);
   } else {
-    Ni--;
     Cshunt.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, posx, 100, QString("N%1").arg(Ni + corr), "gnd");
+        0, posx, 100);
   }
   Cshunt.val["C"] = num2str(Cshunt_LP_MINC, Capacitance);
   Schematic.appendComponent(Cshunt);
 
   // GND
   Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND,
-                   0, posx, 140, "", "");
+                   0, posx, 140);
   Schematic.appendComponent(Ground);
 
   //***** Inductor to node *****
@@ -924,29 +899,21 @@ void EllipticFilter::Insert_LowpassMinC_Section(
     if (mapIT.hasNext())
       mapIT.next();
     Schematic.appendWire(NI.ID, 0, mapIT.key(), mapIT.value());
-    if (j == Specification.order)
-      Ni++;
 
     UnconnectedComponents.clear();
     if (Lseries_LP_MINC != 0)
       UnconnectedComponents[Lseries.ID] = 1;
     else
       UnconnectedComponents[NI.ID] = 0;
-
-    if (j == Specification.order)
-      Ni--;
-
     posx -= 50;
   }
 }
 
 void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
-    int &posx, unsigned int &Ni,
-    QMap<QString, unsigned int> &UnconnectedComponents, unsigned int j,
-    bool flip, bool CentralSection) {
+    int &posx, QMap<QString, unsigned int> &UnconnectedComponents,
+    unsigned int j, bool flip, bool CentralSection) {
   ComponentInfo Lshunt, Lseries, Cshunt, Ground;
   NodeInfo NI;
-  WireInfo WI;
   double L_li, L_ci, lambda0 = SPEED_OF_LIGHT / Specification.fc;
 
   double Kl = Specification.ZS / (2 * M_PI * Specification.fc);
@@ -963,8 +930,7 @@ void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
     Lseries.Connections.clear();
     Lseries.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, -90, posx + 50, 0, QString("N%1").arg(Ni),
-        QString("N%1").arg(Ni + 1));
+        TransmissionLine, -90, posx + 50, 0);
     Lseries.val["Z0"] = num2str(Specification.maxZ, Resistance);
     Lseries.val["Length"] = ConvertLengthFromM("mm", L_li);
     Schematic.appendComponent(Lseries);
@@ -976,8 +942,6 @@ void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
     UnconnectedComponents.clear(); // Remove previous section elements
     UnconnectedComponents[Lseries.ID] = 1;
     posx -= 100;
-    Ni++;
-
     return;
   }
   // Scale lowpass prototype values
@@ -987,19 +951,17 @@ void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
 
   // Shunt capacitor
   (flip) ? posx += 50 : posx += 50;
-  // if (!flip) Ni++;
 
   if (Lseries_LP_MINC != 0) {
     // Microstrip Filters for RF/Microwave Applications. JIA-SHENG HONG. M. J.
-    // LANCASTER. JOHN WILEY & SONS, INC. 2001. page 119. Eq. 5.9
+    // LANCASTER. JOHN WILEY & SONS, INC. 2001. page 119. Eq. 5.9    Ni++;
     L_li = lambda0 / (2 * M_PI) *
            asin(2 * M_PI * Specification.fc * Lseries_LP_MINC /
                 Specification.maxZ);
     Lseries.Connections.clear();
     Lseries.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, 90, posx, 0, QString("N%1").arg(Ni),
-        QString("N%1").arg(Ni + 1));
+        TransmissionLine, 90, posx, 0);
     Lseries.val["Z0"] = num2str(Specification.maxZ, Resistance);
     Lseries.val["Length"] = ConvertLengthFromM("mm", L_li);
     Schematic.appendComponent(Lseries);
@@ -1024,8 +986,6 @@ void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
   else
     corr = 1;
 
-  //  if (!flip)  Ni-=1;
-
   // Shunt inductor
   if (Lshunt_LP_MINC != 0) {
     // Microstrip Filters for RF/Microwave Applications. JIA-SHENG HONG. M. J.
@@ -1036,8 +996,7 @@ void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
     Lshunt.Connections.clear();
     Lshunt.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, 0, posx, 30, QString("N%1").arg(Ni + corr),
-        QString("N%1R").arg(Ni + corr));
+        TransmissionLine, 0, posx, 30);
     Lshunt.val["Z0"] = num2str(Specification.maxZ, Resistance);
     Lshunt.val["Length"] = ConvertLengthFromM("mm", L_li);
     Schematic.appendComponent(Lshunt);
@@ -1051,19 +1010,18 @@ void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
     if (Lseries_LP_MINC != 0) {
       Cshunt.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 0, posx, 100, QString("N%1R").arg(Ni + corr), "gnd");
+          Capacitor, 0, posx, 100);
     } else {
-      Ni--;
       Cshunt.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 0, posx, 100, QString("N%1").arg(Ni + corr), "gnd");
+          Capacitor, 0, posx, 100);
     }
     Cshunt.val["C"] = num2str(Cshunt_LP_MINC, Capacitance);
     Schematic.appendComponent(Cshunt);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx, 140, "", "");
+                     GND, 0, posx, 140);
     Schematic.appendComponent(Ground);
     Schematic.appendWire(Ground.ID, 0, Cshunt.ID, 0);
 
@@ -1073,14 +1031,11 @@ void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
     if (Lseries_LP_MINC != 0) {
       Cshunt.setParams(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-          OpenStub, 0, posx, 100, QString("N%1R").arg(Ni + corr),
-          QString("NOPEN%1").arg(Ni));
+          OpenStub, 0, posx, 100);
     } else {
-      Ni--;
       Cshunt.setParams(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-          OpenStub, 0, posx, 100, QString("N%1").arg(Ni + corr),
-          QString("NOPEN%1").arg(Ni));
+          OpenStub, 0, posx, 100);
     }
     L_ci =
         lambda0 / (2 * M_PI) *
@@ -1124,28 +1079,20 @@ void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
       mapIT.next();
     Schematic.appendWire(NI.ID, 0, mapIT.key(), mapIT.value());
     if (j == Specification.order)
-      Ni++;
-
-    UnconnectedComponents.clear();
+      UnconnectedComponents.clear();
     if (Lseries_LP_MINC != 0)
       UnconnectedComponents[Lseries.ID] = 0;
     else
       UnconnectedComponents[NI.ID] = 0;
-
-    if (j == Specification.order)
-      Ni--;
-
     posx -= 50;
   }
 }
 
 void EllipticFilter::Insert_HighpassMinL_Section(
-    int &posx, unsigned int &Ni,
-    QMap<QString, unsigned int> &UnconnectedComponents, unsigned int j,
-    bool flip, bool CentralSection) {
+    int &posx, QMap<QString, unsigned int> &UnconnectedComponents,
+    unsigned int j, bool flip, bool CentralSection) {
   ComponentInfo Lshunt, Ground, Cseries, Cshunt;
   NodeInfo NI;
-  WireInfo WI;
 
   double Kl = Specification.ZS / (2 * M_PI * Specification.fc);
   double Kc = 1 / (2 * M_PI * Specification.fc * Specification.ZS);
@@ -1155,7 +1102,7 @@ void EllipticFilter::Insert_HighpassMinL_Section(
   if (CentralSection) {
     Cseries.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        90, posx + 50, 0, QString("N%1").arg(Ni), QString("N%1").arg(Ni + 1));
+        90, posx + 50, 0);
     Cseries.val["C"] = num2str(Kc / Cshunt_LP->at(j), Capacitance);
     Schematic.appendComponent(Cseries);
 
@@ -1166,7 +1113,6 @@ void EllipticFilter::Insert_HighpassMinL_Section(
     UnconnectedComponents.clear(); // Remove previous section elements
     UnconnectedComponents[Cseries.ID] = 0;
     posx -= 100;
-    Ni++;
 
     return;
   }
@@ -1181,7 +1127,7 @@ void EllipticFilter::Insert_HighpassMinL_Section(
   if (Cshunt_LP->at(j) != 0) {
     Cseries.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        90, posx, 0, QString("N%1").arg(Ni), QString("N%1").arg(Ni + 1));
+        90, posx, 0);
     Cseries.val["C"] = num2str(Cseries_HP_MINL, Capacitance);
     Schematic.appendComponent(Cseries);
   }
@@ -1206,13 +1152,10 @@ void EllipticFilter::Insert_HighpassMinL_Section(
   // Shunt inductor
   if (Cseries_LP->at(j) != 0) {
     Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                     Inductor, 0, posx, 30, QString("N%1").arg(Ni + corr),
-                     QString("N%1R").arg(Ni + corr));
+                     Inductor, 0, posx, 30);
   } else {
-    Ni--;
     Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                     Inductor, 0, posx, 30, QString("N%1").arg(Ni + corr),
-                     "gnd");
+                     Inductor, 0, posx, 30);
   }
   Lshunt.val["L"] = num2str(Lshunt_HP_MINL, Inductance);
   Schematic.appendComponent(Lshunt);
@@ -1221,14 +1164,14 @@ void EllipticFilter::Insert_HighpassMinL_Section(
   if (Cseries_LP->at(j) != 0) {
     Cshunt.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, posx, 100, QString("N%1R").arg(Ni + corr), "gnd");
+        0, posx, 100);
     Cshunt.val["C"] = num2str(Cshunt_HP_MINL, Capacitance);
     Schematic.appendComponent(Cshunt);
   }
 
   // GND
   Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND,
-                   0, posx, 140, "", "");
+                   0, posx, 140);
   Schematic.appendComponent(Ground);
 
   //***** Inductor to node *****
@@ -1271,28 +1214,23 @@ void EllipticFilter::Insert_HighpassMinL_Section(
     if (mapIT.hasNext())
       mapIT.next();
     Schematic.appendWire(NI.ID, 0, mapIT.key(), mapIT.value());
-    if (j == Specification.order)
-      Ni++;
 
     UnconnectedComponents.clear();
     if (Cshunt_LP->at(j) != 0)
       UnconnectedComponents[Cseries.ID] = 0;
     else
       UnconnectedComponents[NI.ID] = 0;
-    if (j == Specification.order)
-      Ni--;
+
     posx -= 50;
   }
 }
 
 void EllipticFilter::Insert_HighpassSemilumpedMinL_Section(
-    int &posx, unsigned int &Ni,
-    QMap<QString, unsigned int> &UnconnectedComponents, unsigned int j,
-    bool flip, bool CentralSection) {
+    int &posx, QMap<QString, unsigned int> &UnconnectedComponents,
+    unsigned int j, bool flip, bool CentralSection) {
 
   ComponentInfo Lshunt, Cseries, Cshunt, Ground;
   NodeInfo NI;
-  WireInfo WI;
 
   double Kl = Specification.ZS / (2 * M_PI * Specification.fc);
   double Kc = 1 / (2 * M_PI * Specification.fc * Specification.ZS);
@@ -1303,7 +1241,7 @@ void EllipticFilter::Insert_HighpassSemilumpedMinL_Section(
   if (CentralSection) {
     Cseries.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        90, posx + 50, 0, QString("N%1").arg(Ni), QString("N%1").arg(Ni + 1));
+        90, posx + 50, 0);
     Cseries.val["C"] = num2str(Kc / Cshunt_LP->at(j), Capacitance);
     Schematic.appendComponent(Cseries);
 
@@ -1314,7 +1252,6 @@ void EllipticFilter::Insert_HighpassSemilumpedMinL_Section(
     UnconnectedComponents.clear(); // Remove previous section elements
     UnconnectedComponents[Cseries.ID] = 0;
     posx -= 100;
-    Ni++;
 
     return;
   }
@@ -1329,7 +1266,7 @@ void EllipticFilter::Insert_HighpassSemilumpedMinL_Section(
   if (Cshunt_LP->at(j) != 0) {
     Cseries.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        90, posx, 0, QString("N%1").arg(Ni), QString("N%1").arg(Ni + 1));
+        90, posx, 0);
     Cseries.val["C"] = num2str(Cseries_HP_MINL, Capacitance);
     Schematic.appendComponent(Cseries);
   }
@@ -1355,13 +1292,11 @@ void EllipticFilter::Insert_HighpassSemilumpedMinL_Section(
   if (Cseries_LP->at(j) != 0) {
     Lshunt.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, 0, posx, 30, QString("N%1").arg(Ni + corr),
-        QString("N%1R").arg(Ni + corr));
+        TransmissionLine, 0, posx, 30);
   } else {
-    Ni--;
     Lshunt.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, 0, posx, 30, QString("N%1").arg(Ni + corr), "gnd");
+        TransmissionLine, 0, posx, 30);
   }
   L_li =
       lambda0 / (2 * M_PI) *
@@ -1376,13 +1311,13 @@ void EllipticFilter::Insert_HighpassSemilumpedMinL_Section(
     if (Specification.SemiLumpedISettings == ONLY_INDUCTORS) {
       Cshunt.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 0, posx, 100, QString("N%1R").arg(Ni + corr), "gnd");
+          Capacitor, 0, posx, 100);
       Cshunt.val["C"] = num2str(Cshunt_HP_MINL, Capacitance);
       Schematic.appendComponent(Cshunt);
 
       // GND
       Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                       GND, 0, posx, 140, "", "");
+                       GND, 0, posx, 140);
       Schematic.appendComponent(Ground);
       Schematic.appendWire(Ground.ID, 0, Cshunt.ID, 0);
     } else {
@@ -1393,8 +1328,7 @@ void EllipticFilter::Insert_HighpassSemilumpedMinL_Section(
                   Cshunt_HP_MINL);
       Cshunt.setParams(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-          OpenStub, 0, posx, 100, QString("N%1R").arg(Ni + corr),
-          QString("NOPEN%1").arg(Ni));
+          OpenStub, 0, posx, 100);
       Cshunt.val["Z0"] = num2str(Specification.minZ, Resistance);
       Cshunt.val["Length"] = ConvertLengthFromM("mm", L_ci);
       Schematic.appendComponent(Cshunt);
@@ -1429,27 +1363,21 @@ void EllipticFilter::Insert_HighpassSemilumpedMinL_Section(
     if (mapIT.hasNext())
       mapIT.next();
     Schematic.appendWire(NI.ID, 0, mapIT.key(), mapIT.value());
-    if (j == Specification.order)
-      Ni++;
 
     UnconnectedComponents.clear();
     if (Cshunt_LP->at(j) != 0)
       UnconnectedComponents[Cseries.ID] = 0;
     else
       UnconnectedComponents[NI.ID] = 0;
-    if (j == Specification.order)
-      Ni--;
     posx -= 50;
   }
 }
 
 void EllipticFilter::Insert_Bandpass_1_Section(
-    int &posx, unsigned int &Ni,
-    QMap<QString, unsigned int> &UnconnectedComponents, unsigned int j,
-    bool flip, bool CentralSection) {
+    int &posx, QMap<QString, unsigned int> &UnconnectedComponents,
+    unsigned int j, bool flip, bool CentralSection) {
   ComponentInfo Lshunt, Ground, Cseries1, Cseries2, Lseries1, Lseries2, Cshunt;
   NodeInfo NI;
-  WireInfo WI;
   QMapIterator<QString, unsigned int> mapIT(UnconnectedComponents);
 
   double Kl = Specification.ZS / (2 * M_PI * Specification.fc);
@@ -1470,25 +1398,25 @@ void EllipticFilter::Insert_Bandpass_1_Section(
     // Shunt resonator
     Cshunt.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, posx + 50, 50, QString("%1").arg(NI.ID), "gnd");
+        0, posx + 50, 50);
     Cshunt.val["C"] = num2str(Cshunt_BP_T1, Capacitance);
     Schematic.appendComponent(Cshunt);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx + 50, 100, "", "");
+                     GND, 0, posx + 50, 100);
     Schematic.appendComponent(Ground);
 
     Schematic.appendWire(Cshunt.ID, 0, Ground.ID, 0);
 
     Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                     Inductor, 0, posx, 50, QString("%1").arg(NI.ID), "gnd");
+                     Inductor, 0, posx, 50);
     Lshunt.val["L"] = num2str(Lshunt_BP_T1, Inductance);
     Schematic.appendComponent(Lshunt);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx, 100, "", "");
+                     GND, 0, posx, 100);
     Schematic.appendComponent(Ground);
 
     Schematic.appendWire(Lshunt.ID, 0, Ground.ID, 0);
@@ -1504,7 +1432,6 @@ void EllipticFilter::Insert_Bandpass_1_Section(
     UnconnectedComponents.clear(); // Remove previous section elements
     UnconnectedComponents[NI.ID] = 0;
     posx -= 200;
-    Ni++;
     return;
   }
 
@@ -1530,25 +1457,25 @@ void EllipticFilter::Insert_Bandpass_1_Section(
     // Shunt resonator
     Cshunt.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, posx - 50, 50, QString("%1").arg(NI.ID), "gnd");
+        0, posx - 50, 50);
     Cshunt.val["C"] = num2str(Cshunt_BP_T1, Capacitance);
     Schematic.appendComponent(Cshunt);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx - 50, 100, "", "");
+                     GND, 0, posx - 50, 100);
     Schematic.appendComponent(Ground);
 
     Schematic.appendWire(Cshunt.ID, 0, Ground.ID, 0);
 
     Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                     Inductor, 0, posx, 50, QString("%1").arg(NI.ID), "gnd");
+                     Inductor, 0, posx, 50);
     Lshunt.val["L"] = num2str(Lshunt_BP_T1, Inductance);
     Schematic.appendComponent(Lshunt);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx, 100, "", "");
+                     GND, 0, posx, 100);
     Schematic.appendComponent(Ground);
 
     Schematic.appendWire(Lshunt.ID, 0, Ground.ID, 0);
@@ -1564,63 +1491,51 @@ void EllipticFilter::Insert_Bandpass_1_Section(
     if (Cseries1_BP_T1 != 0) {
       Cseries1.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 90, posx + 75, -50,
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 1),
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 2));
+          Capacitor, 90, posx + 75, -50);
       Cseries1.val["C"] = num2str(Cseries1_BP_T1, Capacitance);
       Schematic.appendComponent(Cseries1);
 
       Lseries1.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-          -90, posx + 75, -100,
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 1),
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 2));
+          -90, posx + 75, -100);
       Lseries1.val["L"] = num2str(Lseries1_BP_T1, Inductance);
       Schematic.appendComponent(Lseries1);
     }
 
     Cseries2.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        90, posx + 40, 0, QString("NV%1").arg(virtual_nodes),
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 2));
+        90, posx + 40, 0);
     Cseries2.val["C"] = num2str(Cseries2_BP_T1, Capacitance);
     Schematic.appendComponent(Cseries2);
 
     Lseries2.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-        -90, posx + 110, 0, QString("NV%1").arg(virtual_nodes++),
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 1));
+        -90, posx + 110, 0);
     Lseries2.val["L"] = num2str(Lseries2_BP_T1, Inductance);
     Schematic.appendComponent(Lseries2);
   } else {
     if (Cseries1_BP_T1 != 0) {
       Cseries1.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 90, posx + 75, -50,
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 1),
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]));
+          Capacitor, 90, posx + 75, -50);
       Cseries1.val["C"] = num2str(Cseries1_BP_T1, Capacitance);
       Schematic.appendComponent(Cseries1);
 
       Lseries1.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-          -90, posx + 75, -100,
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 1),
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]));
+          -90, posx + 75, -100);
       Lseries1.val["L"] = num2str(Lseries1_BP_T1, Inductance);
       Schematic.appendComponent(Lseries1);
     }
     Cseries2.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        -90, posx + 40, 0, QString("NV%1").arg(virtual_nodes),
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 1));
+        -90, posx + 40, 0);
     Cseries2.val["C"] = num2str(Cseries2_BP_T1, Capacitance);
     Schematic.appendComponent(Cseries2);
 
     Lseries2.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-        -90, posx + 110, 0, QString("NV%1").arg(virtual_nodes++),
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]));
+        -90, posx + 110, 0);
     Lseries2.val["L"] = num2str(Lseries2_BP_T1, Inductance);
     Schematic.appendComponent(Lseries2);
   }
@@ -1673,18 +1588,13 @@ void EllipticFilter::Insert_Bandpass_1_Section(
     UnconnectedComponents.clear();
     UnconnectedComponents[NI.ID] = 0;
   }
-
-  if (j == Specification.order - 1)
-    Ni--;
 }
 
 void EllipticFilter::Insert_Bandpass_2_Section(
-    int &posx, unsigned int &Ni,
-    QMap<QString, unsigned int> &UnconnectedComponents, unsigned int j,
-    bool flip, bool CentralSection) {
+    int &posx, QMap<QString, unsigned int> &UnconnectedComponents,
+    unsigned int j, bool flip, bool CentralSection) {
   ComponentInfo Ground, Cshunt1, Cshunt2, Lshunt1, Lshunt2, Lseries, Cseries;
   NodeInfo NI;
-  WireInfo WI;
 
   double Kl = Specification.ZS / (2 * M_PI * Specification.fc);
   double Kc = 1 / (2 * M_PI * Specification.fc * Specification.ZS);
@@ -1699,17 +1609,13 @@ void EllipticFilter::Insert_Bandpass_2_Section(
     // Series resonator
     Lseries.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-        -90, posx + 50, 0,
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]),
-        QString("NV%1").arg(++virtual_nodes));
+        -90, posx + 50, 0);
     Lseries.val["L"] = num2str(Lseries_BP_T2, Inductance);
     Schematic.appendComponent(Lseries);
 
     Cseries.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        90, posx - 25, 0,
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] + 1),
-        QString("NV%1").arg(virtual_nodes));
+        90, posx - 25, 0);
     Cseries.val["C"] = num2str(Cseries_BP_T2, Capacitance);
     Schematic.appendComponent(Cseries);
 
@@ -1723,7 +1629,6 @@ void EllipticFilter::Insert_Bandpass_2_Section(
     UnconnectedComponents[Cseries.ID] = 0;
 
     posx -= 200;
-    Ni++;
 
     return;
   }
@@ -1747,32 +1652,26 @@ void EllipticFilter::Insert_Bandpass_2_Section(
 
       Lseries.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-          -90, posx - 0, 0,
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] + 1),
-          QString("NV%1").arg(++virtual_nodes));
+          -90, posx - 0, 0);
       Lseries.val["L"] = num2str(Lseries_BP_T2, Inductance);
       Schematic.appendComponent(Lseries);
 
       Cseries.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 90, posx - 75, 0, QString("NV%1").arg(virtual_nodes++),
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] + 2));
+          Capacitor, 90, posx - 75, 0);
       Cseries.val["C"] = num2str(Cseries_BP_T2, Capacitance);
       Schematic.appendComponent(Cseries);
 
     } else {
       Lseries.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-          -90, posx - 0, 0,
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]),
-          QString("NV%1").arg(++virtual_nodes));
+          -90, posx - 0, 0);
       Lseries.val["L"] = num2str(Lseries_BP_T2, Inductance);
       Schematic.appendComponent(Lseries);
 
       Cseries.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 90, posx - 75, 0, QString("NV%1").arg(virtual_nodes++),
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] + 1));
+          Capacitor, 90, posx - 75, 0);
       Cseries.val["C"] = num2str(Cseries_BP_T2, Capacitance);
       Schematic.appendComponent(Cseries);
     }
@@ -1807,16 +1706,13 @@ void EllipticFilter::Insert_Bandpass_2_Section(
       0) { // If Lshunt -> 0 and Cshunt->+infty we should skip these components.
     Cshunt1.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, posx + 75, 50,
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]),
-        QString("NV%1").arg(virtual_nodes));
+        0, posx + 75, 50);
     Cshunt1.val["C"] = num2str(Cshunt1_BP_T2, Capacitance);
     Schematic.appendComponent(Cshunt1);
 
     Lshunt1.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor, 0,
-        posx + 75, 100, QString("NV%1").arg(virtual_nodes),
-        QString("NV%1").arg(virtual_nodes + 1));
+        posx + 75, 100);
     Lshunt1.val["L"] = num2str(Lshunt1_BP_T2, Inductance);
     Schematic.appendComponent(Lshunt1);
     virtual_nodes++;
@@ -1827,41 +1723,39 @@ void EllipticFilter::Insert_Bandpass_2_Section(
   if (Lseries_BP_T2 != 0) {
     Cshunt2.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, posx + 40, 150, QString("NV%1").arg(virtual_nodes), "gnd");
+        0, posx + 40, 150);
     Cshunt2.val["C"] = num2str(Cshunt2_BP_T2, Capacitance);
     Schematic.appendComponent(Cshunt2);
   } else {
     Cshunt2.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, posx + 40, 150,
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]), "gnd");
+        0, posx + 40, 150);
     Cshunt2.val["C"] = num2str(Cshunt2_BP_T2, Capacitance);
     Schematic.appendComponent(Cshunt2);
   }
   // GND
   Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND,
-                   0, posx + 40, 200, "", "");
+                   0, posx + 40, 200);
   Schematic.appendComponent(Ground);
   Schematic.appendWire(Cshunt2.ID, 0, Ground.ID, 0);
 
   if (Lseries_BP_T2 != 0) {
     Lshunt2.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor, 0,
-        posx + 110, 150, QString("NV%1").arg(virtual_nodes++), "gnd");
+        posx + 110, 150);
     Lshunt2.val["L"] = num2str(Lshunt2_BP_T2, Inductance);
     Schematic.appendComponent(Lshunt2);
   } else {
     Lshunt2.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor, 0,
-        posx + 110, 150,
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]), "gnd");
+        posx + 110, 150);
     Lshunt2.val["L"] = num2str(Lshunt2_BP_T2, Inductance);
     Schematic.appendComponent(Lshunt2);
   }
 
   // GND
   Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND,
-                   0, posx + 110, 200, "", "");
+                   0, posx + 110, 200);
   Schematic.appendComponent(Ground);
 
   Schematic.appendWire(Lshunt2.ID, 0, Ground.ID, 0);
@@ -1908,20 +1802,13 @@ void EllipticFilter::Insert_Bandpass_2_Section(
   } else {
     UnconnectedComponents[Cseries.ID] = 0;
   }
-
-  if (((Specification.EllipticType == "Type B") ||
-       (Specification.EllipticType == "Type C")) &&
-      (j == Specification.order - 1))
-    Ni--;
 }
 
 void EllipticFilter::Insert_Bandstop_2_Section(
-    int &posx, unsigned int &Ni,
-    QMap<QString, unsigned int> &UnconnectedComponents, unsigned int j,
-    bool flip, bool CentralSection) {
+    int &posx, QMap<QString, unsigned int> &UnconnectedComponents,
+    unsigned int j, bool flip, bool CentralSection) {
   ComponentInfo Lshunt, Ground, Cseries1, Cseries2, Lseries1, Lseries2, Cshunt;
   NodeInfo NI;
-  WireInfo WI;
   QMapIterator<QString, unsigned int> mapIT(UnconnectedComponents);
 
   double Kl = Specification.ZS / (2 * M_PI * Specification.fc);
@@ -1935,21 +1822,18 @@ void EllipticFilter::Insert_Bandstop_2_Section(
     // Series resonator
     Cshunt.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, posx + 25, 100,
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]),
-        QString("NV%1").arg(++virtual_nodes));
+        0, posx + 25, 100);
     Cshunt.val["C"] = num2str(Cshunt_BS_T1, Capacitance);
     Schematic.appendComponent(Cshunt);
 
     Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                     Inductor, 0, posx + 25, 50,
-                     QString("NV%1").arg(virtual_nodes), "gnd");
+                     Inductor, 0, posx + 25, 50);
     Lshunt.val["L"] = num2str(Lshunt_BS_T1, Inductance);
     Schematic.appendComponent(Lshunt);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx + 25, 150, "", "");
+                     GND, 0, posx + 25, 150);
     Schematic.appendComponent(Ground);
 
     // Node
@@ -1970,7 +1854,6 @@ void EllipticFilter::Insert_Bandstop_2_Section(
     UnconnectedComponents.clear(); // Remove previous section elements
     UnconnectedComponents[NI.ID] = 0;
     posx -= 200;
-    Ni++;
 
     return;
   }
@@ -1998,31 +1881,26 @@ void EllipticFilter::Insert_Bandstop_2_Section(
       // Shunt resonator
       Cshunt.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 0, posx - 25, 100,
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 1),
-          QString("NV%1").arg(++virtual_nodes));
+          Capacitor, 0, posx - 25, 100);
       Cshunt.val["C"] = num2str(Cshunt_BS_T2, Capacitance);
       Schematic.appendComponent(Cshunt);
     } else {
       // Shunt resonator
       Cshunt.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 0, posx - 25, 100,
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 1),
-          QString("NV%1").arg(++virtual_nodes));
+          Capacitor, 0, posx - 25, 100);
       Cshunt.val["C"] = num2str(Cshunt_BS_T2, Capacitance);
       Schematic.appendComponent(Cshunt);
     }
 
     Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                     Inductor, 0, posx - 25, 50,
-                     QString("NV%1").arg(virtual_nodes), "gnd");
+                     Inductor, 0, posx - 25, 50);
     Lshunt.val["L"] = num2str(Lshunt_BS_T2, Inductance);
     Schematic.appendComponent(Lshunt);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx - 25, 150, "", "");
+                     GND, 0, posx - 25, 150);
     Schematic.appendComponent(Ground);
 
     Schematic.appendWire(Cshunt.ID, 0, Ground.ID, 0);
@@ -2036,66 +1914,52 @@ void EllipticFilter::Insert_Bandstop_2_Section(
   if (flip) {
     Cseries1.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        90, posx + 75, -50,
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 1),
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]));
+        90, posx + 75, -50);
     Cseries1.val["C"] = num2str(Cseries1_BS_T2, Capacitance);
     Schematic.appendComponent(Cseries1);
 
     Lseries1.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-        -90, posx + 75, -100,
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 1),
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]));
+        -90, posx + 75, -100);
     Lseries1.val["L"] = num2str(Lseries1_BS_T2, Inductance);
     Schematic.appendComponent(Lseries1);
 
     if (Cshunt_BS_T2 != 0) {
       Lseries2.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-          -90, posx + 110, 0, QString("NV%1").arg(++virtual_nodes),
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 1));
+          -90, posx + 110, 0);
       Lseries2.val["L"] = num2str(Lseries2_BS_T2, Inductance);
       Schematic.appendComponent(Lseries2);
 
       Cseries2.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 90, posx + 40, 0,
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]),
-          QString("NV%1").arg(virtual_nodes));
+          Capacitor, 90, posx + 40, 0);
       Cseries2.val["C"] = num2str(Cseries2_BS_T2, Capacitance);
       Schematic.appendComponent(Cseries2);
     }
   } else {
     Cseries1.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        90, posx + 75, -50,
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 2),
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 1));
+        90, posx + 75, -50);
     Cseries1.val["C"] = num2str(Cseries1_BS_T2, Capacitance);
     Schematic.appendComponent(Cseries1);
 
     Lseries1.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-        -90, posx + 75, -100,
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 2),
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 1));
+        -90, posx + 75, -100);
     Lseries1.val["L"] = num2str(Lseries1_BS_T2, Inductance);
     Schematic.appendComponent(Lseries1);
 
     if (Cshunt_BS_T2 != 0) {
       Lseries2.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-          -90, posx + 110, 0, QString("NV%1").arg(++virtual_nodes),
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 2));
+          -90, posx + 110, 0);
       Lseries2.val["L"] = num2str(Lseries2_BS_T2, Inductance);
       Schematic.appendComponent(Lseries2);
 
       Cseries2.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 90, posx + 40, 0,
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] - 1),
-          QString("NV%1").arg(virtual_nodes));
+          Capacitor, 90, posx + 40, 0);
       Cseries2.val["C"] = num2str(Cseries2_BS_T2, Capacitance);
       Schematic.appendComponent(Cseries2);
     }
@@ -2147,15 +2011,11 @@ void EllipticFilter::Insert_Bandstop_2_Section(
 
     UnconnectedComponents[NI.ID] = 0;
   }
-
-  if (j == Specification.order - 1)
-    Ni--;
 }
 
 void EllipticFilter::Insert_Bandstop_1_Section(
-    int &posx, unsigned int &Ni,
-    QMap<QString, unsigned int> &UnconnectedComponents, unsigned int j,
-    bool flip, bool CentralSection) {
+    int &posx, QMap<QString, unsigned int> &UnconnectedComponents,
+    unsigned int j, bool flip, bool CentralSection) {
   ComponentInfo Ground, Cshunt1, Cshunt2, Lshunt1, Lshunt2, Lseries, Cseries;
   NodeInfo NI;
   QMapIterator<QString, unsigned int> mapIT(UnconnectedComponents);
@@ -2171,17 +2031,13 @@ void EllipticFilter::Insert_Bandstop_1_Section(
     // Series resonator
     Cseries.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        90, posx + 25, -50,
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]),
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] + 1));
+        90, posx + 25, -50);
     Cseries.val["C"] = num2str(Cseries_BS_T1, Capacitance);
     Schematic.appendComponent(Cseries);
 
     Lseries.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-        -90, posx + 25, 0,
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]),
-        QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] + 1));
+        -90, posx + 25, 0);
     Lseries.val["L"] = num2str(Lseries_BS_T1, Inductance);
     Schematic.appendComponent(Lseries);
 
@@ -2198,7 +2054,6 @@ void EllipticFilter::Insert_Bandstop_1_Section(
     UnconnectedComponents[Cseries.ID] = 0;
 
     posx -= 200;
-    Ni++;
 
     return;
   }
@@ -2221,34 +2076,26 @@ void EllipticFilter::Insert_Bandstop_1_Section(
       // Series resonator
       Cseries.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 90, posx - 25, -50,
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]),
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] + 1));
+          Capacitor, 90, posx - 25, -50);
       Cseries.val["C"] = num2str(Cseries_BS_T1, Capacitance);
       Schematic.appendComponent(Cseries);
 
       Lseries.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-          -90, posx - 25, 0,
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]),
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] + 1));
+          -90, posx - 25, 0);
       Lseries.val["L"] = num2str(Lseries_BS_T1, Inductance);
       Schematic.appendComponent(Lseries);
     } else {
       // Series resonator
       Cseries.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 90, posx - 25, -50,
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] + 1),
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] + 2));
+          Capacitor, 90, posx - 25, -50);
       Cseries.val["C"] = num2str(Cseries_BS_T1, Capacitance);
       Schematic.appendComponent(Cseries);
 
       Lseries.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-          -90, posx - 25, 0,
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] + 1),
-          QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes] + 2));
+          -90, posx - 25, 0);
       Lseries.val["L"] = num2str(Lseries_BS_T1, Inductance);
       Schematic.appendComponent(Lseries);
     }
@@ -2279,23 +2126,19 @@ void EllipticFilter::Insert_Bandstop_1_Section(
     Schematic.appendWire(NI.ID, 0, mapIT.key(), mapIT.value());
   }
 
-  Cshunt1.setParams(
-      QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor, 0,
-      posx + 75, 50,
-      QString("N%1").arg(Schematic.NumberComponents[ConnectionNodes]),
-      QString("NV%1").arg(++virtual_nodes));
+  Cshunt1.setParams(QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
+                    Capacitor, 0, posx + 75, 50);
   Cshunt1.val["C"] = num2str(Cshunt1_BS_T1, Capacitance);
   Schematic.appendComponent(Cshunt1);
 
   if (Lseries_BS_T1 != 0) {
     Lshunt1.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor, 0,
-        posx + 75, 100, QString("NV%1").arg(virtual_nodes),
-        QString("NV%1").arg(virtual_nodes + 1));
+        posx + 75, 100);
   } else {
     Lshunt1.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor, 0,
-        posx + 75, 100, QString("NV%1").arg(virtual_nodes), "gnd");
+        posx + 75, 100);
   }
   virtual_nodes++;
   Lshunt1.val["L"] = num2str(Lshunt1_BS_T1, Inductance);
@@ -2307,25 +2150,25 @@ void EllipticFilter::Insert_Bandstop_1_Section(
   if (Lseries_BS_T1 != 0) {
     Cshunt2.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, posx + 40, 150, QString("NV%1").arg(virtual_nodes), "gnd");
+        0, posx + 40, 150);
     Cshunt2.val["C"] = num2str(Cshunt2_BS_T1, Capacitance);
     Schematic.appendComponent(Cshunt2);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx + 40, 200, "", "");
+                     GND, 0, posx + 40, 200);
     Schematic.appendComponent(Ground);
     Schematic.appendWire(Cshunt2.ID, 0, Ground.ID, 0);
 
     Lshunt2.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor, 0,
-        posx + 110, 150, QString("NV%1").arg(virtual_nodes), "gnd");
+        posx + 110, 150);
     Lshunt2.val["L"] = num2str(Lshunt2_BS_T1, Inductance);
     Schematic.appendComponent(Lshunt2);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx + 110, 200, "", "");
+                     GND, 0, posx + 110, 200);
     Schematic.appendComponent(Ground);
 
     // Insert a node
@@ -2345,7 +2188,7 @@ void EllipticFilter::Insert_Bandstop_1_Section(
   } else { // Cshunt -> +infty and Lshunt -> 0
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx + 75, 200, "", "");
+                     GND, 0, posx + 75, 200);
     Schematic.appendComponent(Ground);
 
     Schematic.appendWire(Lshunt1.ID, 0, Ground.ID, 0);
@@ -2382,9 +2225,4 @@ void EllipticFilter::Insert_Bandstop_1_Section(
     UnconnectedComponents[Lseries.ID] = 1;
     UnconnectedComponents[Cseries.ID] = 0;
   }
-
-  if (((Specification.EllipticType == "Type B") ||
-       (Specification.EllipticType == "Type C")) &&
-      (j == Specification.order - 1))
-    Ni--;
 }

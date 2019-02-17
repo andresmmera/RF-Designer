@@ -62,7 +62,7 @@ void QuarterWaveFilters::synthesize() {
 
   ComponentInfo TermSpar1(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
-      0, "NS", "gnd");
+      0);
   TermSpar1.val["Z"] = num2str(Z0, Resistance);
   Schematic.appendComponent(TermSpar1);
   PreviousComp = TermSpar1.ID;
@@ -75,8 +75,7 @@ void QuarterWaveFilters::synthesize() {
     QW_TL.Connections.clear();
     QW_TL.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, 90, posx, 0, QString("%1").arg(PreviousNode),
-        CurrentNode);
+        TransmissionLine, 90, posx, 0);
     QW_TL.val["Z0"] = num2str(Z0, Resistance);
     QW_TL.val["Length"] = ConvertLengthFromM("mm", lambda4);
     Schematic.appendComponent(QW_TL);
@@ -102,7 +101,7 @@ void QuarterWaveFilters::synthesize() {
       SC_Stub.Connections.clear();
       SC_Stub.setParams(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-          ShortStub, 0, posx + 50, 50, CurrentNode, QString("gnd"));
+          ShortStub, 0, posx + 50, 50);
       SC_Stub.val["Z0"] = num2str(Z, Resistance);
       SC_Stub.val["Length"] = ConvertLengthFromM("mm", lambda4);
       Schematic.appendComponent(SC_Stub);
@@ -116,7 +115,7 @@ void QuarterWaveFilters::synthesize() {
       OC_Stub.Connections.clear();
       OC_Stub.setParams(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-          OpenStub, 0, posx + 50, 50, CurrentNode, QString("NOPEN%1").arg(k));
+          OpenStub, 0, posx + 50, 50);
       OC_Stub.val["Z0"] = num2str(Z, Resistance);
       OC_Stub.val["Length"] = ConvertLengthFromM("mm", lambda4);
       Schematic.appendComponent(OC_Stub);
@@ -134,15 +133,14 @@ void QuarterWaveFilters::synthesize() {
   QW_TL.Connections.clear();
   QW_TL.setParams(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 90, posx, 0, QString("%1").arg(PreviousNode),
-      QString("N%1").arg(N));
+      TransmissionLine, 90, posx, 0);
   QW_TL.val["Z0"] = num2str(Z0, Resistance);
   QW_TL.val["Length"] = ConvertLengthFromM("mm", lambda4);
   Schematic.appendComponent(QW_TL);
 
   ComponentInfo TermSpar2(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0,
-      posx + 50, 0, QString("N%1").arg(N), "gnd");
+      posx + 50, 0);
   TermSpar2.val["Z"] = num2str(Z0, Resistance);
   Schematic.appendComponent(TermSpar2);
 

@@ -47,7 +47,7 @@ void SteppedImpedanceFilter::synthesize() {
   // Add Term 1
   ComponentInfo TermSpar1(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
-      0, "NS", "gnd");
+      0);
   TermSpar1.val["Z"] = num2str(Specification.ZS, Resistance);
   Schematic.appendComponent(TermSpar1);
   PreviousComponent = TermSpar1.ID;
@@ -75,8 +75,7 @@ void SteppedImpedanceFilter::synthesize() {
     TL.Connections.clear();
     TL.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, 90, posx, 0, QString("%1").arg(PreviousNode),
-        CurrentNode);
+        TransmissionLine, 90, posx, 0);
     TL.val["Z0"] = num2str(Zline, Resistance);
     TL.val["Length"] = ConvertLengthFromM("mm", TL_length);
     Schematic.appendComponent(TL);
@@ -94,8 +93,7 @@ void SteppedImpedanceFilter::synthesize() {
     (Specification.isCLC) ? k /= gi[N + 1] : k *= gi[N + 1];
 
   ComponentInfo TermSpar2(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0,
-      QString("N%1").arg(N), "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0);
   TermSpar2.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar2);
   Schematic.appendWire(TermSpar2.ID, 0, PreviousComponent, 1);

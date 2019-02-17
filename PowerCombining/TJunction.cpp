@@ -25,14 +25,13 @@ void PowerCombinerDesigner::TJunction() {
   ComponentInfo TL4, TL5; // Auxiliar lines for matching in case of K!=1
 
   ComponentInfo TermSpar1(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, 0, 0,
-      "N0", "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, 0, 0);
   TermSpar1.val["Z0"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar1);
 
   ComponentInfo TL1(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 90, 25, 0, "N0", "N1");
+      TransmissionLine, 90, 25, 0);
   TL1.val["Z0"] = num2str(Specs.Z0, Resistance);
   TL1.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL1);
@@ -41,7 +40,7 @@ void PowerCombinerDesigner::TJunction() {
 
   ComponentInfo TL2(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 90, 100, -50, "N1", "N2");
+      TransmissionLine, 90, 100, -50);
   TL2.val["Z0"] = num2str(Specs.Z0 * (K + 1), Resistance);
   TL2.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL2);
@@ -50,7 +49,7 @@ void PowerCombinerDesigner::TJunction() {
 
   ComponentInfo TL3(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 90, 100, 50, "N1", "N3");
+      TransmissionLine, 90, 100, 50);
   TL3.val["Z0"] = num2str(Specs.Z0 * (K + 1) / K, Resistance);
   TL3.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL3);
@@ -62,7 +61,7 @@ void PowerCombinerDesigner::TJunction() {
   if (K != 1) { // Requires matching
     TL4.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, 90, 175, -50, "N2", "N4");
+        TransmissionLine, 90, 175, -50);
     TL4.val["Z0"] =
         num2str(sqrt(2 * Specs.Z0 * Specs.Z0 * (K + 1)), Resistance);
     TL4.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
@@ -72,7 +71,7 @@ void PowerCombinerDesigner::TJunction() {
 
     TL5.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, 90, 175, 50, "N3", "N5");
+        TransmissionLine, 90, 175, 50);
     TL5.val["Z0"] =
         num2str(sqrt(2 * Specs.Z0 * Specs.Z0 * (K + 1) / K), Resistance);
     TL5.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
@@ -87,7 +86,7 @@ void PowerCombinerDesigner::TJunction() {
 
   ComponentInfo TermSpar2(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0,
-      xpos_term + 25, -50, QString("N%1").arg(index_t2), "gnd");
+      xpos_term + 25, -50);
   TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar2);
 
@@ -97,7 +96,7 @@ void PowerCombinerDesigner::TJunction() {
 
   ComponentInfo TermSpar3(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0,
-      xpos_term + 25, 50, QString("N%1").arg(index_t3), "gnd");
+      xpos_term + 25, 50);
 
   TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar3);

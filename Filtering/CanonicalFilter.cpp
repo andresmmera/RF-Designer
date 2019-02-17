@@ -83,13 +83,12 @@ void CanonicalFilter::SynthesizeLPF() {
 
   ComponentInfo TermSpar1(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
-      0, "N0", "gnd");
+      0);
   TermSpar1.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar1);
 
   ConnectionAux = TermSpar1.ID;
 
-  unsigned int Ni = 0;
   int Kcontrol = 0;
   if (!Specification.UseZverevTables)
     Kcontrol = 0;
@@ -108,8 +107,7 @@ void CanonicalFilter::SynthesizeLPF() {
           (Specification.SemiLumpedISettings == INDUCTORS_AND_SHUNT_CAPS)) {
         Cshunt.setParams(QString("TLIN%1").arg(
                              ++Schematic.NumberComponents[TransmissionLine]),
-                         OpenStub, 0.0, posx, 50, QString("N%1").arg(Ni),
-                         QString("NOPEN%1").arg(Ni));
+                         OpenStub, 0.0, posx, 50);
         // Microstrip Filters for RF/Microwave Applications. JIA-SHENG HONG. M.
         // J. LANCASTER. JOHN WILEY & SONS, INC. 2001. page 119. Eq. 5.9
         L_ci =
@@ -121,13 +119,13 @@ void CanonicalFilter::SynthesizeLPF() {
         // Lumped capacitor
         Cshunt.setParams(
             QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-            Capacitor, 0.0, posx, 50, QString("N%1").arg(Ni), "gnd");
+            Capacitor, 0.0, posx, 50);
         Cshunt.val["C"] = num2str(gi[k + 1], Capacitance);
 
         // GND
         Ground.setParams(
             QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND, 0,
-            posx, 100, "", "");
+            posx, 100);
         Schematic.appendComponent(Ground);
 
         //***** GND to capacitor *****
@@ -162,20 +160,17 @@ void CanonicalFilter::SynthesizeLPF() {
             asin(2 * M_PI * Specification.fc * gi[k + 1] / Specification.maxZ);
         Lseries.setParams(QString("TLIN%1").arg(
                               ++Schematic.NumberComponents[TransmissionLine]),
-                          TransmissionLine, -90, posx, 0,
-                          QString("N%1").arg(Ni), QString("N%1").arg(Ni + 1));
+                          TransmissionLine, -90, posx, 0);
         Lseries.val["Z0"] = num2str(Specification.maxZ, Resistance);
         Lseries.val["Length"] = ConvertLengthFromM("mm", L_li);
       } else {
         Lseries.setParams(
             QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-            Inductor, -90, posx, 0, QString("N%1").arg(Ni),
-            QString("N%1").arg(Ni + 1));
+            Inductor, -90, posx, 0);
 
         Lseries.val["L"] = num2str(gi[k + 1], Inductance);
       }
       Schematic.appendComponent(Lseries);
-      Ni++;
       // Wiring
       Schematic.appendWire(ConnectionAux, 0, Lseries.ID, 1);
       ConnectionAux = Lseries.ID;
@@ -190,8 +185,7 @@ void CanonicalFilter::SynthesizeLPF() {
     (Specification.isCLC) ? k /= gi[N + 1] : k *= gi[N + 1];
 
   ComponentInfo TermSpar2(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0,
-      QString("N%1").arg(Ni), "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0);
   TermSpar2.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar2);
 
@@ -212,12 +206,11 @@ void CanonicalFilter::SynthesizeHPF() {
   // Add Term 1
   ComponentInfo TermSpar1(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, -180, posx,
-      0, "N0", "gnd");
+      0);
   TermSpar1.val["Z"] = num2str(Specification.ZS, Resistance);
   Schematic.appendComponent(TermSpar1);
 
   ConnectionAux = TermSpar1.ID;
-  unsigned int Ni = 0; // Node index
   posx += 50;
   for (int k = 0; k < N; k++) {
 
@@ -229,7 +222,7 @@ void CanonicalFilter::SynthesizeHPF() {
       if (semilumped == true) {
         Lshunt.setParams(QString("TLIN%1").arg(
                              ++Schematic.NumberComponents[TransmissionLine]),
-                         ShortStub, 0, posx, 50, QString("N%1").arg(Ni), "gnd");
+                         ShortStub, 0, posx, 50);
         // Microstrip Filters for RF/Microwave Applications. JIA-SHENG HONG. M.
         // J. LANCASTER. JOHN WILEY & SONS, INC. 2001. page 119. Eq. 5.9
         L_li =
@@ -240,13 +233,13 @@ void CanonicalFilter::SynthesizeHPF() {
       } else {
         Lshunt.setParams(
             QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-            Inductor, 0, posx, 50, QString("N%1").arg(Ni), "gnd");
+            Inductor, 0, posx, 50);
         Lshunt.val["L"] = num2str(gi[k + 1], Inductance);
 
         // GND
         Ground.setParams(
             QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND, 0,
-            posx, 100, "", "");
+            posx, 100);
         Schematic.appendComponent(Ground);
 
         //***** GND to capacitor *****
@@ -274,14 +267,11 @@ void CanonicalFilter::SynthesizeHPF() {
       Cseries.Connections.clear();
       Cseries.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 90, posx, 0, QString("N%1").arg(Ni),
-          QString("N%1").arg(Ni + 1));
+          Capacitor, 90, posx, 0);
       gi[k + 1] =
           1 / (2 * M_PI * Specification.fc * gi[k + 1] * Specification.ZS);
       Cseries.val["C"] = num2str(gi[k + 1], Capacitance);
       Schematic.appendComponent(Cseries);
-
-      Ni++;
 
       // Wiring
       Schematic.appendWire(ConnectionAux, 0, Cseries.ID, 0);
@@ -295,8 +285,7 @@ void CanonicalFilter::SynthesizeHPF() {
   Specification.isCLC ? k /= gi[N + 1] : k *= gi[N + 1];
 
   ComponentInfo TermSpar2(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0,
-      QString("N%1").arg(Ni), "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0);
   TermSpar2.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar2);
 
@@ -315,13 +304,12 @@ void CanonicalFilter::SynthesizeBPF() {
   // Add Term 1
   ComponentInfo TermSpar1(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, -180, posx,
-      0, "N0", "gnd");
+      0);
   TermSpar1.val["Z"] = num2str(Specification.ZS, Resistance);
   Schematic.appendComponent(TermSpar1);
 
   ConnectionAux = TermSpar1.ID;
 
-  unsigned int Ni = 0;
   double wc = 2 * M_PI * Specification.fc;
   double delta = 2 * M_PI * Specification.bw;
   double w0 = sqrt(wc * wc - .25 * delta * delta);
@@ -335,28 +323,28 @@ void CanonicalFilter::SynthesizeBPF() {
       Cshunt.Connections.clear();
       Cshunt.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 0, posx - 25, 50, QString("N%1").arg(Ni), "gnd");
+          Capacitor, 0, posx - 25, 50);
       Cshunt.val["C"] =
           num2str(gi[k + 1] / (delta * Specification.ZS), Capacitance);
       Schematic.appendComponent(Cshunt);
 
       // GND
       Ground1.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                        GND, 0, posx - 25, 100, "", "");
+                        GND, 0, posx - 25, 100);
       Schematic.appendComponent(Ground1);
 
       // Shunt inductor
       Lshunt.Connections.clear();
       Lshunt.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-          0, posx + 25, 50, QString("N%1").arg(Ni), "gnd");
+          0, posx + 25, 50);
       Lshunt.val["L"] =
           num2str(Specification.ZS * delta / (w0 * w0 * gi[k + 1]), Inductance);
       Schematic.appendComponent(Lshunt);
 
       // GND
       Ground2.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                        GND, 0, posx + 25, 100, "", "");
+                        GND, 0, posx + 25, 100);
       Schematic.appendComponent(Ground2);
 
       // Node
@@ -390,8 +378,7 @@ void CanonicalFilter::SynthesizeBPF() {
       Lseries.Connections.clear();
       Lseries.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-          -90, posx - 30, 0, QString("N%1").arg(Ni),
-          QString("N%1").arg(Ni + 1));
+          -90, posx - 30, 0);
       Lseries.val["L"] =
           num2str(gi[k + 1] * Specification.ZS / (delta), Inductance);
       Schematic.appendComponent(Lseries);
@@ -400,13 +387,10 @@ void CanonicalFilter::SynthesizeBPF() {
       Cseries.Connections.clear();
       Cseries.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 90, posx + 30, 0, QString("N%1").arg(Ni + 1),
-          QString("N%1").arg(Ni + 2));
+          Capacitor, 90, posx + 30, 0);
       Cseries.val["C"] = num2str(
           delta / (w0 * w0 * Specification.ZS * gi[k + 1]), Capacitance);
       Schematic.appendComponent(Cseries);
-
-      Ni += 2;
 
       // Wiring
       Schematic.appendWire(ConnectionAux, 0, Lseries.ID, 1);
@@ -420,8 +404,7 @@ void CanonicalFilter::SynthesizeBPF() {
   Specification.isCLC ? k /= gi[N + 1] : k *= gi[N + 1];
 
   ComponentInfo TermSpar2(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0,
-      QString("N%1").arg(Ni), "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0);
   TermSpar2.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar2);
   Schematic.appendWire(ConnectionAux, 1, TermSpar2.ID, 0);
@@ -438,14 +421,13 @@ void CanonicalFilter::SynthesizeBSF() {
   // Add Term 1
   ComponentInfo TermSpar1(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, -180, posx,
-      0, "N0", "gnd");
+      0);
   TermSpar1.val["Z"] = num2str(Specification.ZS, Resistance);
   Schematic.appendComponent(TermSpar1);
 
   QMap<QString, unsigned int> UnconnectedComponents;
   UnconnectedComponents[TermSpar1.ID] = 0;
 
-  unsigned int Ni = 0;
   double wc = 2 * M_PI * Specification.fc;
   double delta = 2 * M_PI * Specification.bw;
   double w0 = sqrt(wc * wc - .25 * delta * delta);
@@ -459,25 +441,24 @@ void CanonicalFilter::SynthesizeBSF() {
       Cshunt.Connections.clear();
       Cshunt.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 0, posx, 100, QString("N%1").arg(Ni + 1), "gnd");
+          Capacitor, 0, posx, 100);
       Cshunt.val["C"] = num2str(
           gi[k + 1] * delta / (w0 * w0 * Specification.ZS), Capacitance);
       Schematic.appendComponent(Cshunt);
 
       // GND
       Ground1.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                        GND, 0, posx, 150, "", "");
+                        GND, 0, posx, 150);
       Schematic.appendComponent(Ground1);
 
       // Shunt inductor
       Lshunt.Connections.clear();
       Lshunt.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-          0, posx, 50, QString("N%1").arg(Ni), QString("N%1").arg(Ni + 1));
+          0, posx, 50);
       Lshunt.val["L"] =
           num2str(Specification.ZS / (delta * gi[k + 1]), Inductance);
       Schematic.appendComponent(Lshunt);
-      Ni++;
 
       // Node
       NI.setParams(
@@ -524,8 +505,7 @@ void CanonicalFilter::SynthesizeBSF() {
       Lseries.Connections.clear();
       Lseries.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-          -90, posx, 30, QString("N%1").arg(Ni - 1),
-          QString("N%1").arg(Ni + 1));
+          -90, posx, 30);
       Lseries.val["L"] =
           num2str(gi[k + 1] * Specification.ZS * delta / (w0 * w0), Inductance);
       Schematic.appendComponent(Lseries);
@@ -534,12 +514,10 @@ void CanonicalFilter::SynthesizeBSF() {
       Cseries.Connections.clear();
       Cseries.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 90, posx, -30, QString("N%1").arg(Ni - 1),
-          QString("N%1").arg(Ni + 1));
+          Capacitor, 90, posx, -30);
       Cseries.val["C"] =
           num2str(1 / (gi[k + 1] * delta * Specification.ZS), Capacitance);
       Schematic.appendComponent(Cseries);
-      Ni++;
 
       // Node
       posx += 50;
@@ -573,13 +551,8 @@ void CanonicalFilter::SynthesizeBSF() {
   double k = Specification.ZL;
   Specification.isCLC ? k /= gi[N + 1] : k *= gi[N + 1];
 
-  int last_node;
-  ((Specification.order % 2 == 0) && (Specification.isCLC))
-      ? last_node = Ni
-      : last_node = Ni - 1;
   ComponentInfo TermSpar2(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0,
-      QString("N%1").arg(last_node), "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0);
   TermSpar2.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar2);
 

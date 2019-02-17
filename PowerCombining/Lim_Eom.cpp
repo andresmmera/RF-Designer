@@ -40,7 +40,7 @@ void PowerCombinerDesigner::Lim_Eom() {
 
   ComponentInfo TermSpar1(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, -25,
-      -100, "N0", "gnd");
+      -100);
   TermSpar1.val["Z0"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar1);
 
@@ -52,7 +52,7 @@ void PowerCombinerDesigner::Lim_Eom() {
 
   ComponentInfo TL1(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 90, 50, -100, "N0", "N1");
+      TransmissionLine, 90, 50, -100);
   TL1.val["Z0"] = num2str(Z2, Resistance);
   TL1.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL1);
@@ -67,7 +67,7 @@ void PowerCombinerDesigner::Lim_Eom() {
 
   ComponentInfo TermSpar2(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, -90, 100,
-      -130, "N1", "gnd");
+      -130);
   TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar2);
 
@@ -75,7 +75,7 @@ void PowerCombinerDesigner::Lim_Eom() {
 
   ComponentInfo TL2(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 90, 150, -100, "N1", "N2");
+      TransmissionLine, 90, 150, -100);
   TL2.val["Z0"] = num2str(Z1, Resistance);
   TL2.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL2);
@@ -89,19 +89,19 @@ void PowerCombinerDesigner::Lim_Eom() {
 
   // Isolation resistor
   ComponentInfo Ri1(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                    Resistor, 0, 260, -60, "N2", "gnd");
+                    Resistor, 0, 260, -60);
   Ri1.val["R"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(Ri1);
 
   ComponentInfo Ground1(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                        GND, 0, 260, -20, "", "");
+                        GND, 0, 260, -20);
   Schematic.appendComponent(Ground1);
   Schematic.appendWire(Ri1.ID, 1, N2.ID, 0);
   Schematic.appendWire(Ri1.ID, 0, Ground1.ID, 0);
 
   ComponentInfo TL3(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 0, 200, -50, "N2", "N3");
+      TransmissionLine, 0, 200, -50);
   TL3.val["Z0"] = num2str(Z2, Resistance);
   TL3.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL3);
@@ -115,7 +115,7 @@ void PowerCombinerDesigner::Lim_Eom() {
 
   ComponentInfo TL4(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 0, 200, 50, "N3", "N4");
+      TransmissionLine, 0, 200, 50);
   TL4.val["Z0"] = num2str(Z4, Resistance);
   TL4.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL4);
@@ -129,15 +129,15 @@ void PowerCombinerDesigner::Lim_Eom() {
   Schematic.appendWire(TL4.ID, 0, N4.ID, 0);
 
   ComponentInfo TermSpar3(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 220, 100,
-      "N4", "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 220,
+      100);
   TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar3);
   Schematic.appendWire(TermSpar3.ID, 0, N4.ID, 0);
 
   ComponentInfo TL5(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 90, 150, 100, "N4", "N5");
+      TransmissionLine, 90, 150, 100);
   TL5.val["Z0"] = num2str(Z5, Resistance);
   TL5.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL5);
@@ -151,19 +151,19 @@ void PowerCombinerDesigner::Lim_Eom() {
 
   // Isolation resistor
   ComponentInfo Ri2(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                    Resistor, 0, 100, 150, "N5", "gnd");
+                    Resistor, 0, 100, 150);
   Ri2.val["R"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(Ri2);
 
   ComponentInfo Ground2(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                        GND, 0, 100, 200, "", "");
+                        GND, 0, 100, 200);
   Schematic.appendComponent(Ground2);
   Schematic.appendWire(Ri2.ID, 1, N5.ID, 0);
   Schematic.appendWire(Ri2.ID, 0, Ground2.ID, 0);
 
   ComponentInfo TL6(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 90, 50, 100, "N5", "N6");
+      TransmissionLine, 90, 50, 100);
   TL6.val["Z0"] = num2str(Z4, Resistance);
   TL6.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL6);
@@ -177,14 +177,14 @@ void PowerCombinerDesigner::Lim_Eom() {
 
   ComponentInfo TermSpar4(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, -20,
-      100, "N6", "gnd");
+      100);
   TermSpar4.val["Z0"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar4);
   Schematic.appendWire(TermSpar4.ID, 0, N6.ID, 0);
 
   ComponentInfo TL7(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 0, 0, 50, "N7", "N6");
+      TransmissionLine, 0, 0, 50);
   TL7.val["Z0"] = num2str(Z5, Resistance);
   TL7.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL7);
@@ -198,7 +198,7 @@ void PowerCombinerDesigner::Lim_Eom() {
 
   ComponentInfo TL8(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 0, 0, -50, "N7", "N0");
+      TransmissionLine, 0, 0, -50);
   TL8.val["Z0"] = num2str(Z1, Resistance);
   TL8.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL8);
@@ -207,7 +207,7 @@ void PowerCombinerDesigner::Lim_Eom() {
 
   ComponentInfo TL9(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 90, 100, 0, "N7", "N3");
+      TransmissionLine, 90, 100, 0);
   TL9.val["Z0"] = num2str(Specs.Z0, Resistance);
   TL9.val["Length"] = ConvertLengthFromM(Specs.units, 2 * lambda4);
   Schematic.appendComponent(TL9);

@@ -50,41 +50,33 @@ private:
 
   //***********  Schematic synthesis ********************
   void SynthesizeEllipticFilter();
-  void InsertEllipticSection(int &, unsigned int &,
-                             QMap<QString, unsigned int> &, int, bool, bool);
+  void InsertEllipticSection(int &, QMap<QString, unsigned int> &, int, bool,
+                             bool);
 
-  void Insert_LowpassMinL_Section(int &, unsigned int &,
-                                  QMap<QString, unsigned int> &, unsigned int,
-                                  bool, bool);
-  void Insert_HighpassMinC_Section(int &, unsigned int &,
-                                   QMap<QString, unsigned int> &, unsigned int,
-                                   bool, bool);
+  void Insert_LowpassMinL_Section(int &, QMap<QString, unsigned int> &,
+                                  unsigned int, bool, bool);
+  void Insert_HighpassMinC_Section(int &, QMap<QString, unsigned int> &,
+                                   unsigned int, bool, bool);
 
-  void Insert_LowpassMinC_Section(int &, unsigned int &,
-                                  QMap<QString, unsigned int> &, unsigned int,
-                                  bool, bool);
-  void Insert_HighpassMinL_Section(int &, unsigned int &,
-                                   QMap<QString, unsigned int> &, unsigned int,
-                                   bool, bool);
-  void Insert_LowpassSemilumpedMinC_Section(int &, unsigned int &,
+  void Insert_LowpassMinC_Section(int &, QMap<QString, unsigned int> &,
+                                  unsigned int, bool, bool);
+  void Insert_HighpassMinL_Section(int &, QMap<QString, unsigned int> &,
+                                   unsigned int, bool, bool);
+  void Insert_LowpassSemilumpedMinC_Section(int &,
                                             QMap<QString, unsigned int> &,
                                             unsigned int, bool, bool);
-  void Insert_HighpassSemilumpedMinL_Section(int &, unsigned int &,
+  void Insert_HighpassSemilumpedMinL_Section(int &,
                                              QMap<QString, unsigned int> &,
                                              unsigned int, bool, bool);
 
-  void Insert_Bandpass_1_Section(int &, unsigned int &,
-                                 QMap<QString, unsigned int> &, unsigned int,
-                                 bool, bool);
-  void Insert_Bandpass_2_Section(int &, unsigned int &,
-                                 QMap<QString, unsigned int> &, unsigned int,
-                                 bool, bool);
+  void Insert_Bandpass_1_Section(int &, QMap<QString, unsigned int> &,
+                                 unsigned int, bool, bool);
+  void Insert_Bandpass_2_Section(int &, QMap<QString, unsigned int> &,
+                                 unsigned int, bool, bool);
 
-  void Insert_Bandstop_1_Section(int &, unsigned int &,
-                                 QMap<QString, unsigned int> &, unsigned int,
-                                 bool, bool);
-  void Insert_Bandstop_2_Section(int &, unsigned int &,
-                                 QMap<QString, unsigned int> &, unsigned int,
-                                 bool, bool);
+  void Insert_Bandstop_1_Section(int &, QMap<QString, unsigned int> &,
+                                 unsigned int, bool, bool);
+  void Insert_Bandstop_2_Section(int &, QMap<QString, unsigned int> &,
+                                 unsigned int, bool, bool);
 };
 #endif

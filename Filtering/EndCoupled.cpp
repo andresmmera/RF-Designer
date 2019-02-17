@@ -44,7 +44,7 @@ void EndCoupled::synthesize() {
   // Add Term 1
   ComponentInfo TermSpar1(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
-      0, "NS", "gnd");
+      0);
   TermSpar1.val["Z"] = num2str(Specification.ZS, Resistance);
   Schematic.appendComponent(TermSpar1);
   PreviousComponent = TermSpar1.ID;
@@ -78,8 +78,7 @@ void EndCoupled::synthesize() {
       TL.Connections.clear();
       TL.setParams(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-          TransmissionLine, 90, posx, 0, QString("%1").arg(PreviousNode),
-          QString("Nk%1").arg(k));
+          TransmissionLine, 90, posx, 0);
       TL.val["Z0"] = num2str(Z0, Resistance);
       TL.val["Length"] = ConvertLengthFromM("mm", TL_length);
       Schematic.appendComponent(TL);
@@ -96,7 +95,7 @@ void EndCoupled::synthesize() {
     Cseries.Connections.clear();
     Cseries.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        90, posx, 0, QString("Nk%1").arg(k), CurrentNode);
+        90, posx, 0);
     Cseries.val["C"] = num2str(C, Capacitance);
     Schematic.appendComponent(Cseries);
 
@@ -115,8 +114,7 @@ void EndCoupled::synthesize() {
     (Specification.isCLC) ? k /= gi[N + 1] : k *= gi[N + 1];
 
   ComponentInfo TermSpar2(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0,
-      QString("N%1").arg(N), "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0);
   TermSpar2.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar2);
 

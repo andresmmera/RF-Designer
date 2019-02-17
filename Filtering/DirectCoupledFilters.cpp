@@ -107,14 +107,14 @@ void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators() {
 
   ComponentInfo TermSpar1(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
-      0, "N0", "gnd");
+      0);
   TermSpar1.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar1);
 
   posx += 50;
   // Series capacitor
   Cseries.setParams(QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-                    Capacitor, 90, posx, 0, "N0", "N1");
+                    Capacitor, 90, posx, 0);
   Cseries.val["C"] = num2str(Cs[0], Capacitance);
   Schematic.appendComponent(Cseries);
   Ni++;
@@ -128,13 +128,13 @@ void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators() {
     // Shunt resonator
     // Shunt inductor
     Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                     Inductor, 0, posx, 50, QString("N%1").arg(Ni), "gnd");
+                     Inductor, 0, posx, 50);
     Lshunt.val["L"] = num2str(L[k], Inductance);
     Schematic.appendComponent(Lshunt);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx, 100, "", "");
+                     GND, 0, posx, 100);
     Schematic.appendComponent(Ground);
 
     Schematic.appendWire(Lshunt.ID, 0, Ground.ID, 0);
@@ -154,20 +154,20 @@ void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators() {
     // Shunt capacitor
     Cshunt.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, posx, 50, QString("N%1").arg(Ni), "gnd");
+        0, posx, 50);
     Cshunt.val["C"] = num2str(Cp[k], Capacitance);
     Schematic.appendComponent(Cshunt);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx, 100, "", "");
+                     GND, 0, posx, 100);
     Schematic.appendComponent(Ground);
 
     posx += 50;
     // Series capacitor
     Cseries.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        90, posx, 0, QString("N%1").arg(Ni), QString("N%1").arg(Ni + 1));
+        90, posx, 0);
     Cseries.val["C"] = num2str(Cs[k + 1], Capacitance);
     Schematic.appendComponent(Cseries);
     Ni++;
@@ -181,8 +181,7 @@ void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators() {
   posx += 50;
 
   ComponentInfo TermSpar2(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0,
-      QString("N%1").arg(Ni), "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0);
   TermSpar2.val["Z"] = num2str(Specification.ZL, Resistance);
   Schematic.appendComponent(TermSpar2);
   ConnectionAux = TermSpar2.ID;
@@ -262,7 +261,7 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators() {
 
   ComponentInfo TermSpar1(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
-      0, QString("N%1").arg(Ni), "gnd");
+      0);
   TermSpar1.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar1);
   ConnectionAux = TermSpar1.ID;
@@ -270,7 +269,7 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators() {
   posx += 50;
   // Series inductor
   Lseries.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                    Inductor, -90, posx, 0, "N0", "N1");
+                    Inductor, -90, posx, 0);
   Lseries.val["L"] = num2str(Ls[0], Inductance);
   Schematic.appendComponent(Lseries);
   Ni++;
@@ -282,13 +281,13 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators() {
   posx += 50;
   // Shunt inductor
   Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                   Inductor, 0, posx, 50, QString("N%1").arg(Ni), "gnd");
+                   Inductor, 0, posx, 50);
   Lshunt.val["L"] = num2str(Lp[0], Inductance);
   Schematic.appendComponent(Lshunt);
 
   // GND
   Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND,
-                   0, posx, 100, "", "");
+                   0, posx, 100);
   Schematic.appendComponent(Ground);
 
   // Node
@@ -306,7 +305,7 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators() {
     posx += 50;
     Lseries.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-        -90, posx, 0, QString("N%1").arg(Ni), QString("N%1").arg(Ni + 1));
+        -90, posx, 0);
     Lseries.val["L"] = num2str(Ls[k + 1], Inductance);
     Schematic.appendComponent(Lseries);
     Ni++;
@@ -315,7 +314,7 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators() {
     posx += 75;
     Cseries.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        90, posx, 0, QString("N%1").arg(Ni), QString("N%1").arg(Ni + 1));
+        90, posx, 0);
     Cseries.val["C"] = num2str(Crk[k], Capacitance);
     Schematic.appendComponent(Cseries);
     Ni++;
@@ -323,13 +322,13 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators() {
     posx += 50;
     // Shunt inductor coupling
     Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                     Inductor, 0, posx, 50, QString("N%1").arg(Ni), "gnd");
+                     Inductor, 0, posx, 50);
     Lshunt.val["L"] = num2str(Lp[k + 1], Inductance);
     Schematic.appendComponent(Lshunt);
 
     // GND
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, posx, 100, "", "");
+                     GND, 0, posx, 100);
     Schematic.appendComponent(Ground);
 
     Schematic.appendWire(NI.ID, 0, Lseries.ID,
@@ -354,8 +353,7 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators() {
   posx += 50;
   // Series inductor
   Lseries.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                    Inductor, -90, posx, 0, QString("N%1").arg(Ni),
-                    QString("N%1").arg(Ni + 1));
+                    Inductor, -90, posx, 0);
   Lseries.val["L"] = num2str(Ls[N + 1], Inductance);
   Schematic.appendComponent(Lseries);
 
@@ -364,8 +362,7 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators() {
 
   posx += 50;
   ComponentInfo TermSpar2(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0,
-      QString("N%1").arg(Ni + 1), "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0);
   TermSpar2.val["Z"] = num2str(Specification.ZL, Resistance);
   Schematic.appendComponent(TermSpar2);
 

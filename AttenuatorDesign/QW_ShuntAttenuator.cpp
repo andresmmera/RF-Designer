@@ -42,7 +42,7 @@ void QW_ShuntAttenuator::synthesize() {
 
   // Circuit implementation
   TermSpar1.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                      Term, 180, 0, 0, "N0", "gnd");
+                      Term, 180, 0, 0);
   TermSpar1.val["Z"] = num2str(Specs.Zin, Resistance);
   Schematic.appendComponent(TermSpar1);
 
@@ -55,17 +55,17 @@ void QW_ShuntAttenuator::synthesize() {
 
     Cshunt.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, 50, -50, QString("N0"), QString("gnd"));
+        0, 50, -50);
     Cshunt.val["C"] = num2str(1 / (Specs.Zin * w0), Capacitance);
     Schematic.appendComponent(Cshunt);
 
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 180, 50, -75, "", "");
+                     GND, 180, 50, -75);
     Schematic.appendComponent(Ground);
 
     Lseries.setParams(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor, 0,
-        50, 50, QString("N0"), QString("NA"));
+        50, 50);
     Lseries.val["L"] = num2str(Specs.Zin / w0, Inductance);
     Schematic.appendComponent(Lseries);
 
@@ -75,7 +75,7 @@ void QW_ShuntAttenuator::synthesize() {
   } else {
     TL.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, 0, 50, 50, QString("N0"), QString("NA"));
+        TransmissionLine, 0, 50, 50);
     TL.val["Z0"] = num2str(Specs.Zin, Resistance);
     TL.val["Length"] = ConvertLengthFromM("mm", l4);
     Schematic.appendComponent(TL);
@@ -86,23 +86,23 @@ void QW_ShuntAttenuator::synthesize() {
 
   // 1st shunt resistor
   Res2.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                 Resistor, 0, 50, 120, "NA", "gnd");
+                 Resistor, 0, 50, 120);
   Res2.val["R"] = num2str(Specs.Zin, Resistance);
   Schematic.appendComponent(Res2);
 
   Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND,
-                   0, 50, 175, "", "");
+                   0, 50, 175);
   Schematic.appendComponent(Ground);
   Schematic.appendWire(Res2.ID, 0, Ground.ID, 0);
 
   // 2nd shunt resistor
   Res3.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                 Resistor, 0, 100, 120, "NA", "gnd");
+                 Resistor, 0, 100, 120);
   Res3.val["R"] = num2str(R, Resistance);
   Schematic.appendComponent(Res3);
 
   Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND,
-                   0, 100, 175, "", "");
+                   0, 100, 175);
   Schematic.appendComponent(Ground);
 
   Schematic.appendWire(Res3.ID, 0, Ground.ID, 0);
@@ -111,12 +111,12 @@ void QW_ShuntAttenuator::synthesize() {
     Cshunt.Connections.clear();
     Cshunt.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, 150, 120, "NA", "gnd");
+        0, 150, 120);
     Cshunt.val["C"] = num2str(1 / (Specs.Zin * w0), Capacitance);
     Schematic.appendComponent(Cshunt);
 
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, 150, 175, "", "");
+                     GND, 0, 150, 175);
     Schematic.appendComponent(Ground);
     Schematic.appendWire(Cshunt.ID, 0, Ground.ID, 0);
     Schematic.appendWire(Cshunt.ID, 1, Lseries.ID, 0);
@@ -128,7 +128,7 @@ void QW_ShuntAttenuator::synthesize() {
   }
 
   Res1.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                 Resistor, 90, 100, 0, "N0", "N1");
+                 Resistor, 90, 100, 0);
   Res1.val["R"] = num2str(R, Resistance);
   Schematic.appendComponent(Res1);
   Schematic.appendWire(Res1.ID, 0, NI.ID, 0);
@@ -140,7 +140,7 @@ void QW_ShuntAttenuator::synthesize() {
   Schematic.appendNode(NI);
 
   TermSpar2.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                      Term, 0, 200, 0, "N1", "gnd");
+                      Term, 0, 200, 0);
   TermSpar2.val["Z"] = num2str(Specs.Zin, Resistance);
   Schematic.appendComponent(TermSpar2);
 

@@ -8,15 +8,10 @@ class ComponentInfo {
 public:
   ComponentInfo() : Coordinates(2){};
   ComponentInfo(QString ID_, ComponentType Type_, double rot_, double x,
-                double y,              // Coordinates
-                QString N1, QString N2 // Nodes
-                )
-      : ID(ID_), Type(Type_), Rotation(rot_), Net1(N1), Net2(N2),
-        Coordinates(2) {
+                double y)
+      : ID(ID_), Type(Type_), Rotation(rot_), Coordinates(2) {
     Coordinates[0] = x;
     Coordinates[1] = y;
-    Connections.append(N1);
-    Connections.append(N2);
   };
 
   QString ID;
@@ -35,28 +30,13 @@ public:
     }
   };
   void setParams(QString ID_, ComponentType Type_, double Rotation_, double x,
-                 double y,              // Coordinates
-                 QString N1, QString N2 // Nodes
+                 double y // Coordinates
   ) {
     ID = ID_;
     Type = Type_;
     Rotation = Rotation_;
     Coordinates[0] = x;
     Coordinates[1] = y;
-    Connections.append(N1);
-    Connections.append(N2);
-  };
-
-  void setParams(QString ID_, ComponentType Type_, double Rotation_, double x,
-                 double y,         // Coordinates
-                 QStringList Nodes // Nodes
-  ) {
-    ID = ID_;
-    Type = Type_;
-    Rotation = Rotation_;
-    Coordinates[0] = x;
-    Coordinates[1] = y;
-    Connections = Nodes;
   };
 
   QString getQucsCode() {

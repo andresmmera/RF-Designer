@@ -24,7 +24,7 @@ void PowerCombinerDesigner::Bagley() {
   NodeInfo NI;
 
   ComponentInfo TermSpar(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                         Term, 0, (Specs.Noutputs - 1) * 50, -30, "N0", "gnd");
+                         Term, 0, (Specs.Noutputs - 1) * 50, -30);
   TermSpar.val["Z"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar);
 
@@ -34,15 +34,14 @@ void PowerCombinerDesigner::Bagley() {
 
   ComponentInfo TL1(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 0, (Specs.Noutputs - 1) * 100, 50, "N0",
-      QString("N%1").arg(Specs.Noutputs));
+      TransmissionLine, 0, (Specs.Noutputs - 1) * 100, 50);
   TL1.val["Z0"] = num2str(Zbranch, Resistance);
   TL1.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL1);
 
   ComponentInfo TL2(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 0, 0, 50, "N0", "N1");
+      TransmissionLine, 0, 0, 50);
   TL2.val["Z0"] = num2str(Zbranch, Resistance);
   TL2.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL2);
@@ -53,7 +52,7 @@ void PowerCombinerDesigner::Bagley() {
 
   TermSpar.Connections.clear();
   TermSpar.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                     Term, 90, 0, 120, "N1", "gnd");
+                     Term, 90, 0, 120);
   TermSpar.val["Z"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar);
 
@@ -72,8 +71,7 @@ void PowerCombinerDesigner::Bagley() {
     TL.Connections.clear();
     TL.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, 90, posx, 100, QString("N%1").arg(i),
-        QString("N%1").arg(i + 1));
+        TransmissionLine, 90, posx, 100);
     TL.val["Z0"] = num2str(Zbranch, Resistance);
     TL.val["Length"] = ConvertLengthFromM(Specs.units, lambda2);
     Schematic.appendComponent(TL);
@@ -82,8 +80,7 @@ void PowerCombinerDesigner::Bagley() {
 
     TermSpar.Connections.clear();
     TermSpar.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                       Term, 90, posx + 50, 120, QString("N%1").arg(i + 1),
-                       "gnd");
+                       Term, 90, posx + 50, 120);
     TermSpar.val["Z"] = num2str(Specs.Z0, Resistance);
     Schematic.appendComponent(TermSpar);
 

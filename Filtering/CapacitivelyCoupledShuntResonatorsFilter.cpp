@@ -50,7 +50,7 @@ void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
   // Add Term 1
   ComponentInfo TermSpar1(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
-      0, "N0", "gnd");
+      0);
   TermSpar1.val["Z"] = num2str(Specification.ZS, Resistance);
   Schematic.appendComponent(TermSpar1);
   PreviousComponent = TermSpar1.ID;
@@ -68,7 +68,7 @@ void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
       Cseries.Connections.clear();
       Cseries.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-          Capacitor, 90, posx, 0, CurrentNode, NextNode);
+          Capacitor, 90, posx, 0);
       Cseries.val["C"] = num2str(C[k], Capacitance);
       Schematic.appendComponent(Cseries);
       posx += 50;
@@ -90,7 +90,7 @@ void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
     SC_Stub.Connections.clear();
     SC_Stub.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        ShortStub, 0, posx, 25, CurrentNode, QString("gnd"));
+        ShortStub, 0, posx, 25);
     SC_Stub.val["Z0"] = num2str(Z0, Resistance);
     SC_Stub.val["Length"] = ConvertLengthFromM("mm", l[k - 1]);
     Schematic.appendComponent(SC_Stub);
@@ -104,7 +104,7 @@ void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
     Cseries.Connections.clear();
     Cseries.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        90, posx, 0, CurrentNode, NextNode);
+        90, posx, 0);
     Cseries.val["C"] = num2str(C[k], Capacitance);
     Schematic.appendComponent(Cseries);
 
@@ -128,7 +128,7 @@ void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
   SC_Stub.Connections.clear();
   SC_Stub.setParams(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      ShortStub, 0, posx, 25, CurrentNode, QString("gnd"));
+      ShortStub, 0, posx, 25);
   SC_Stub.val["Z0"] = num2str(Z0, Resistance);
   SC_Stub.val["Length"] = ConvertLengthFromM("mm", l[N - 1]);
   Schematic.appendComponent(SC_Stub);
@@ -138,7 +138,7 @@ void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
   NextNode = QString("N%1").arg(N + 1);
   Cseries.Connections.clear();
   Cseries.setParams(QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-                    Capacitor, 90, posx, 0, CurrentNode, NextNode);
+                    Capacitor, 90, posx, 0);
   Cseries.val["C"] = num2str(C[N], Capacitance);
   Schematic.appendComponent(Cseries);
   posx += 50;
@@ -154,8 +154,7 @@ void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
     (Specification.isCLC) ? k /= gi[N + 1] : k *= gi[N + 1];
 
   ComponentInfo TermSpar2(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0,
-      QString("N%1").arg(N + 1), "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0);
   TermSpar2.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar2);
 

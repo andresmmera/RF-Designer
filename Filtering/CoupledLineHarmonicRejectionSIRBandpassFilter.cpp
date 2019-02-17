@@ -37,13 +37,10 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
   std::deque<double> gi = LP_coeffs.getCoefficients();
 
   ComponentInfo Coupled_Lines, TL;
-  QStringList ConnectionNodes;
 
   int N = Specification.order; // Number of elements
   int posx = 0, posy = 10;
-  int Nopen = 0;
-  QString PreviousComponent, NextNode;
-  QString PreviousNode, CurrentNode = QString("N0");
+  QString PreviousComponent;
 
   double delta = Specification.bw / Specification.fc; // Fractional bandwidth
   double Z0 = Specification.ZS;
@@ -60,17 +57,13 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
   // Add Term 1
   ComponentInfo TermSpar1(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
-      0, CurrentNode, "gnd");
+      0);
   TermSpar1.val["Z"] = num2str(Specification.ZS, Resistance);
   Schematic.appendComponent(TermSpar1);
   PreviousComponent = TermSpar1.ID;
-  PreviousNode = CurrentNode;
   posx += 50;
 
   for (int k = 0; k < N; k++) {
-    CurrentNode = QString("N%1").arg(k);
-    NextNode = QString("N%1").arg(k + 1);
-
     if (k == 0) {                                        // First element
       J[k] = sqrt(2 * delta * theta / (gi[k + 1])) / Z0; // Eq. 25
       Z0e[k] =
@@ -84,14 +77,9 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
 
       Coupled_Lines.Connections.clear();
       // Set connections
-      ConnectionNodes.clear();
-      ConnectionNodes.append(QString("%1").arg(PreviousNode));
-      ConnectionNodes.append(QString("NOPEN%1").arg(Nopen)), Nopen++;
-      ConnectionNodes.append(QString("%1").arg(QString("NC%1").arg(k + 1)));
-      ConnectionNodes.append(QString("NOPEN%1").arg(Nopen)), Nopen++;
       Coupled_Lines.setParams(
           QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
-          CoupledLines, 90, posx, posy, ConnectionNodes);
+          CoupledLines, 90, posx, posy);
       Coupled_Lines.val["Ze"] = num2str(Z0e[k], Resistance);
       Coupled_Lines.val["Zo"] = num2str(Z0o[k], Resistance);
       Coupled_Lines.val["Length"] = ConvertLengthFromM("mm", len_coup);
@@ -103,8 +91,7 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
       TL.Connections.clear();
       TL.setParams(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-          TransmissionLine, 90, posx, posy,
-          QString("%1").arg(QString("NC%1").arg(k + 1)), NextNode);
+          TransmissionLine, 90, posx, posy);
       TL.val["Z0"] = num2str(Z1, Resistance);
       TL.val["Length"] = ConvertLengthFromM("mm", len_TL);
       Schematic.appendComponent(TL);
@@ -118,7 +105,6 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
       Schematic.appendWire(Coupled_Lines.ID, 2, TL.ID, 0);
 
       PreviousComponent = TL.ID;
-      PreviousNode = NextNode;
       continue;
     }
 
@@ -134,13 +120,9 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
 
     // Coupled lines
     Coupled_Lines.Connections.clear();
-    ConnectionNodes[0] = QString("%1").arg(PreviousNode);
-    ConnectionNodes[1] = QString("NOPEN%1").arg(Nopen), Nopen++;
-    ConnectionNodes[2] = QString("%1").arg(QString("NC%1").arg(k + 1));
-    ConnectionNodes[3] = QString("NOPEN%1").arg(Nopen), Nopen++;
     Coupled_Lines.setParams(
         QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
-        CoupledLines, 90, posx, posy, ConnectionNodes);
+        CoupledLines, 90, posx, posy);
     Coupled_Lines.val["Ze"] = num2str(Z0e[k], Resistance);
     Coupled_Lines.val["Zo"] = num2str(Z0o[k], Resistance);
     Coupled_Lines.val["Length"] = ConvertLengthFromM("mm", len_coup);
@@ -152,8 +134,7 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
     TL.Connections.clear();
     TL.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, 90, posx, posy,
-        QString("%1").arg(QString("NC%1").arg(k + 1)), NextNode);
+        TransmissionLine, 90, posx, posy);
     TL.val["Z0"] = num2str(Z1, Resistance);
     TL.val["Length"] = ConvertLengthFromM("mm", len_TL);
     Schematic.appendComponent(TL);
@@ -165,7 +146,6 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
     Schematic.appendWire(Coupled_Lines.ID, 2, TL.ID, 0);
 
     PreviousComponent = TL.ID;
-    PreviousNode = NextNode;
     posx += 75;
     posy += 10;
   }
@@ -180,18 +160,12 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
       Z0 *
       ((1 - (J[N] * Z0) / sin(theta) + (J[N] * J[N] * Z0 * Z0)) /
        (1 - (J[N] * J[N] * Z0 * Z0) / (tan(theta) * tan(theta)))); // Eq. 21
-  CurrentNode = QString("N%1").arg(N);
-  NextNode = QString("N%1").arg(N + 1);
 
   // Coupled lines
   Coupled_Lines.Connections.clear();
-  ConnectionNodes[0] = QString("%1").arg(PreviousNode);
-  ConnectionNodes[1] = QString("NOPEN%1").arg(Nopen), Nopen++;
-  ConnectionNodes[2] = QString("%1").arg(NextNode);
-  ConnectionNodes[3] = QString("NOPEN%1").arg(Nopen), Nopen++;
   Coupled_Lines.setParams(
       QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
-      CoupledLines, 90, posx, posy, ConnectionNodes);
+      CoupledLines, 90, posx, posy);
   Coupled_Lines.val["Ze"] = num2str(Z0e[N], Resistance);
   Coupled_Lines.val["Zo"] = num2str(Z0o[N], Resistance);
   Coupled_Lines.val["Length"] = ConvertLengthFromM("mm", len_coup);
@@ -212,7 +186,7 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
 
   ComponentInfo TermSpar2(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx,
-      posy, NextNode, "gnd");
+      posy);
   TermSpar2.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar2);
 

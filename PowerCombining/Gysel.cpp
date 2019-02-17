@@ -21,8 +21,8 @@ void PowerCombinerDesigner::Gysel() {
   double lambda2 = lambda4 * 2;
 
   ComponentInfo TermSpar1(
-      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, -20, 0,
-      "N0", "gnd");
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, -20,
+      0);
   TermSpar1.val["Z0"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar1);
 
@@ -32,7 +32,7 @@ void PowerCombinerDesigner::Gysel() {
 
   ComponentInfo TL1(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 0, 0, -50, "N0", "N1");
+      TransmissionLine, 0, 0, -50);
   TL1.ID =
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]);
   TL1.val["Z0"] = num2str(sqrt(2) * Specs.Z0, Resistance);
@@ -44,7 +44,7 @@ void PowerCombinerDesigner::Gysel() {
 
   ComponentInfo TL2(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 0, 0, 50, "N0", "N4");
+      TransmissionLine, 0, 0, 50);
   TL2.ID =
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]);
   TL2.val["Z0"] = num2str(sqrt(2) * Specs.Z0, Resistance);
@@ -55,14 +55,14 @@ void PowerCombinerDesigner::Gysel() {
 
   ComponentInfo TL3(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 90, 100, -75, "N1", "N2");
+      TransmissionLine, 90, 100, -75);
   TL3.val["Z0"] = num2str(Specs.Z0, Resistance);
   TL3.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL3);
 
   ComponentInfo TermSpar2(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, -20,
-      -75, "N1", "gnd");
+      -75);
   TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar2);
 
@@ -77,14 +77,14 @@ void PowerCombinerDesigner::Gysel() {
 
   ComponentInfo TL4(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 90, 100, 75, "N3", "N4");
+      TransmissionLine, 90, 100, 75);
   TL4.val["Z0"] = num2str(Specs.Z0, Resistance);
   TL4.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
   Schematic.appendComponent(TL4);
 
   ComponentInfo TermSpar3(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, -20,
-      75, "N4", "gnd");
+      75);
   TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(TermSpar3);
 
@@ -103,7 +103,7 @@ void PowerCombinerDesigner::Gysel() {
 
   ComponentInfo TL5(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-      TransmissionLine, 0, 150, 0, "N2", "N3");
+      TransmissionLine, 0, 150, 0);
   TL5.val["Z0"] = num2str(Specs.Z0 / sqrt(2), Resistance);
   TL5.val["Length"] = ConvertLengthFromM(Specs.units, lambda2);
   Schematic.appendComponent(TL5);
@@ -114,12 +114,12 @@ void PowerCombinerDesigner::Gysel() {
   Schematic.appendNode(N2);
 
   ComponentInfo Ri1(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                    Resistor, 0, 200, 100, "N3", "gnd");
+                    Resistor, 0, 200, 100);
   Ri1.val["R"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(Ri1);
 
   ComponentInfo Ground1(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                        GND, 0, 200, 125, "", "");
+                        GND, 0, 200, 125);
   Schematic.appendComponent(Ground1);
 
   Schematic.appendWire(Ri1.ID, 0, Ground1.ID, 0);
@@ -129,12 +129,12 @@ void PowerCombinerDesigner::Gysel() {
   Schematic.appendWire(TL5.ID, 1, N1.ID, 1);
 
   ComponentInfo Ri2(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                    Resistor, 0, 200, -50, "N2", "gnd");
+                    Resistor, 0, 200, -50);
   Ri2.val["R"] = num2str(Specs.Z0, Resistance);
   Schematic.appendComponent(Ri2);
 
   ComponentInfo Ground2(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                        GND, 0, 200, 0, "", "");
+                        GND, 0, 200, 0);
   Schematic.appendComponent(Ground2);
   Schematic.appendWire(Ri2.ID, 0, Ground2.ID, 0);
   Schematic.appendWire(Ri2.ID, 1, N1.ID, 0);

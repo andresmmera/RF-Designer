@@ -32,14 +32,11 @@ void CoupledLineBandpassFilter::synthesize() {
   std::deque<double> gi = LP_coeffs.getCoefficients();
 
   ComponentInfo Coupled_Lines;
-  WireInfo WI;
-  QStringList ConnectionNodes;
 
   int N = Specification.order; // Number of elements
   int posx = 0, posy = 10;
-  int Nopen = 0;
-  QString PreviousComponent, NextNode;
-  QString PreviousNode, CurrentNode = QString("N0");
+
+  QString PreviousComponent;
 
   double delta = Specification.bw / Specification.fc; // Fractional bandwidth
   double Z0 = Specification.ZS;
@@ -50,17 +47,13 @@ void CoupledLineBandpassFilter::synthesize() {
   // Add Term 1
   ComponentInfo TermSpar1(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
-      0, CurrentNode, "gnd");
+      0);
   TermSpar1.val["Z"] = num2str(Specification.ZS, Resistance);
   Schematic.appendComponent(TermSpar1);
   PreviousComponent = TermSpar1.ID;
-  PreviousNode = CurrentNode;
   posx += 50;
 
   for (int k = 0; k < N; k++) {
-    CurrentNode = QString("N%1").arg(k);
-    NextNode = QString("N%1").arg(k + 1);
-
     if (k == 0) {                                            // First element
       J[k] = sqrt(M_PI * delta / (2 * gi[k + 1])) / Z0;      // Eq. 8.121
       Z0e[k] = Z0 * (1 + J[k] * Z0 + J[k] * J[k] * Z0 * Z0); // Eq. 8.108a
@@ -68,14 +61,9 @@ void CoupledLineBandpassFilter::synthesize() {
 
       Coupled_Lines.Connections.clear();
       // Set connections
-      ConnectionNodes.clear();
-      ConnectionNodes.append(QString("%1").arg(PreviousNode));
-      ConnectionNodes.append(QString("NOPEN%1").arg(Nopen)), Nopen++;
-      ConnectionNodes.append(QString("%1").arg(NextNode));
-      ConnectionNodes.append(QString("NOPEN%1").arg(Nopen)), Nopen++;
       Coupled_Lines.setParams(
           QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
-          CoupledLines, 90, posx, posy, ConnectionNodes);
+          CoupledLines, 90, posx, posy);
       Coupled_Lines.val["Ze"] = num2str(Z0e[k], Resistance);
       Coupled_Lines.val["Zo"] = num2str(Z0o[k], Resistance);
       Coupled_Lines.val["Length"] = ConvertLengthFromM("mm", l4);
@@ -86,7 +74,6 @@ void CoupledLineBandpassFilter::synthesize() {
       // Wire: Series capacitor to SPAR term
       Schematic.appendWire(Coupled_Lines.ID, 0, TermSpar1.ID, 0);
       PreviousComponent = Coupled_Lines.ID;
-      PreviousNode = NextNode;
       continue;
     }
 
@@ -96,13 +83,9 @@ void CoupledLineBandpassFilter::synthesize() {
 
     // Coupled lines
     Coupled_Lines.Connections.clear();
-    ConnectionNodes[0] = QString("%1").arg(PreviousNode);
-    ConnectionNodes[1] = QString("NOPEN%1").arg(Nopen), Nopen++;
-    ConnectionNodes[2] = QString("%1").arg(NextNode);
-    ConnectionNodes[3] = QString("NOPEN%1").arg(Nopen), Nopen++;
     Coupled_Lines.setParams(
         QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
-        CoupledLines, 90, posx, posy, ConnectionNodes);
+        CoupledLines, 90, posx, posy);
     Coupled_Lines.val["Ze"] = num2str(Z0e[k], Resistance);
     Coupled_Lines.val["Zo"] = num2str(Z0o[k], Resistance);
     Coupled_Lines.val["Length"] = ConvertLengthFromM("mm", l4);
@@ -112,7 +95,6 @@ void CoupledLineBandpassFilter::synthesize() {
     Schematic.appendWire(Coupled_Lines.ID, 0, PreviousComponent, 2);
 
     PreviousComponent = Coupled_Lines.ID;
-    PreviousNode = NextNode;
     posx += 75;
     posy += 20;
   }
@@ -121,18 +103,12 @@ void CoupledLineBandpassFilter::synthesize() {
   J[N] = sqrt(M_PI * delta / (2 * gi[N + 1] * gi[N])) / Z0;
   Z0e[N] = Z0 * (1 + J[N] * Z0 + J[N] * J[N] * Z0 * Z0); // Eq. 8.108a
   Z0o[N] = Z0 * (1 - J[N] * Z0 + J[N] * J[N] * Z0 * Z0); // Eq. 8.108b
-  CurrentNode = QString("N%1").arg(N);
-  NextNode = QString("N%1").arg(N + 1);
 
   // Coupled lines
   Coupled_Lines.Connections.clear();
-  ConnectionNodes[0] = QString("%1").arg(PreviousNode);
-  ConnectionNodes[1] = QString("NOPEN%1").arg(Nopen), Nopen++;
-  ConnectionNodes[2] = QString("%1").arg(NextNode);
-  ConnectionNodes[3] = QString("NOPEN%1").arg(Nopen), Nopen++;
   Coupled_Lines.setParams(
       QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
-      CoupledLines, 90, posx, posy, ConnectionNodes);
+      CoupledLines, 90, posx, posy);
   Coupled_Lines.val["Ze"] = num2str(Z0e[N], Resistance);
   Coupled_Lines.val["Zo"] = num2str(Z0o[N], Resistance);
   Coupled_Lines.val["Length"] = ConvertLengthFromM("mm", l4);
@@ -151,7 +127,7 @@ void CoupledLineBandpassFilter::synthesize() {
 
   ComponentInfo TermSpar2(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx,
-      posy, NextNode, "gnd");
+      posy);
   TermSpar2.val["Z"] = num2str(k, Resistance);
   Schematic.appendComponent(TermSpar2);
 

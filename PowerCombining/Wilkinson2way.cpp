@@ -51,19 +51,19 @@ void PowerCombinerDesigner::Wilkinson() {
 
     // Build the circuit and the netlist
     TermSpar1.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                        Term, 180, 50, 0, "N0", "gnd");
+                        Term, 180, 50, 0);
     TermSpar1.val["Z0"] = num2str(Specs.Z0, Resistance);
     Schematic.appendComponent(TermSpar1);
 
     // Shunt capacitor
     ComponentInfo Cshunt1(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, 100, 20, "N0", "gnd");
+        0, 100, 20);
     Cshunt1.val["C"] = num2str(CC, Capacitance);
     Schematic.appendComponent(Cshunt1);
 
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, 100, 65, "", "");
+                     GND, 0, 100, 65);
     Schematic.appendComponent(Ground);
 
     Schematic.appendWire(Cshunt1.ID, 0, Ground.ID, 0);
@@ -80,19 +80,19 @@ void PowerCombinerDesigner::Wilkinson() {
     // Series inductor
     ComponentInfo Lseries1(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-        -90, 150, -75, "N0", "N1");
+        -90, 150, -75);
     Lseries1.val["L"] = num2str(L2, Inductance);
     Schematic.appendComponent(Lseries1);
 
     // Cshunt
     ComponentInfo Cshunt2(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, 200, -55, "N1", "gnd");
+        0, 200, -55);
     Cshunt2.val["C"] = num2str(C2, Capacitance);
     Schematic.appendComponent(Cshunt2);
 
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, 200, -10, "", "");
+                     GND, 0, 200, -10);
     Schematic.appendComponent(Ground);
 
     NodeInfo N2(
@@ -115,19 +115,19 @@ void PowerCombinerDesigner::Wilkinson() {
     // Series inductor
     ComponentInfo Lseries2(
         QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
-        -90, 150, 75, "N0", "N2");
+        -90, 150, 75);
     Lseries2.val["L"] = num2str(L3, Inductance);
     Schematic.appendComponent(Lseries2);
 
     // Cshunt
     ComponentInfo Cshunt3(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
-        0, 200, 95, "N2", "gnd");
+        0, 200, 95);
     Cshunt3.val["C"] = num2str(C3, Capacitance);
     Schematic.appendComponent(Cshunt3);
 
     Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                     GND, 0, 200, 130, "", "");
+                     GND, 0, 200, 130);
     Schematic.appendComponent(Ground);
 
     NodeInfo N3(
@@ -148,7 +148,7 @@ void PowerCombinerDesigner::Wilkinson() {
 
     ComponentInfo Risolation(
         QString("R%1").arg(++Schematic.NumberComponents[Resistor]), Resistor, 0,
-        250, 0, "N1", "N2");
+        250, 0);
     Risolation.val["R"] = num2str(WilkinsonParams.R, Resistance);
     Schematic.appendComponent(Risolation);
 
@@ -162,7 +162,7 @@ void PowerCombinerDesigner::Wilkinson() {
 
       // Upper branch
       Ls3.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                    Inductor, -90, 285, -75, "N1", "N3");
+                    Inductor, -90, 285, -75);
       Ls3.val["L"] = num2str(L2_, Inductance);
       Schematic.appendComponent(Ls3);
 
@@ -170,12 +170,12 @@ void PowerCombinerDesigner::Wilkinson() {
 
       // Cshunt
       Cp4.setParams(QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-                    Capacitor, 0, 320, -50, "N3", "gnd");
+                    Capacitor, 0, 320, -50);
       Cp4.val["C"] = num2str(C2_, Capacitance);
       Schematic.appendComponent(Cp4);
 
       Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                       GND, 0, 320, -10, "", "");
+                       GND, 0, 320, -10);
       Schematic.appendComponent(Ground);
 
       NodeInfo N4(
@@ -189,7 +189,7 @@ void PowerCombinerDesigner::Wilkinson() {
 
       TermSpar2.setParams(
           QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 370,
-          -50, "N3", "gnd");
+          -50);
       TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
       Schematic.appendComponent(TermSpar2);
 
@@ -197,7 +197,7 @@ void PowerCombinerDesigner::Wilkinson() {
 
       // Lower branch
       Ls4.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
-                    Inductor, -90, 285, 75, "N2", "N4");
+                    Inductor, -90, 285, 75);
       Ls4.val["L"] = num2str(L3_, Inductance);
       Schematic.appendComponent(Ls4);
 
@@ -205,12 +205,12 @@ void PowerCombinerDesigner::Wilkinson() {
 
       // Cshunt
       Cp5.setParams(QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
-                    Capacitor, 0, 320, 100, "N4", "gnd");
+                    Capacitor, 0, 320, 100);
       Cp5.val["C"] = num2str(C3_, Capacitance);
       Schematic.appendComponent(Cp5);
 
       Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
-                       GND, 0, 320, 140, "", "");
+                       GND, 0, 320, 140);
       Schematic.appendComponent(Ground);
 
       NodeInfo N5(
@@ -224,7 +224,7 @@ void PowerCombinerDesigner::Wilkinson() {
 
       TermSpar3.setParams(
           QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 370,
-          75, "N4", "gnd");
+          75);
       TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
       Schematic.appendComponent(TermSpar3);
 
@@ -232,14 +232,14 @@ void PowerCombinerDesigner::Wilkinson() {
     } else { // Just put the output terms
       TermSpar2.setParams(
           QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 280,
-          -75, "N1", "gnd");
+          -75);
       TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
       Schematic.appendComponent(TermSpar2);
       Schematic.appendWire(TermSpar2.ID, 0, N2.ID, 0);
 
       TermSpar3.setParams(
           QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 280,
-          75, "N2", "gnd");
+          75);
       TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
       Schematic.appendComponent(TermSpar3);
       Schematic.appendWire(TermSpar3.ID, 0, N3.ID, 0);
@@ -248,14 +248,14 @@ void PowerCombinerDesigner::Wilkinson() {
 
   if (Specs.Implementation == "Ideal TL") {
     TermSpar1.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                        Term, 180, 0, 0, "N0", "gnd");
-    TermSpar1.val["Z0"] = num2str(Specs.Z0, Resistance);
+                        Term, 180, 0, 0);
+    TermSpar1.val["Z"] = num2str(Specs.Z0, Resistance);
     Schematic.appendComponent(TermSpar1);
 
     // 1st transmission line
     ComponentInfo TL1(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, 90, 50, 0, "N0", "N1");
+        TransmissionLine, 90, 50, 0);
     TL1.val["Z0"] = num2str(Specs.Z0, Resistance);
     TL1.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
     Schematic.appendComponent(TL1);
@@ -273,7 +273,7 @@ void PowerCombinerDesigner::Wilkinson() {
     // 1st transmission line
     ComponentInfo TL2(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, 90, 135, -50, "N1", "N2");
+        TransmissionLine, 90, 135, -50);
     TL2.val["Z0"] = num2str(WilkinsonParams.Z2, Resistance);
     TL2.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
     Schematic.appendComponent(TL2);
@@ -289,7 +289,7 @@ void PowerCombinerDesigner::Wilkinson() {
     // 1st transmission line
     ComponentInfo TL3(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-        TransmissionLine, 90, 135, 50, "N1", "N3");
+        TransmissionLine, 90, 135, 50);
     TL3.val["Z0"] = num2str(WilkinsonParams.Z3, Resistance);
     TL3.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
     Schematic.appendComponent(TL3);
@@ -304,14 +304,13 @@ void PowerCombinerDesigner::Wilkinson() {
     // Isolation resistor
     ComponentInfo Riso(
         QString("R%1").arg(++Schematic.NumberComponents[Resistor]), Resistor, 0,
-        200, 0, "N2", "N3");
+        200, 0);
     Riso.val["R"] = num2str(WilkinsonParams.R, Resistance);
     Schematic.appendComponent(Riso);
 
     Schematic.appendWire(Riso.ID, 1, N2.ID, 0);
     Schematic.appendWire(Riso.ID, 0, N3.ID, 0);
 
-    ComponentInfo TL4, TL5; // Auxiliar lines for matching in case of K!=1
     if (Specs.OutputRatio.at(0) !=
         1) { // An unequal power ratio implies that the load impedance != Z0, so
              // it requires matching
@@ -319,7 +318,7 @@ void PowerCombinerDesigner::Wilkinson() {
       // Upper branch matching transmission line
       ComponentInfo TL4(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-          TransmissionLine, 90, 275, -50, "N2", "N4");
+          TransmissionLine, 90, 275, -50);
       TL4.val["Z0"] = num2str(sqrt(Specs.Z0 * WilkinsonParams.R2), Resistance);
       TL4.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
       Schematic.appendComponent(TL4);
@@ -327,8 +326,8 @@ void PowerCombinerDesigner::Wilkinson() {
       // Upper branch term
       TermSpar2.setParams(
           QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 325,
-          -50, "N4", "gnd");
-      TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
+          -50);
+      TermSpar2.val["Z"] = num2str(Specs.Z0, Resistance);
       Schematic.appendComponent(TermSpar2);
 
       Schematic.appendWire(TL4.ID, 0, N2.ID, 0);
@@ -337,7 +336,7 @@ void PowerCombinerDesigner::Wilkinson() {
       // Lower branch matching transmission line
       ComponentInfo TL5(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
-          TransmissionLine, 90, 275, 50, "N3", "N5");
+          TransmissionLine, 90, 275, 50);
       TL5.val["Z0"] = num2str(sqrt(Specs.Z0 * WilkinsonParams.R3), Resistance);
       TL5.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
       Schematic.appendComponent(TL5);
@@ -345,8 +344,8 @@ void PowerCombinerDesigner::Wilkinson() {
       // Lower branch term
       TermSpar3.setParams(
           QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 325,
-          50, "N5", "gnd");
-      TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
+          50);
+      TermSpar3.val["Z"] = num2str(Specs.Z0, Resistance);
       Schematic.appendComponent(TermSpar3);
 
       Schematic.appendWire(TL5.ID, 0, N3.ID, 0);
@@ -356,16 +355,16 @@ void PowerCombinerDesigner::Wilkinson() {
       // Upper branch term
       TermSpar2.setParams(
           QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 250,
-          -50, "N2", "gnd");
-      TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
+          -50);
+      TermSpar2.val["Z"] = num2str(Specs.Z0, Resistance);
       Schematic.appendComponent(TermSpar2);
       Schematic.appendWire(N2.ID, 1, TermSpar2.ID, 0);
 
       // Lower branch term
       TermSpar3.setParams(
           QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 250,
-          50, "N3", "gnd");
-      TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
+          50);
+      TermSpar3.val["Z"] = num2str(Specs.Z0, Resistance);
       Schematic.appendComponent(TermSpar3);
       Schematic.appendWire(N3.ID, 1, TermSpar3.ID, 0);
     }

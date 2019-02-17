@@ -27,7 +27,6 @@ ReflectionAttenuator::~ReflectionAttenuator() {}
 void ReflectionAttenuator::synthesize() {
   ComponentInfo TermSpar1, TermSpar2;
   ComponentInfo Ground, Res1, Res2, Coup;
-  QStringList ConnectionNodes;
 
   // Design equations
   double L = pow(10, -.05 * Specs.Attenuation);
@@ -39,30 +38,25 @@ void ReflectionAttenuator::synthesize() {
 
   // Circuit implementation
   TermSpar1.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                      Term, 180, 0, 0, "N0", "gnd");
+                      Term, 180, 0, 0);
   TermSpar1.val["Z"] = num2str(Specs.Zin, Resistance);
   Schematic.appendComponent(TermSpar1);
 
   // 1st shunt resistor
   Res1.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                 Resistor, 0, 50, 100, "NR1", "gnd");
+                 Resistor, 0, 50, 100);
   Res1.val["R"] = num2str(Ri, Resistance);
   Schematic.appendComponent(Res1);
 
   Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND,
-                   0, 50, 150, "", "");
+                   0, 50, 150);
   Schematic.appendComponent(Ground);
 
   Schematic.appendWire(Res1.ID, 0, Ground.ID, 0);
 
   // Coupler
-  ConnectionNodes.clear();
-  ConnectionNodes.append(QString("N0"));
-  ConnectionNodes.append(QString("NR1"));
-  ConnectionNodes.append(QString("NR2"));
-  ConnectionNodes.append(QString("N1"));
   Coup.setParams(QString("COUP%1").arg(++Schematic.NumberComponents[Coupler]),
-                 Coupler, 0, 100, 25, ConnectionNodes);
+                 Coupler, 0, 100, 25);
   Coup.val["k"] = num2str(0.7071, NoUnits);
   Coup.val["phi"] = num2str(90, NoUnits);
   Schematic.appendComponent(Coup);
@@ -71,19 +65,19 @@ void ReflectionAttenuator::synthesize() {
 
   // 2nd shunt resistor
   Res2.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                 Resistor, 0, 150, 100, "NR2", "gnd");
+                 Resistor, 0, 150, 100);
   Res2.val["R"] = num2str(Ri, Resistance);
   Schematic.appendComponent(Res2);
 
   Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND,
-                   0, 150, 150, "", "");
+                   0, 150, 150);
   Schematic.appendComponent(Ground);
 
   Schematic.appendWire(Res2.ID, 1, Coup.ID, 3);
   Schematic.appendWire(Res2.ID, 0, Ground.ID, 0);
 
   TermSpar2.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                      Term, 0, 200, 0, "N1", "gnd");
+                      Term, 0, 200, 0);
   TermSpar2.val["Z"] = num2str(Specs.Zout, Resistance);
   Schematic.appendComponent(TermSpar2);
 

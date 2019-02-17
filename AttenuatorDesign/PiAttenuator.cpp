@@ -44,18 +44,18 @@ void PiAttenuator::synthesize() {
 
   // Circuit implementation
   TermSpar1.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                      Term, 180, 0, 0, "N0", "gnd");
+                      Term, 180, 0, 0);
   TermSpar1.val["Z"] = num2str(Specs.Zin, Resistance);
   Schematic.appendComponent(TermSpar1);
 
   // 1st shunt resistor
   Res1.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                 Resistor, 0, 50, 50, "N0", "gnd");
+                 Resistor, 0, 50, 50);
   Res1.val["R"] = num2str(R1, Resistance);
   Schematic.appendComponent(Res1);
 
   Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND,
-                   0, 50, 100, "", "");
+                   0, 50, 100);
   Schematic.appendComponent(Ground);
 
   // Node
@@ -69,7 +69,7 @@ void PiAttenuator::synthesize() {
 
   // Series resistor
   Res2.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                 Resistor, 90, 100, 0, "N0", "N1");
+                 Resistor, 90, 100, 0);
   Res2.val["R"] = num2str(R2, Resistance);
   Schematic.appendComponent(Res2);
 
@@ -77,7 +77,7 @@ void PiAttenuator::synthesize() {
 
   // 2nd shunt resistor
   Res3.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                 Resistor, 0, 150, 50, "N1", "gnd");
+                 Resistor, 0, 150, 50);
   Res3.val["R"] = num2str(R3, Resistance);
   Schematic.appendComponent(Res3);
 
@@ -88,7 +88,7 @@ void PiAttenuator::synthesize() {
   Schematic.appendNode(NI);
 
   Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND,
-                   0, 150, 100, "", "");
+                   0, 150, 100);
   Schematic.appendComponent(Ground);
 
   Schematic.appendWire(Res2.ID, 1, NI.ID, 0);
@@ -96,7 +96,7 @@ void PiAttenuator::synthesize() {
   Schematic.appendWire(Res3.ID, 0, Ground.ID, 0);
 
   TermSpar2.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                      Term, 0, 200, 0, "N1", "gnd");
+                      Term, 0, 200, 0);
   TermSpar2.val["Z"] = num2str(Specs.Zout, Resistance);
   Schematic.appendComponent(TermSpar2);
 

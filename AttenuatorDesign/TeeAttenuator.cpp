@@ -43,13 +43,13 @@ void TeeAttenuator::synthesize() {
 
   // Circuit implementation
   TermSpar1.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                      Term, 180, 0, 0, "N0", "gnd");
+                      Term, 180, 0, 0);
   TermSpar1.val["Z"] = num2str(Specs.Zin, Resistance);
   Schematic.appendComponent(TermSpar1);
 
   // 1st series resistor
   Res1.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                 Resistor, 90, 50, 0, "N0", "N1");
+                 Resistor, 90, 50, 0);
   Res1.val["R"] = num2str(R1, Resistance);
   Schematic.appendComponent(Res1);
 
@@ -64,12 +64,12 @@ void TeeAttenuator::synthesize() {
 
   // Shunt resistor
   Res2.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                 Resistor, 0, 100, 50, "N1", "gnd");
+                 Resistor, 0, 100, 50);
   Res2.val["R"] = num2str(R2, Resistance);
   Schematic.appendComponent(Res2);
 
   Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND,
-                   0, 100, 100, "", "");
+                   0, 100, 100);
   Schematic.appendComponent(Ground);
 
   Schematic.appendWire(Res2.ID, 1, NI.ID, 0);
@@ -77,7 +77,7 @@ void TeeAttenuator::synthesize() {
 
   // 2nd series resistor
   Res3.setParams(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
-                 Resistor, 90, 150, 0, "N1", "N2");
+                 Resistor, 90, 150, 0);
   Res3.val["R"] = num2str(R3, Resistance);
   Schematic.appendComponent(Res3);
 
@@ -85,7 +85,7 @@ void TeeAttenuator::synthesize() {
   Schematic.appendWire(Res3.ID, 0, NI.ID, 0);
 
   TermSpar2.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
-                      Term, 0, 200, 0, "N2", "gnd");
+                      Term, 0, 200, 0);
   TermSpar2.val["Z"] = num2str(Specs.Zout, Resistance);
   Schematic.appendComponent(TermSpar2);
 
