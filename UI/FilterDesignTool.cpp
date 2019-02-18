@@ -364,162 +364,113 @@ FilterDesignTool::~FilterDesignTool() {
 }
 
 void FilterDesignTool::synthesize() {
-  EllipticFilter *EF, *SMLEF;
-  CanonicalFilter *CF, *SMLCF;
-  DirectCoupledFilters *DCF;
-  QuarterWaveFilters *QWF;
-  SteppedImpedanceFilter *STIF;
-  EndCoupled *ECF;
-  CapacitivelyCoupledShuntResonatorsFilter *CCSRF;
-  CoupledLineBandpassFilter *CLBPF;
-  CoupledLineHarmonicRejectionSIRBandpassFilter *CLSIRF;
-
   // Recalculate network
   if (FilterImplementationCombo->currentText() == "LC Ladder") {
     if (FilterResponseTypeCombo->currentText() == "Elliptic") {
+      EllipticFilter *EF;
       EF = new EllipticFilter(Filter_SP);
       EF->synthesize();
-      SchInfo.netlist = EF->getQucsNetlist();
-      SchInfo.Comps = EF->getComponents();
-      SchInfo.Wires = EF->getWires();
-      SchInfo.Nodes = EF->getNodes();
-      SchInfo.displayGraphs = EF->displaygraphs;
-      SchInfo.Description = "NOT LADDER";
+      SchContent = EF->Schematic;
+      SchContent.setDescription(QString("NOT LADDER"));
       delete EF;
     } else {
+      CanonicalFilter *CF;
       CF = new CanonicalFilter(Filter_SP);
       CF->synthesize();
-      SchInfo.netlist = CF->getQucsNetlist();
-      SchInfo.Comps = CF->getComponents();
-      SchInfo.Wires = CF->getWires();
-      SchInfo.Nodes = CF->getNodes();
-      SchInfo.displayGraphs = CF->displaygraphs;
+      SchContent = CF->Schematic;
       if (FilterClassCombo->currentText() ==
           "Bandstop") { // The bandstop configuration contains a shunt resonator
                         // which cannot be handled with the internal simulator
-        SchInfo.Description = "NOT LADDER";
+        SchContent.setDescription(QString("NOT LADDER"));
       } else {
-        SchInfo.Description = "";
+        SchContent.setDescription(QString(""));
       }
       delete CF;
     }
   }
   if (FilterImplementationCombo->currentText() == "LC Direct Coupled") {
+    DirectCoupledFilters *DCF;
     DCF = new DirectCoupledFilters(Filter_SP);
     DCF->synthesize();
-    SchInfo.netlist = DCF->getQucsNetlist();
-    SchInfo.Comps = DCF->getComponents();
-    SchInfo.Wires = DCF->getWires();
-    SchInfo.Nodes = DCF->getNodes();
-    SchInfo.displayGraphs = DCF->displaygraphs;
-    SchInfo.Description = "";
+    SchContent = DCF->Schematic;
     delete DCF;
   }
   if (FilterImplementationCombo->currentText() == "Quarter-wavelength") {
+    QuarterWaveFilters *QWF;
     QWF = new QuarterWaveFilters(Filter_SP);
     QWF->synthesize();
-    SchInfo.netlist = QWF->getQucsNetlist();
-    SchInfo.Comps = QWF->getComponents();
-    SchInfo.Wires = QWF->getWires();
-    SchInfo.Nodes = QWF->getNodes();
-    SchInfo.displayGraphs = QWF->displaygraphs;
-    SchInfo.Description =
-        "NOT LADDER"; // For some reason, the short stub implementation is buggy
-                      // in the internal simulator
+    SchContent = QWF->Schematic;
+    SchContent.setDescription(QString("NOT LADDER"));
     delete QWF;
   }
   if (FilterImplementationCombo->currentText() == "Stepped impedance") {
+    SteppedImpedanceFilter *STIF;
     STIF = new SteppedImpedanceFilter(Filter_SP);
     STIF->synthesize();
-    SchInfo.netlist = STIF->getQucsNetlist();
-    SchInfo.Comps = STIF->getComponents();
-    SchInfo.Wires = STIF->getWires();
-    SchInfo.Nodes = STIF->getNodes();
-    SchInfo.displayGraphs = STIF->displaygraphs;
-    SchInfo.Description = "";
+    SchContent = STIF->Schematic;
     delete STIF;
   }
 
   if (FilterImplementationCombo->currentText() == "End-coupled") {
+    EndCoupled *ECF;
     ECF = new EndCoupled(Filter_SP);
     ECF->synthesize();
-    SchInfo.netlist = ECF->getQucsNetlist();
-    SchInfo.Comps = ECF->getComponents();
-    SchInfo.Wires = ECF->getWires();
-    SchInfo.Nodes = ECF->getNodes();
-    SchInfo.displayGraphs = ECF->displaygraphs;
-    SchInfo.Description = "";
+    SchContent = ECF->Schematic;
     delete ECF;
   }
 
   if (FilterImplementationCombo->currentText() ==
       "Capacitively-coupled shunt resonators") {
+    CapacitivelyCoupledShuntResonatorsFilter *CCSRF;
     CCSRF = new CapacitivelyCoupledShuntResonatorsFilter(Filter_SP);
     CCSRF->synthesize();
-    SchInfo.netlist = CCSRF->getQucsNetlist();
-    SchInfo.Comps = CCSRF->getComponents();
-    SchInfo.Wires = CCSRF->getWires();
-    SchInfo.Nodes = CCSRF->getNodes();
-    SchInfo.displayGraphs = CCSRF->displaygraphs;
-    SchInfo.Description = "";
+    SchContent = CCSRF->Schematic;
     delete CCSRF;
   }
   if (FilterImplementationCombo->currentText() == "Semilumped Elliptic") {
+    EllipticFilter *SMLEF;
     SMLEF = new EllipticFilter(Filter_SP);
     SMLEF->setSemilumpedMode(true);
     SMLEF->synthesize();
-    SchInfo.netlist = SMLEF->getQucsNetlist();
-    SchInfo.Comps = SMLEF->getComponents();
-    SchInfo.Wires = SMLEF->getWires();
-    SchInfo.Nodes = SMLEF->getNodes();
-    SchInfo.displayGraphs = SMLEF->displaygraphs;
-    SchInfo.Description = "NOT LADDER";
+    SchContent = SMLEF->Schematic;
+    SchContent.setDescription(QString("NOT LADDER"));
     delete SMLEF;
   }
 
   if (FilterImplementationCombo->currentText() == "Semilumped Canonical") {
+    CanonicalFilter *SMLCF;
     SMLCF = new CanonicalFilter(Filter_SP);
     SMLCF->setSemilumpedMode(true);
     SMLCF->synthesize();
-    SchInfo.netlist = SMLCF->getQucsNetlist();
-    SchInfo.Comps = SMLCF->getComponents();
-    SchInfo.Wires = SMLCF->getWires();
-    SchInfo.Nodes = SMLCF->getNodes();
-    SchInfo.displayGraphs = SMLCF->displaygraphs;
-    SchInfo.Description = "";
+    SchContent = SMLCF->Schematic;
+    SchContent.setDescription(QString(""));
     delete SMLCF;
   }
   if (FilterImplementationCombo->currentText() == "Coupled line bandpass") {
+    CoupledLineBandpassFilter *CLBPF;
     CLBPF = new CoupledLineBandpassFilter(Filter_SP);
     CLBPF->synthesize();
-    SchInfo.netlist = CLBPF->getQucsNetlist();
-    SchInfo.Comps = CLBPF->getComponents();
-    SchInfo.Wires = CLBPF->getWires();
-    SchInfo.Nodes = CLBPF->getNodes();
-    SchInfo.displayGraphs = CLBPF->displaygraphs;
-    SchInfo.Description = "NOT LADDER";
+    SchContent = CLBPF->Schematic;
+    SchContent.setDescription(QString("NOT LADDER"));
     delete CLBPF;
   }
-
   if (FilterImplementationCombo->currentText() ==
       "Coupled line SIR with harmonic rejection") {
+    CoupledLineHarmonicRejectionSIRBandpassFilter *CLSIRF;
     CLSIRF = new CoupledLineHarmonicRejectionSIRBandpassFilter(Filter_SP);
     CLSIRF->synthesize();
-    SchInfo.netlist = CLSIRF->getQucsNetlist();
-    SchInfo.Comps = CLSIRF->getComponents();
-    SchInfo.Wires = CLSIRF->getWires();
-    SchInfo.Nodes = CLSIRF->getNodes();
-    SchInfo.displayGraphs = CLSIRF->displaygraphs;
-    SchInfo.Description = "NOT LADDER";
+    SchContent = CLSIRF->Schematic;
+    SchContent.setDescription(QString("NOT LADDER"));
     delete CLSIRF;
   }
-
-  SchInfo.SPAR_Settings = SPAR_Settings;
+  SchContent.setSPAR_Sweep(SPAR_Settings);
 }
 
-QString FilterDesignTool::getQucsNetlist() { return netlist; }
+QString FilterDesignTool::getQucsNetlist() {
+  return SchContent.getQucsNetlist();
+}
 
-SchematicInfo FilterDesignTool::getSchematic() { return SchInfo; }
+SchematicContent FilterDesignTool::getSchematic() { return SchContent; }
 
 void FilterDesignTool::ResposeComboChanged() {
   bool ActivateCauer =
@@ -737,7 +688,7 @@ void FilterDesignTool::UpdateDesignParameters() {
 
   synthesize();
   // EMIT SIGNAL TO FORCE SIMULATION
-  emit simulateNetwork(SchInfo);
+  emit simulateNetwork(SchContent);
 }
 
 void FilterDesignTool::EllipticTypeChanged() {

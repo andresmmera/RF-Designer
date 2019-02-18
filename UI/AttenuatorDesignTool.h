@@ -27,8 +27,15 @@
 #include <QRadioButton>
 #include <QWidget>
 
-#include "AttenuatorDesign/AttenuatorDesigner.h"
-#include "Filtering/Network.h"
+#include "Schematic/Network.h"
+#include "Schematic/SchematicContent.h"
+
+#include "AttenuatorDesign/BridgedTeeAttenuator.h"
+#include "AttenuatorDesign/PiAttenuator.h"
+#include "AttenuatorDesign/QW_SeriesAttenuator.h"
+#include "AttenuatorDesign/QW_ShuntAttenuator.h"
+#include "AttenuatorDesign/ReflectionAttenuator.h"
+#include "AttenuatorDesign/TeeAttenuator.h"
 
 class AttenuatorDesignTool : public QWidget {
   Q_OBJECT
@@ -64,10 +71,10 @@ private:
   double ConvertPowerFromW(double, unsigned int);
 
   QString netlist;
-  SchematicInfo SchInfo; // Schematic representation
+  SchematicContent SchContent; // Schematic representation
 
 signals:
-  void simulateNetwork(struct SchematicInfo);
+  void simulateNetwork(SchematicContent);
 };
 
 #endif // ATTENUATORDESIGNTOOL_H

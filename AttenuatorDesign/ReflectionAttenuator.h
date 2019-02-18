@@ -1,5 +1,5 @@
 /***************************************************************************
-                                SteppedImpedanceFilter.h
+                                ReflectionAttenuator.cpp
                                 ----------
     copyright            :  QUCS team
     author                :  2019 Andres Martinez-Mera
@@ -14,25 +14,21 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
-
-#ifndef STEPPEDIMPEDANCEFILTER_H
-#define STEPPEDIMPEDANCEFILTER_H
-
-#include "Filtering/LowpassPrototypeCoeffs.h"
+#ifndef REFLECTIONATTENUATOR_H
+#define REFLECTIONATTENUATOR_H
 #include "Schematic/Network.h"
+#include "Schematic/SchematicContent.h"
 #include "Schematic/component.h"
-#include "general.h"
-#include <QPen>
 
-class SteppedImpedanceFilter : public Network {
+class ReflectionAttenuator : public Network {
 public:
-  SteppedImpedanceFilter();
-  virtual ~SteppedImpedanceFilter();
-  SteppedImpedanceFilter(FilterSpecifications);
+  ReflectionAttenuator();
+  virtual ~ReflectionAttenuator();
+  ReflectionAttenuator(AttenuatorDesignParameters);
   void synthesize();
+  struct PdissAtt Pdiss;
 
 private:
-  struct FilterSpecifications Specification;
+  AttenuatorDesignParameters Specs;
 };
-
-#endif // STEPPEDIMPEDANCEFILTER_H
+#endif // REFLECTIONATTENUATOR_H

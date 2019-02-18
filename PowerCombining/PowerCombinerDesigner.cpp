@@ -20,14 +20,6 @@ PowerCombinerDesigner::PowerCombinerDesigner(PowerCombinerParams SPC) {
   Specs = SPC;
 }
 
-QList<ComponentInfo> PowerCombinerDesigner::getComponents() {
-  return Components;
-}
-
-QList<WireInfo> PowerCombinerDesigner::getWires() { return Wires; }
-
-QList<NodeInfo> PowerCombinerDesigner::getNodes() { return Nodes; }
-
 void PowerCombinerDesigner::synthesize() {
   if (Specs.Type == "Wilkinson")
     Wilkinson();
@@ -51,15 +43,6 @@ void PowerCombinerDesigner::synthesize() {
     Recombinant3WayWilkinson();
   /*if (Specs.Type == "Travelling Wave")       TravellingWave();
   if (Specs.Type == "Tree")                  Tree();*/
-
-  // Build Qucs netlist
-  QucsNetlist.clear();
-  QString codestr;
-  for (int i = 0; i < Components.length(); i++) {
-    codestr = Components[i].getQucs();
-    if (!codestr.isEmpty())
-      QucsNetlist += codestr;
-  }
 }
 
 TwoWayWilkinsonParams PowerCombinerDesigner::CalculateWilkinson() {

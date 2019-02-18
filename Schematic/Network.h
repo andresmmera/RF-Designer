@@ -1,5 +1,5 @@
 /***************************************************************************
-                                SteppedImpedanceFilter.h
+                                component.h
                                 ----------
     copyright            :  QUCS team
     author                :  2019 Andres Martinez-Mera
@@ -14,25 +14,29 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
+#ifndef NETWORK_H
+#define NETWORK_H
 
-#ifndef STEPPEDIMPEDANCEFILTER_H
-#define STEPPEDIMPEDANCEFILTER_H
-
-#include "Filtering/LowpassPrototypeCoeffs.h"
-#include "Schematic/Network.h"
-#include "Schematic/component.h"
-#include "general.h"
+#include "Schematic/SchematicContent.h"
+#include <QMap>
 #include <QPen>
+#include <QString>
+#include <QStringList>
+#include <complex>
+#include <deque>
+#include <vector>
 
-class SteppedImpedanceFilter : public Network {
+class SchematicContent;
+class WireInfo;
+class NodeInfo;
+class ComponentInfo;
+
+// Inherited by the network implementation classes
+class Network {
 public:
-  SteppedImpedanceFilter();
-  virtual ~SteppedImpedanceFilter();
-  SteppedImpedanceFilter(FilterSpecifications);
-  void synthesize();
-
-private:
-  struct FilterSpecifications Specification;
+  virtual void synthesize() = 0;
+  SchematicContent Schematic; // This object contains all the circuit data of
+  // the filter, i.e. components and nets and it
+  // returns data for the simulation
 };
-
-#endif // STEPPEDIMPEDANCEFILTER_H
+#endif

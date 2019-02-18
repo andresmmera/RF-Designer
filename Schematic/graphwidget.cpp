@@ -205,10 +205,10 @@ void GraphWidget::setNodes(QList<NodeInfo> nds) {
   }
 }
 
-void GraphWidget::setSchematic(SchematicInfo SchInfo) {
-  this->setNodes(SchInfo.Nodes);
-  this->setComponents(SchInfo.Comps);
-  this->setWires(SchInfo.Wires);
+void GraphWidget::setSchematic(SchematicContent SchContent) {
+  this->setNodes(SchContent.getNodes());
+  this->setComponents(SchContent.getComponents());
+  this->setWires(SchContent.getWires());
 }
 
 // Clear the scene

@@ -36,7 +36,6 @@
 #include "Schematic/graphwidget.h"
 #include "UI/QucsRFDesignerWindow.h"
 #include "UI/preferencesdialog.h"
-#include "UI/smithchart.h"
 #include "qcustomplot.h"
 
 // Tools
@@ -49,16 +48,6 @@
 
 struct ToolSettings {
   QString PathToQucsator;
-  double fstart;
-  double fstop;
-  double Npoints;
-  std::vector<bool> ShowTraces;
-  std::vector<QColor> TraceColor;
-  double xstep;
-  double ymin;
-  double ymax;
-  double ystep;
-  bool FixedAxes;
 };
 
 class QucsRFDesignerWindow : public QMainWindow {
@@ -75,10 +64,9 @@ private slots: // Functions to launch the actions
   void PreferencesWindow();
   void ReceiveSettings(ToolSettings);
   QMap<QString, vector<complex<double>>> loadQucsDataSet(QString);
-  void ShowSmithChart();
   void ReceiveNetworkFromDesignTools(
-      struct SchematicInfo); // Simulates the network after changing the design
-                             // goals
+      SchematicContent); // Simulates the network after changing the design
+                         // goals
   void simulate(); // Rerun simulation when the user does some action over the
                    // display
   void
@@ -97,8 +85,7 @@ private: // Actions
   void UpdateWindows();
   QToolBar *RFToolBar;
 
-  QAction *PreferencesAction, *SmithAction;
-  bool SmithWindowVisible;
+  QAction *PreferencesAction;
   QString netlist;
   // ************************* Widgets *******************************
   GraphWidget *SchematicWidget;
@@ -107,16 +94,14 @@ private: // Actions
   PowerCombiningTool *PowerCombining_Tool; // Widget for power combiner design
   AttenuatorDesignTool *AttenuatorDesign_Tool;
 
-  SmithChart *Smith_plot;
-
   // ************************** Docks ********************************
   QDockWidget *dock_Schematic, *dock_Setup, *dock_DisplayWindow1,
-      *dock_DisplayWindow2, *dock_Smith;
+      *dock_DisplayWindow2;
 
   // ************************ SIMULATION SETTINGS ********************
   SP_Analysis SPAR_Settings;
   NetworkInfo NWI; // Synthesized network
-  SchematicInfo SchInfo;
+  SchematicContent SchContent;
 
   // ************************ TOOL SETTINGS *************************
   ToolSettings Tool_Settings;

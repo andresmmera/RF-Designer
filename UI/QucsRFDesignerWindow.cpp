@@ -22,13 +22,11 @@ QucsRFDesignerWindow::QucsRFDesignerWindow() {
   dock_Setup = new QDockWidget("");
   dock_DisplayWindow1 = new QDockWidget("Plot window");
   dock_DisplayWindow2 = new QDockWidget("Plot window");
-  dock_Smith = new QDockWidget("Smith chart");
 
   dock_Schematic->setAllowedAreas(Qt::AllDockWidgetAreas);
   dock_Setup->setAllowedAreas(Qt::AllDockWidgetAreas);
   dock_DisplayWindow1->setAllowedAreas(Qt::AllDockWidgetAreas);
   dock_DisplayWindow2->setAllowedAreas(Qt::AllDockWidgetAreas);
-  dock_Smith->setAllowedAreas(Qt::AllDockWidgetAreas);
   //******************************* End of the dock setup
 
   //******************* Setup panel ******************************
@@ -77,9 +75,6 @@ QucsRFDesignerWindow::QucsRFDesignerWindow() {
             SLOT(simulate()));
   }
 
-  Smith_plot = new SmithChart();
-  Smith_plot->showLine(true);
-  Smith_plot->setMinimumSize(200, 350);
   //*********************************** End of the plot window region
 
   SchematicWidget = new GraphWidget(dock_Schematic); // Schematic window
@@ -93,7 +88,7 @@ QucsRFDesignerWindow::QucsRFDesignerWindow() {
   dock_DisplayWindow1->setWidget(DisplayWindow[0]);
   dock_DisplayWindow2->setWidget(DisplayWindow[1]);
   dock_Schematic->setWidget(SchematicWidget);
-  dock_Smith->setWidget(Smith_plot);
+  ;
 
   addDockWidget(Qt::LeftDockWidgetArea, dock_Setup);
   addDockWidget(Qt::RightDockWidgetArea, dock_DisplayWindow1);
@@ -109,34 +104,20 @@ QucsRFDesignerWindow::QucsRFDesignerWindow() {
   SPAR_Settings.fstop = 1.5e9;  // 2GHz
   SPAR_Settings.n_points = 500; // points
 
-  //***********  Set default tool settings ****************************
-  Tool_Settings.ShowTraces.push_back(true);  // Show S21
-  Tool_Settings.ShowTraces.push_back(true);  // Show S11
-  Tool_Settings.ShowTraces.push_back(false); // Do not show S22 by default
-
-  Tool_Settings.TraceColor.push_back(Qt::red);       // S21 -> red
-  Tool_Settings.TraceColor.push_back(Qt::blue);      // S11 -> blue
-  Tool_Settings.TraceColor.push_back(Qt::darkGreen); // S22 -> green
-
-  Tool_Settings.fstart = 5e8;
-  Tool_Settings.fstop = 2e9;
-  Tool_Settings.xstep = 1e8;
-  Tool_Settings.ymin = -50;
-  Tool_Settings.ymax = 0;
-  Tool_Settings.ystep = 5;
-  Tool_Settings.FixedAxes = true;
-
   DisplayWindow[0]->xAxis->setRange(SPAR_Settings.fstart / 1e6,
                                     SPAR_Settings.fstop / 1e6);
-  DisplayWindow[0]->yAxis->setRange(Tool_Settings.ymin, Tool_Settings.ymax);
+  DisplayWindow[0]->yAxis->setRange(-50, 0);
+  QSharedPointer<QCPAxisTickerFixed> fixedTickerY(new QCPAxisTickerFixed);
+  fixedTickerY->setTickStep(5);
+  DisplayWindow[0]->yAxis->setTicker(fixedTickerY);
 
   connect(TabWidget, SIGNAL(currentChanged(int)), this, SLOT(SwitchTabs(int)));
-  connect(Filter_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)), this,
-          SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
-  connect(PowerCombining_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)),
-          this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
-  connect(AttenuatorDesign_Tool, SIGNAL(simulateNetwork(struct SchematicInfo)),
-          this, SLOT(ReceiveNetworkFromDesignTools(struct SchematicInfo)));
+  connect(Filter_Tool, SIGNAL(simulateNetwork(SchematicContent)), this,
+          SLOT(ReceiveNetworkFromDesignTools(SchematicContent)));
+  connect(PowerCombining_Tool, SIGNAL(simulateNetwork(SchematicContent)), this,
+          SLOT(ReceiveNetworkFromDesignTools(SchematicContent)));
+  connect(AttenuatorDesign_Tool, SIGNAL(simulateNetwork(SchematicContent)),
+          this, SLOT(ReceiveNetworkFromDesignTools(SchematicContent)));
 
   Filter_Tool->design();
 }
@@ -167,10 +148,6 @@ void QucsRFDesignerWindow::PreferencesWindow() {
 }
 
 void QucsRFDesignerWindow::ReceiveSettings(ToolSettings TS) {
-  SPAR_Settings.fstart = TS.fstart;
-  SPAR_Settings.fstop = TS.fstop;
-  SPAR_Settings.n_points = TS.Npoints;
-
   Tool_Settings = TS;
   UpdateWindows();
 }
@@ -181,20 +158,12 @@ void QucsRFDesignerWindow::createActions() {
   PreferencesAction->setStatusTip("Set up preferences");
   connect(PreferencesAction, SIGNAL(triggered()), this,
           SLOT(PreferencesWindow()));
-
-  SmithAction = new QAction("Smith Chart", this);
-  SmithAction->setStatusTip("Show Smith Chart plot");
-  connect(SmithAction, SIGNAL(changed()), this, SLOT(ShowSmithChart()));
 }
 
 void QucsRFDesignerWindow::createMenus() {
   RFToolBar = addToolBar(tr("RFtools"));
   PreferencesAction->setIcon(QIcon(":/bitmaps/Settings.png"));
   RFToolBar->addAction(PreferencesAction);
-
-  SmithAction->setIcon(QIcon(":/bitmaps/SmithChartIcon.png"));
-  SmithAction->setCheckable(true);
-  RFToolBar->addAction(SmithAction);
 }
 
 // This function updates the content of the schematic window and the display
@@ -210,7 +179,7 @@ void QucsRFDesignerWindow::updateGraph(
 
   QVector<double> freq =
       QVector<double>::fromStdVector(freq_); // Get frequency axis
-  QMapIterator<QString, QPen> MapIT(SchInfo.displayGraphs);
+  QMapIterator<QString, QPen> MapIT(SchContent.getDisplayGraphs());
 
   while (MapIT.hasNext()) {
     MapIT.next();
@@ -223,25 +192,7 @@ void QucsRFDesignerWindow::updateGraph(
     DisplayWindow[DisplayID]->graph()->setData(freq, trace);
   }
 
-  // X axis step
-  QSharedPointer<QCPAxisTickerFixed> fixedTickerX(new QCPAxisTickerFixed);
-  fixedTickerX->setTickStep(Tool_Settings.xstep / k);
-  DisplayWindow[DisplayID]->xAxis->setTicker(fixedTickerX);
-  // Y axis step
-  QSharedPointer<QCPAxisTickerFixed> fixedTickerY(new QCPAxisTickerFixed);
-  fixedTickerY->setTickStep(Tool_Settings.ystep);
-  DisplayWindow[DisplayID]->yAxis->setTicker(fixedTickerY);
-
   DisplayWindow[DisplayID]->replot();
-
-  // Update Smith Chart
-  /*  std::complex<double> Z;
-  Smith_plot->clear();
-  for(unsigned int i = 0; i < S11_.size(); i++)
-  {
-      Z = ((std::complex<double>(1, 0)+S11_.at(i)))/(std::complex<double>(1,
-  0)-S11_.at(i)); Smith_plot->setData(Z.real(),Z.imag());
-  }*/
 }
 
 void QucsRFDesignerWindow::updateGraph(int DisplayID, vector<double> Pin_,
@@ -381,29 +332,19 @@ QucsRFDesignerWindow::loadQucsDataSet(QString dataset_path) {
   return data;
 }
 
-void QucsRFDesignerWindow::ShowSmithChart() {
-  if (SmithAction->isChecked()) {
-    Smith_plot->show();
-  }
-}
-
-void QucsRFDesignerWindow::ReceiveNetworkFromDesignTools(
-    struct SchematicInfo SI) {
-  SchInfo = SI;
+void QucsRFDesignerWindow::ReceiveNetworkFromDesignTools(SchematicContent SI) {
+  SchContent = SI;
   simulate();
 }
 
 void QucsRFDesignerWindow::simulate() {
-  if (!SchInfo.Description.contains("NOT LADDER"))
+  if (!SchContent.getDescription().contains("NOT LADDER"))
     SimulateLadderSPAR();
   else
     SimulateSPAR();
 }
 
-void QucsRFDesignerWindow::PlotImpedanceTransformations() {
-  Smith_plot->clear();
-  Smith_plot->setData(SchInfo.ImpedanceTrace);
-}
+void QucsRFDesignerWindow::PlotImpedanceTransformations() {}
 
 // S-parameter simulation using the built-in ladder SPAR simulator. This is used
 // only for SPAR simulations relying on the input/output port (complex)
@@ -426,14 +367,14 @@ void QucsRFDesignerWindow::SimulateLadderSPAR() {
   SPARSettings.n_points = SPAR_Settings.n_points;
   SPARSim.setSimulationSettings(SPARSettings);
 
+  // Convert SchematicContent object data into NetworkInfo for SPAR simulation
   NetworkInfo NWI;
   std::vector<complex<double>> ZS(1), ZL(1);
-  ZS[0] = Str2Complex(SchInfo.Comps[0].val["Z"]); // Port 1 impedance
-  ZL[0] = Str2Complex(
-      SchInfo.Comps[SchInfo.Comps.size() - 1].val["Z"]); // Port 2 impedance
+  ZS[0] = Str2Complex(SchContent.getZinString());  // Port 1 impedance
+  ZL[0] = Str2Complex(SchContent.getZoutString()); // Port 2 impedance
   NWI.ZS = ZS;
   NWI.ZL = ZL;
-  NWI.Ladder = SchInfo.Comps;
+  NWI.Ladder = SchContent.getComponents();
   SPARSim.setNetwork(NWI);
   SPARSim.run();
 
@@ -449,7 +390,7 @@ void QucsRFDesignerWindow::SimulateLadderSPAR() {
   }
 
   SchematicWidget->clear(); // Remove the components in the scene
-  SchematicWidget->setSchematic(SchInfo);
+  SchematicWidget->setSchematic(SchContent);
 
   QMap<QString, vector<complex<double>>> data = SPARSim.getData();
   updateGraph(0, SPARSim.getFreq(), data);
@@ -481,7 +422,7 @@ void QucsRFDesignerWindow::SimulateSPAR() {
 
   SchematicWidget->clear(); // Remove the components in the scene
 
-  netlist = SchInfo.netlist;
+  netlist = SchContent.getQucsNetlist();
   netlist +=
       QString(
           ".SP:SP1 Type=\"lin\" Start=\"%1 Hz\" Stop=\"%2 Hz\" Points=\"%3\"\n")
@@ -497,7 +438,7 @@ void QucsRFDesignerWindow::SimulateSPAR() {
   system("qucsator -i netlist -o data.dat");
 
   // Update schematic window
-  SchematicWidget->setSchematic(SchInfo);
+  SchematicWidget->setSchematic(SchContent);
 
   // Load info from Qucs dataset and update graph
   QMap<QString, vector<complex<double>>> data = loadQucsDataSet("data.dat");

@@ -20,126 +20,129 @@ void PowerCombinerDesigner::Gysel() {
   double lambda4 = SPEED_OF_LIGHT / (4 * Specs.freq);
   double lambda2 = lambda4 * 2;
 
-  ComponentInfo TermSpar1(QString("T%1").arg(++NumberComponents[Term]), Term,
-                          180, 0, 0, "N0", "gnd");
+  ComponentInfo TermSpar1(
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, -20,
+      0);
   TermSpar1.val["Z0"] = num2str(Specs.Z0, Resistance);
-  Components.append(TermSpar1);
+  Schematic.appendComponent(TermSpar1);
 
-  ComponentInfo TL1(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
-                    TransmissionLine, 0, 0, -50, "N0", "N1");
-  TL1.ID = QString("TLIN%1").arg(++NumberComponents[TransmissionLine]);
+  NodeInfo NSP1(
+      QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 0, 0);
+  Schematic.appendNode(NSP1);
+
+  ComponentInfo TL1(
+      QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
+      TransmissionLine, 0, 0, -50);
+  TL1.ID =
+      QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]);
   TL1.val["Z0"] = num2str(sqrt(2) * Specs.Z0, Resistance);
   TL1.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
-  Components.append(TL1);
+  Schematic.appendComponent(TL1);
 
-  WireInfo WI(TL1.ID, 0, TermSpar1.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(NSP1.ID, 0, TermSpar1.ID, 0);
+  Schematic.appendWire(TL1.ID, 0, NSP1.ID, 0);
 
-  ComponentInfo TL2(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
-                    TransmissionLine, 0, 0, 50, "N0", "N4");
-  TL2.ID = QString("TLIN%1").arg(++NumberComponents[TransmissionLine]);
+  ComponentInfo TL2(
+      QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
+      TransmissionLine, 0, 0, 50);
+  TL2.ID =
+      QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]);
   TL2.val["Z0"] = num2str(sqrt(2) * Specs.Z0, Resistance);
   TL2.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
-  Components.append(TL2);
+  Schematic.appendComponent(TL2);
 
-  WI.setParams(TL2.ID, 1, TermSpar1.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(TL2.ID, 1, NSP1.ID, 0);
 
-  ComponentInfo TL3(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
-                    TransmissionLine, 90, 100, -75, "N1", "N2");
+  ComponentInfo TL3(
+      QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
+      TransmissionLine, 90, 100, -75);
   TL3.val["Z0"] = num2str(Specs.Z0, Resistance);
   TL3.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
-  Components.append(TL3);
+  Schematic.appendComponent(TL3);
 
-  ComponentInfo TermSpar2(QString("T%1").arg(++NumberComponents[Term]), Term,
-                          180, 0, -75, "N1", "gnd");
+  ComponentInfo TermSpar2(
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, -20,
+      -75);
   TermSpar2.val["Z0"] = num2str(Specs.Z0, Resistance);
-  Components.append(TermSpar2);
+  Schematic.appendComponent(TermSpar2);
 
-  WI.setParams(TL1.ID, 1, TermSpar2.ID, 0);
-  Wires.append(WI);
+  NodeInfo NSP2(
+      QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 0,
+      -75);
+  Schematic.appendNode(NSP2);
 
-  WI.setParams(TL3.ID, 0, TermSpar2.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(NSP2.ID, 0, TermSpar2.ID, 0);
+  Schematic.appendWire(TL1.ID, 1, NSP2.ID, 0);
+  Schematic.appendWire(TL3.ID, 0, NSP2.ID, 0);
 
-  ComponentInfo TL4(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
-                    TransmissionLine, 90, 100, 75, "N3", "N4");
+  ComponentInfo TL4(
+      QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
+      TransmissionLine, 90, 100, 75);
   TL4.val["Z0"] = num2str(Specs.Z0, Resistance);
   TL4.val["Length"] = ConvertLengthFromM(Specs.units, lambda4);
-  Components.append(TL4);
+  Schematic.appendComponent(TL4);
 
-  ComponentInfo TermSpar3(QString("T%1").arg(++NumberComponents[Term]), Term,
-                          180, 0, 75, "N4", "gnd");
+  ComponentInfo TermSpar3(
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, -20,
+      75);
   TermSpar3.val["Z0"] = num2str(Specs.Z0, Resistance);
-  Components.append(TermSpar3);
+  Schematic.appendComponent(TermSpar3);
 
-  WI.setParams(TL2.ID, 0, TermSpar3.ID, 0);
-  Wires.append(WI);
+  NodeInfo NSP3(
+      QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), 0, 75);
+  Schematic.appendNode(NSP3);
 
-  WI.setParams(TL4.ID, 0, TermSpar3.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(NSP3.ID, 0, TermSpar3.ID, 0);
+  Schematic.appendWire(TL2.ID, 0, NSP3.ID, 0);
+  Schematic.appendWire(TL4.ID, 0, NSP3.ID, 0);
 
   // Node
-  NodeInfo N1(QString("N%1").arg(++NumberComponents[ConnectionNodes]), 150,
-              -75);
-  Nodes.append(N1);
+  NodeInfo N1(QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]),
+              150, -75);
+  Schematic.appendNode(N1);
 
-  ComponentInfo TL5(QString("TLIN%1").arg(++NumberComponents[TransmissionLine]),
-                    TransmissionLine, 0, 150, 0, "N2", "N3");
+  ComponentInfo TL5(
+      QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
+      TransmissionLine, 0, 150, 0);
   TL5.val["Z0"] = num2str(Specs.Z0 / sqrt(2), Resistance);
   TL5.val["Length"] = ConvertLengthFromM(Specs.units, lambda2);
-  Components.append(TL5);
+  Schematic.appendComponent(TL5);
 
   // Node
-  NodeInfo N2(QString("N%1").arg(++NumberComponents[ConnectionNodes]), 150, 75);
-  Nodes.append(N2);
+  NodeInfo N2(QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]),
+              150, 75);
+  Schematic.appendNode(N2);
 
-  ComponentInfo Ri1(QString("R%1").arg(++NumberComponents[Resistor]), Resistor,
-                    0, 200, 100, "N3", "gnd");
+  ComponentInfo Ri1(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
+                    Resistor, 0, 200, 100);
   Ri1.val["R"] = num2str(Specs.Z0, Resistance);
-  Components.append(Ri1);
+  Schematic.appendComponent(Ri1);
 
-  ComponentInfo Ground1(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
-                        200, 125, "", "");
-  Components.append(Ground1);
+  ComponentInfo Ground1(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
+                        GND, 0, 200, 125);
+  Schematic.appendComponent(Ground1);
 
-  WI.setParams(Ri1.ID, 0, Ground1.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(Ri1.ID, 0, Ground1.ID, 0);
+  Schematic.appendWire(Ri1.ID, 1, N2.ID, 0);
+  Schematic.appendWire(TL5.ID, 0, N2.ID, 0);
+  Schematic.appendWire(TL4.ID, 1, N2.ID, 0);
+  Schematic.appendWire(TL5.ID, 1, N1.ID, 1);
 
-  WI.setParams(Ri1.ID, 1, N2.ID, 0);
-  Wires.append(WI);
-
-  WI.setParams(TL5.ID, 0, N2.ID, 0);
-  Wires.append(WI);
-
-  WI.setParams(TL4.ID, 1, N2.ID, 0);
-  Wires.append(WI);
-
-  WI.setParams(TL5.ID, 1, TL3.ID, 1);
-  Wires.append(WI);
-
-  ComponentInfo Ri2(QString("R%1").arg(++NumberComponents[Resistor]), Resistor,
-                    0, 200, -50, "N2", "gnd");
+  ComponentInfo Ri2(QString("R%1").arg(++Schematic.NumberComponents[Resistor]),
+                    Resistor, 0, 200, -50);
   Ri2.val["R"] = num2str(Specs.Z0, Resistance);
-  Components.append(Ri2);
+  Schematic.appendComponent(Ri2);
 
-  ComponentInfo Ground2(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
-                        200, 0, "", "");
-  Components.append(Ground2);
+  ComponentInfo Ground2(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
+                        GND, 0, 200, 0);
+  Schematic.appendComponent(Ground2);
+  Schematic.appendWire(Ri2.ID, 0, Ground2.ID, 0);
+  Schematic.appendWire(Ri2.ID, 1, N1.ID, 0);
+  Schematic.appendWire(TL3.ID, 1, N1.ID, 0);
 
-  WI.setParams(Ri2.ID, 0, Ground2.ID, 0);
-  Wires.append(WI);
-
-  WI.setParams(Ri2.ID, 1, N1.ID, 0);
-  Wires.append(WI);
-
-  // Ideally, the user should be the one which controls the style of the traces
-  // as well the traces to be shown However, in favour of a simpler
-  // implementation, it'll be the design code responsible for this... by the
-  // moment...
-  displaygraphs.clear();
-  displaygraphs[QString("S[2,1]")] = QPen(Qt::red, 1, Qt::SolidLine);
-  displaygraphs[QString("S[3,1]")] = QPen(Qt::red, 1, Qt::DashLine);
-  displaygraphs[QString("S[1,1]")] = QPen(Qt::blue, 1, Qt::SolidLine);
-  displaygraphs[QString("S[3,2]")] = QPen(Qt::black, 1, Qt::DotLine);
+  Schematic.clearGraphs();
+  Schematic.appendGraph(QString("S[2,1]"), QPen(Qt::red, 1, Qt::SolidLine));
+  Schematic.appendGraph(QString("S[3,1]"), QPen(Qt::red, 1, Qt::DashLine));
+  Schematic.appendGraph(QString("S[1,1]"), QPen(Qt::blue, 1, Qt::SolidLine));
+  Schematic.appendGraph(QString("S[3,2]"), QPen(Qt::black, 1, Qt::DotLine));
 }

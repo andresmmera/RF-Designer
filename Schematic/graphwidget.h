@@ -41,54 +41,50 @@
 #ifndef GRAPHWIDGET_H
 #define GRAPHWIDGET_H
 
-#include <QtGui/QGraphicsView>
+#include "Schematic/SchematicContent.h"
+#include "Schematic/structures.h"
 #include <QMap>
+#include <QtGui/QGraphicsView>
 #include <deque>
 
-#include "Filtering/Network.h"
-#include "Schematic/component.h"
-#include "Schematic/wire.h"
-#include "Schematic/node.h"
-
 class Node;
-class Component;
+class Wire;
 
 //! [0]
-class GraphWidget : public QGraphicsView
-{
-    Q_OBJECT
+class GraphWidget : public QGraphicsView {
+  Q_OBJECT
 
 public:
-    GraphWidget(QWidget *parent = 0);
+  GraphWidget(QWidget *parent = 0);
 
-    void itemMoved();
-    void setComponents(QList<struct ComponentInfo>);
-    void ModifyComponent(struct ComponentInfo);
-    void setWires(QList<struct WireInfo>);
-    void setNodes(QList<struct NodeInfo>);
-    void setSchematic(struct SchematicInfo);
-    void clear();
+  void itemMoved();
+  void setComponents(QList<struct ComponentInfo>);
+  void ModifyComponent(struct ComponentInfo);
+  void setWires(QList<struct WireInfo>);
+  void setNodes(QList<struct NodeInfo>);
+  void setSchematic(SchematicContent);
+  void clear();
 
 public slots:
-    void shuffle();
-    void zoomIn();
-    void zoomOut();
-    void ComponentSelectionHandler(struct ComponentInfo);
+  void shuffle();
+  void zoomIn();
+  void zoomOut();
+  void ComponentSelectionHandler(struct ComponentInfo);
 
 protected:
-    void keyPressEvent(QKeyEvent *event);
-    void timerEvent(QTimerEvent *event);
-    void wheelEvent(QWheelEvent *event);
+  void keyPressEvent(QKeyEvent *event);
+  void timerEvent(QTimerEvent *event);
+  void wheelEvent(QWheelEvent *event);
 
-    void scaleView(qreal scaleFactor);
+  void scaleView(qreal scaleFactor);
 
 private:
-    int timerId;
-    std::deque<Component*> Components;
-    std::deque<Wire*> Wires;
-    std::deque<Node*> Nodes;
+  int timerId;
+  std::deque<Component *> Components;
+  std::deque<Wire *> Wires;
+  std::deque<Node *> Nodes;
 signals:
-    void SendComponentSelectionToMainFunction(struct ComponentInfo);
+  void SendComponentSelectionToMainFunction(struct ComponentInfo);
 };
 //! [0]
 

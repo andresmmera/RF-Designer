@@ -248,20 +248,37 @@ QPoint Component::getPortLocation(int port_number) {
     break;
 
   case Coupler:
+    switch (port_number) {
+    case 0:
+    default:
+      P = QPoint(-10, 25);
+      break;
+    case 1:
+      P = QPoint(-10, -25);
+      break;
+    case 2:
+      P = QPoint(10, -25);
+      break;
+    case 3:
+      P = QPoint(10, 25);
+      break;
+    }
+    break;
+
   case CoupledLines:
     switch (port_number) {
     case 0:
     default:
-      P = QPoint(-10, -25);
-      break;
-    case 1:
-      P = QPoint(10, -25);
-      break;
-    case 2:
       P = QPoint(-10, 25);
       break;
-    case 3:
+    case 1:
       P = QPoint(10, 25);
+      break;
+    case 2:
+      P = QPoint(10, -25);
+      break;
+    case 3:
+      P = QPoint(-10, -25);
       break;
     }
   }
@@ -666,8 +683,6 @@ void Component::paintCoupler(QPainter *painter) {
   if (Rotation != 0) {
     painter->rotate(Rotation);
   }
-
-  int w = 15, shiftx = 10;
 
   // Terms
   painter->drawLine(QPoint(-10, -25), QPoint(-10, -20));

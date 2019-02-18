@@ -31,8 +31,9 @@
 #include <QWidget>
 #include <QtSql>
 
-#include "Filtering/Network.h"
 #include "PowerCombining/PowerCombinerDesigner.h"
+#include "Schematic/Network.h"
+#include "Schematic/SchematicContent.h"
 
 class BagleyValidator : public QValidator {
   Q_OBJECT
@@ -58,6 +59,7 @@ public:
   PowerCombiningTool();
   ~PowerCombiningTool();
   void design();
+  SchematicContent getSchematic();
 
 private slots:
   void UpdateDesignParameters();
@@ -78,13 +80,13 @@ private:
 
   double getScaleFreq();
   QString netlist;
-  SchematicInfo SchInfo; // Schematic representation
+  SchematicContent SchContent; // Schematic representation
 
   // Input validation
   QValidator *Bagley_Validator;
 
 signals:
-  void simulateNetwork(struct SchematicInfo);
+  void simulateNetwork(SchematicContent);
 };
 
 #endif // POWERCOMBININGTOOL_H

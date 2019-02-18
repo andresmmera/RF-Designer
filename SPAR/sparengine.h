@@ -17,8 +17,9 @@
 #ifndef SPARENGINE_H
 #define SPARENGINE_H
 
-#include "Filtering/Network.h"
 #include "MathOperations.h"
+#include "Schematic/Network.h"
+#include "Schematic/structures.h"
 #include <set>
 #include <string.h>
 

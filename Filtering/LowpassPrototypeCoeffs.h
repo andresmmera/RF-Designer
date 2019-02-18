@@ -16,13 +16,14 @@
  ***************************************************************************/
 #ifndef LOWPASSPROTOTYPECOEFFS_H
 #define LOWPASSPROTOTYPECOEFFS_H
-#include "Filtering/Network.h"
+#include "Schematic/Network.h"
+#include "Schematic/structures.h"
 #include <QtSql>
 #include <deque>
 
 class LowpassPrototypeCoeffs {
 public:
-  LowpassPrototypeCoeffs(FilterSpecifications Specificica);
+  LowpassPrototypeCoeffs(FilterSpecifications);
   std::deque<double> getCoefficients();
   void setDatabase(QSqlDatabase);
 

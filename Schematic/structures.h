@@ -1,35 +1,25 @@
-/***************************************************************************
-                                Network.h
-                                ----------
-    copyright            :  QUCS team
-    author                :  2019 Andres Martinez-Mera
-    email                  :  andresmmera@protonmail.com
- ***************************************************************************/
+#ifndef STRUCTURES_H
+#define STRUCTURES_H
 
-/***************************************************************************
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- *
- ***************************************************************************/
-#ifndef NETWORK_H
-#define NETWORK_H
-
-#include <QFile>
-#include <QList>
-#include <QMap>
+#include <QString>
 #include <QStringList>
-#include <cmath>
 #include <complex>
 #include <deque>
-#include <list>
 #include <vector>
 
-#include "Schematic/component.h"
-#include <QDebug>
-#include <QtSql>
+enum ComponentType {
+  Capacitor,
+  Inductor,
+  Term,
+  GND,
+  ConnectionNodes,
+  Resistor,
+  TransmissionLine,
+  OpenStub,
+  ShortStub,
+  CoupledLines,
+  Coupler
+};
 
 enum ResponseType {
   Butterworth,
@@ -90,24 +80,6 @@ struct NetworkInfo {
       Ladder; // Contains the ID of the components and their properties
 };
 
-struct SP_Analysis {
-  unsigned int n_points;
-  double fstart;
-  double fstop;
-  std::vector<double> freq;
-};
-
-struct SchematicInfo {
-  struct SP_Analysis SPAR_Settings;
-  QString netlist;
-  QList<struct ComponentInfo> Comps;
-  QList<struct WireInfo> Wires;
-  QList<struct NodeInfo> Nodes;
-  QMap<QString, QPen> displayGraphs;
-  QString Description;
-  QVector<QPointF> ImpedanceTrace;
-};
-
 struct PowerCombinerParams {
   QString Type; // Wilkinson, branchlines, Bagley, etc.
   int Noutputs; // Number of output branches
@@ -130,12 +102,8 @@ struct AttenuatorDesignParameters {
   bool Lumped_TL;     // Use the lumped equivalent of a QW transmission line
 };
 
-class Network {
-public:
-  virtual QList<ComponentInfo> getComponents() = 0;
-  virtual QList<WireInfo> getWires() = 0;
-  virtual QList<NodeInfo> getNodes() = 0;
-  virtual void synthesize() = 0;
+struct PdissAtt {
+  double R1, R2, R3, R4;
 };
 
-#endif // NETWORK_H
+#endif // STRUCTURES_H

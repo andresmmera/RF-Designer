@@ -1,5 +1,5 @@
 /***************************************************************************
-                                SteppedImpedanceFilter.h
+                                TeeAttenuator.cpp
                                 ----------
     copyright            :  QUCS team
     author                :  2019 Andres Martinez-Mera
@@ -14,25 +14,21 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
-
-#ifndef STEPPEDIMPEDANCEFILTER_H
-#define STEPPEDIMPEDANCEFILTER_H
-
-#include "Filtering/LowpassPrototypeCoeffs.h"
+#ifndef TEEATTENUATOR_H
+#define TEEATTENUATOR_H
 #include "Schematic/Network.h"
-#include "Schematic/component.h"
-#include "general.h"
-#include <QPen>
+//#include "Schematic/SchematicContent.h"
+//#include "Schematic/component.h"
 
-class SteppedImpedanceFilter : public Network {
+class TeeAttenuator : public Network {
 public:
-  SteppedImpedanceFilter();
-  virtual ~SteppedImpedanceFilter();
-  SteppedImpedanceFilter(FilterSpecifications);
+  TeeAttenuator();
+  virtual ~TeeAttenuator();
+  TeeAttenuator(AttenuatorDesignParameters);
   void synthesize();
+  struct PdissAtt Pdiss;
 
 private:
-  struct FilterSpecifications Specification;
+  struct AttenuatorDesignParameters Specs;
 };
-
-#endif // STEPPEDIMPEDANCEFILTER_H
+#endif // TEEATTENUATOR_H

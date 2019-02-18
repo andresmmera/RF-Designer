@@ -16,23 +16,10 @@
  ***************************************************************************/
 #include "DirectCoupledFilters.h"
 
-DirectCoupledFilters::DirectCoupledFilters() {
-  // Initialize list of components
-  NumberComponents[Capacitor] = 0;
-  NumberComponents[Inductor] = 0;
-  NumberComponents[Term] = 0;
-  NumberComponents[GND] = 0;
-  NumberComponents[ConnectionNodes] = 0;
-}
+DirectCoupledFilters::DirectCoupledFilters() {}
 
 DirectCoupledFilters::DirectCoupledFilters(FilterSpecifications FS) {
   Specification = FS;
-  // Initialize list of components
-  NumberComponents[Capacitor] = 0;
-  NumberComponents[Inductor] = 0;
-  NumberComponents[Term] = 0;
-  NumberComponents[GND] = 0;
-  NumberComponents[ConnectionNodes] = 0;
 }
 
 DirectCoupledFilters::~DirectCoupledFilters() {}
@@ -45,22 +32,13 @@ void DirectCoupledFilters::synthesize() {
   if (Specification.DC_Coupling == InductiveCoupledSeriesResonators)
     Synthesize_Inductive_Coupled_Series_Resonators();
 
-  // Build Qucs netlist
-  QucsNetlist.clear();
-  QString codestr;
-  for (int i = 0; i < Components.length(); i++) {
-    codestr = Components[i].getQucs();
-    if (!codestr.isEmpty())
-      QucsNetlist += codestr;
-  }
-
   // Ideally, the user should be the one which controls the style of the traces
   // as well the traces to be shown However, in favour of a simpler
   // implementation, it'll be the design code responsible for this... by the
   // moment...
-  displaygraphs.clear();
-  displaygraphs[QString("S[2,1]")] = QPen(Qt::red, 1, Qt::SolidLine);
-  displaygraphs[QString("S[1,1]")] = QPen(Qt::blue, 1, Qt::SolidLine);
+  Schematic.clearGraphs();
+  Schematic.appendGraph(QString("S[2,1]"), QPen(Qt::red, 1, Qt::SolidLine));
+  Schematic.appendGraph(QString("S[1,1]"), QPen(Qt::blue, 1, Qt::SolidLine));
 }
 
 void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators() {
@@ -125,99 +103,90 @@ void DirectCoupledFilters::Synthesize_Capacitative_Coupled_Shunt_Resonators() {
   // Build schematic
   int posx = 0, Ni = 0;
   QString ConnectionAux = "";
-  Components.clear();
   double k = Specification.ZS;
 
-  ComponentInfo TermSpar1(QString("T%1").arg(++NumberComponents[Term]), Term,
-                          180, posx, 0, "N0", "gnd");
+  ComponentInfo TermSpar1(
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
+      0);
   TermSpar1.val["Z"] = num2str(k, Resistance);
-  Components.append(TermSpar1);
+  Schematic.appendComponent(TermSpar1);
 
   posx += 50;
   // Series capacitor
-  Cseries.setParams(QString("C%1").arg(++NumberComponents[Capacitor]),
-                    Capacitor, 90, posx, 0, "N0", "N1");
+  Cseries.setParams(QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
+                    Capacitor, 90, posx, 0);
   Cseries.val["C"] = num2str(Cs[0], Capacitance);
-  Components.append(Cseries);
+  Schematic.appendComponent(Cseries);
   Ni++;
 
   // Wires
   //***** Port to capacitor *****
-  WI.setParams(TermSpar1.ID, 0, Cseries.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(TermSpar1.ID, 0, Cseries.ID, 0);
 
   for (int k = 0; k < N; k++) {
     posx += 50;
     // Shunt resonator
     // Shunt inductor
-    Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor,
-                     0, posx, 50, QString("N%1").arg(Ni), "gnd");
+    Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
+                     Inductor, 0, posx, 50);
     Lshunt.val["L"] = num2str(L[k], Inductance);
-    Components.append(Lshunt);
+    Schematic.appendComponent(Lshunt);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
-                     posx, 100, "", "");
-    Components.append(Ground);
+    Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
+                     GND, 0, posx, 100);
+    Schematic.appendComponent(Ground);
 
-    WI.setParams(Lshunt.ID, 0, Ground.ID, 0);
-    Wires.append(WI);
+    Schematic.appendWire(Lshunt.ID, 0, Ground.ID, 0);
 
     posx += 25;
 
     // Node
-    NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), posx,
-                 0);
-    Nodes.append(NI);
+    NI.setParams(
+        QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), posx,
+        0);
+    Schematic.appendNode(NI);
 
     // Node to the previous series capacitor
-    WI.setParams(NI.ID, 0, Cseries.ID, 1);
-    Wires.append(WI);
+    Schematic.appendWire(NI.ID, 0, Cseries.ID, 1);
 
     posx += 25;
     // Shunt capacitor
-    Cshunt.setParams(QString("C%1").arg(++NumberComponents[Capacitor]),
-                     Capacitor, 0, posx, 50, QString("N%1").arg(Ni), "gnd");
+    Cshunt.setParams(
+        QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
+        0, posx, 50);
     Cshunt.val["C"] = num2str(Cp[k], Capacitance);
-    Components.append(Cshunt);
+    Schematic.appendComponent(Cshunt);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
-                     posx, 100, "", "");
-    Components.append(Ground);
+    Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
+                     GND, 0, posx, 100);
+    Schematic.appendComponent(Ground);
 
     posx += 50;
     // Series capacitor
-    Cseries.setParams(QString("C%1").arg(++NumberComponents[Capacitor]),
-                      Capacitor, 90, posx, 0, QString("N%1").arg(Ni),
-                      QString("N%1").arg(Ni + 1));
+    Cseries.setParams(
+        QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
+        90, posx, 0);
     Cseries.val["C"] = num2str(Cs[k + 1], Capacitance);
-    Components.append(Cseries);
+    Schematic.appendComponent(Cseries);
     Ni++;
 
-    WI.setParams(NI.ID, 0, Lshunt.ID, 1);
-    Wires.append(WI);
-
-    WI.setParams(NI.ID, 0, Cshunt.ID, 1);
-    Wires.append(WI);
-
-    WI.setParams(NI.ID, 0, Cseries.ID, 0);
-    Wires.append(WI);
-
-    WI.setParams(Cshunt.ID, 0, Ground.ID, 0);
-    Wires.append(WI);
+    Schematic.appendWire(NI.ID, 0, Lshunt.ID, 1);
+    Schematic.appendWire(NI.ID, 0, Cshunt.ID, 1);
+    Schematic.appendWire(NI.ID, 0, Cseries.ID, 0);
+    Schematic.appendWire(Cshunt.ID, 0, Ground.ID, 0);
   }
 
   posx += 50;
 
-  ComponentInfo TermSpar2(QString("T%1").arg(++NumberComponents[Term]), Term, 0,
-                          posx, 0, QString("N%1").arg(Ni), "gnd");
+  ComponentInfo TermSpar2(
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0);
   TermSpar2.val["Z"] = num2str(Specification.ZL, Resistance);
-  Components.append(TermSpar2);
+  Schematic.appendComponent(TermSpar2);
   ConnectionAux = TermSpar2.ID;
 
-  WI.setParams(Cseries.ID, 1, TermSpar2.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(Cseries.ID, 1, TermSpar2.ID, 0);
 }
 
 void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators() {
@@ -284,146 +253,119 @@ void DirectCoupledFilters::Synthesize_Inductive_Coupled_Series_Resonators() {
   }
 
   // Create schematic and Qucs netlist
-
   int posx = 0, Ni = 0;
   QString ConnectionAux = "";
-  Components.clear();
   double k = Specification.ZS;
   ComponentInfo Lseries, Lshunt, Cseries, Ground;
-  WireInfo WI;
   NodeInfo NI;
 
-  ComponentInfo TermSpar1(QString("T%1").arg(++NumberComponents[Term]), Term,
-                          180, posx, 0, QString("N%1").arg(Ni), "gnd");
+  ComponentInfo TermSpar1(
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 180, posx,
+      0);
   TermSpar1.val["Z"] = num2str(k, Resistance);
-  Components.append(TermSpar1);
+  Schematic.appendComponent(TermSpar1);
   ConnectionAux = TermSpar1.ID;
 
   posx += 50;
   // Series inductor
-  Lseries.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor,
-                    -90, posx, 0, "N0", "N1");
+  Lseries.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
+                    Inductor, -90, posx, 0);
   Lseries.val["L"] = num2str(Ls[0], Inductance);
-  Components.append(Lseries);
+  Schematic.appendComponent(Lseries);
   Ni++;
 
   // Wires
   //***** Port to capacitor *****
-  WI.setParams(TermSpar1.ID, 0, Lseries.ID, 1);
-  Wires.append(WI);
+  Schematic.appendWire(TermSpar1.ID, 0, Lseries.ID, 1);
 
   posx += 50;
   // Shunt inductor
-  Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor,
-                   0, posx, 50, QString("N%1").arg(Ni), "gnd");
+  Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
+                   Inductor, 0, posx, 50);
   Lshunt.val["L"] = num2str(Lp[0], Inductance);
-  Components.append(Lshunt);
+  Schematic.appendComponent(Lshunt);
 
   // GND
-  Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0, posx,
-                   100, "", "");
-  Components.append(Ground);
+  Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]), GND,
+                   0, posx, 100);
+  Schematic.appendComponent(Ground);
 
   // Node
-  NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), posx,
-               0);
-  Nodes.append(NI);
+  NI.setParams(
+      QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), posx,
+      0);
+  Schematic.appendNode(NI);
 
-  WI.setParams(Lseries.ID, 0, NI.ID, 0);
-  Wires.append(WI);
-
-  WI.setParams(NI.ID, 0, Lshunt.ID, 1);
-  Wires.append(WI);
-
-  WI.setParams(Lshunt.ID, 0, Ground.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(Lseries.ID, 0, NI.ID, 0);
+  Schematic.appendWire(NI.ID, 0, Lshunt.ID, 1);
+  Schematic.appendWire(Lshunt.ID, 0, Ground.ID, 0);
 
   for (int k = 0; k < N; k++) {
-    // Series resonator
-
     // Series inductor
     posx += 50;
-    Lseries.setParams(QString("L%1").arg(++NumberComponents[Inductor]),
-                      Inductor, -90, posx, 0, QString("N%1").arg(Ni),
-                      QString("N%1").arg(Ni + 1));
+    Lseries.setParams(
+        QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
+        -90, posx, 0);
     Lseries.val["L"] = num2str(Ls[k + 1], Inductance);
-    Components.append(Lseries);
+    Schematic.appendComponent(Lseries);
     Ni++;
 
     // Series capacitor
     posx += 75;
-    Cseries.setParams(QString("C%1").arg(++NumberComponents[Capacitor]),
-                      Capacitor, 90, posx, 0, QString("N%1").arg(Ni),
-                      QString("N%1").arg(Ni + 1));
+    Cseries.setParams(
+        QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
+        90, posx, 0);
     Cseries.val["C"] = num2str(Crk[k], Capacitance);
-    Components.append(Cseries);
+    Schematic.appendComponent(Cseries);
     Ni++;
 
     posx += 50;
     // Shunt inductor coupling
-    Lshunt.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor,
-                     0, posx, 50, QString("N%1").arg(Ni), "gnd");
+    Lshunt.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
+                     Inductor, 0, posx, 50);
     Lshunt.val["L"] = num2str(Lp[k + 1], Inductance);
-    Components.append(Lshunt);
+    Schematic.appendComponent(Lshunt);
 
     // GND
-    Ground.setParams(QString("GND%1").arg(++NumberComponents[GND]), GND, 0,
-                     posx, 100, "", "");
-    Components.append(Ground);
+    Ground.setParams(QString("GND%1").arg(++Schematic.NumberComponents[GND]),
+                     GND, 0, posx, 100);
+    Schematic.appendComponent(Ground);
 
-    // Series inductor to the previous section
-    WI.setParams(NI.ID, 0, Lseries.ID, 1);
-    Wires.append(WI);
-
-    // Series inductor to the series capacitor
-    WI.setParams(Lseries.ID, 0, Cseries.ID, 0);
-    Wires.append(WI);
+    Schematic.appendWire(NI.ID, 0, Lseries.ID,
+                         1); // Series inductor to the previous section
+    Schematic.appendWire(Lseries.ID, 0, Cseries.ID,
+                         0); // Series inductor to the series capacitor
 
     // Node to connect the shunt coupling inductor to the series resonator
-    NI.setParams(QString("N%1").arg(++NumberComponents[ConnectionNodes]), posx,
-                 0);
-    Nodes.append(NI);
+    NI.setParams(
+        QString("N%1").arg(++Schematic.NumberComponents[ConnectionNodes]), posx,
+        0);
+    Schematic.appendNode(NI);
 
-    // Series inductor to the previous section
-    WI.setParams(NI.ID, 0, Cseries.ID, 1);
-    Wires.append(WI);
-
-    // Node to the shunt coupling inductor
-    WI.setParams(NI.ID, 0, Lshunt.ID, 1);
-    Wires.append(WI);
-
-    // Shunt inductor to ground
-    WI.setParams(Ground.ID, 0, Lshunt.ID, 0);
-    Wires.append(WI);
+    Schematic.appendWire(NI.ID, 0, Cseries.ID,
+                         1); // Series inductor to the previous section
+    Schematic.appendWire(NI.ID, 0, Lshunt.ID,
+                         1); // Node to the shunt coupling inductor
+    Schematic.appendWire(Ground.ID, 0, Lshunt.ID,
+                         0); // Shunt inductor to ground
   }
 
   posx += 50;
   // Series inductor
-  Lseries.setParams(QString("L%1").arg(++NumberComponents[Inductor]), Inductor,
-                    -90, posx, 0, QString("N%1").arg(Ni),
-                    QString("N%1").arg(Ni + 1));
+  Lseries.setParams(QString("L%1").arg(++Schematic.NumberComponents[Inductor]),
+                    Inductor, -90, posx, 0);
   Lseries.val["L"] = num2str(Ls[N + 1], Inductance);
-  Components.append(Lseries);
+  Schematic.appendComponent(Lseries);
 
-  // Last series inductor to the previous node
-  WI.setParams(NI.ID, 0, Lseries.ID, 1);
-  Wires.append(WI);
+  Schematic.appendWire(NI.ID, 0, Lseries.ID,
+                       1); // Last series inductor to the previous node
 
   posx += 50;
-  ComponentInfo TermSpar2(QString("T%1").arg(++NumberComponents[Term]), Term, 0,
-                          posx, 0, QString("N%1").arg(Ni + 1), "gnd");
+  ComponentInfo TermSpar2(
+      QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, posx, 0);
   TermSpar2.val["Z"] = num2str(Specification.ZL, Resistance);
-  Components.append(TermSpar2);
+  Schematic.appendComponent(TermSpar2);
 
   // Last series inductor to the previous node
-  WI.setParams(TermSpar2.ID, 0, Lseries.ID, 0);
-  Wires.append(WI);
+  Schematic.appendWire(TermSpar2.ID, 0, Lseries.ID, 0);
 }
-
-QList<ComponentInfo> DirectCoupledFilters::getComponents() {
-  return Components;
-}
-
-QList<WireInfo> DirectCoupledFilters::getWires() { return Wires; }
-
-QList<NodeInfo> DirectCoupledFilters::getNodes() { return Nodes; }

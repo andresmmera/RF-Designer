@@ -16,7 +16,9 @@
  ***************************************************************************/
 #ifndef POWERCOMBINERDESIGNER_H
 #define POWERCOMBINERDESIGNER_H
-#include "Filtering/Network.h"
+#include "Schematic/Network.h"
+#include "Schematic/SchematicContent.h"
+#include "Schematic/structures.h"
 #include "general.h"
 #include <QPen>
 
@@ -31,22 +33,12 @@ struct TwoWayWilkinsonParams {
 class PowerCombinerDesigner {
 public:
   PowerCombinerDesigner(PowerCombinerParams);
-  QList<ComponentInfo> getComponents();
-  QList<WireInfo> getWires();
-  QList<NodeInfo> getNodes();
-  QMap<QString, QPen> displaygraphs;
   void synthesize();
-  QString getQucsNetlist() { return QucsNetlist; };
+  SchematicContent getSchematic() { return Schematic; }
 
 private:
   PowerCombinerParams Specs;
-  QList<ComponentInfo> Components;
-  QList<WireInfo> Wires;
-  QList<NodeInfo> Nodes;
-
-  QString QucsNetlist;
-  QMap<ComponentType, int>
-      NumberComponents; // List for assigning IDs to the filter components
+  SchematicContent Schematic;
 
   // Power combiner design functions
   void Wilkinson();
