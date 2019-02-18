@@ -102,6 +102,12 @@ struct AttenuatorDesignParameters {
   bool Lumped_TL;     // Use the lumped equivalent of a QW transmission line
 };
 
+struct MatchingNetworkDesignParameters {
+  QString Topology; // Attenuator topology
+  double Zin;       // Input impedance
+  double Zout;      // Output impedance
+};
+
 struct PdissAtt {
   double R1, R2, R3, R4;
 };

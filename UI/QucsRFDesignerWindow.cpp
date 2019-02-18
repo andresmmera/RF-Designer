@@ -34,13 +34,12 @@ QucsRFDesignerWindow::QucsRFDesignerWindow() {
   //************* Filter Design tab ************************
 
   Filter_Tool = new FilterDesignTool();
-  QWidget *MatchingWidget =
-      new QWidget(); // Impedance matching. Not started yet...
+  MatchingNetworkDesign_Tool = new MatchingNetworkDesignTool();
   PowerCombining_Tool = new PowerCombiningTool();
   AttenuatorDesign_Tool = new AttenuatorDesignTool();
 
   TabWidget->addTab(Filter_Tool, "Filter design");
-  TabWidget->addTab(MatchingWidget, "Matching");
+  TabWidget->addTab(MatchingNetworkDesign_Tool, "Matching");
   TabWidget->addTab(PowerCombining_Tool, "Power Combining");
   TabWidget->addTab(AttenuatorDesign_Tool, "Attenuator Design");
   TabWidget->setMinimumSize(200, 150);
@@ -128,15 +127,6 @@ QucsRFDesignerWindow::~QucsRFDesignerWindow() {
   delete SchematicWidget;
   for (int i = 0; i < DisplayWindow.size(); i++)
     delete DisplayWindow[i];
-
-  /* delete dock_Schematic;
-delete dock_Setup;
-delete dock_DisplayWindow1;
-delete TabWidget;
-delete FilterDesignWidget;
-delete FilterDesignLayout;
-delete TeePiWidget;
-delete TeePiLayout;*/
 }
 
 // Launches the preferences window
@@ -343,8 +333,6 @@ void QucsRFDesignerWindow::simulate() {
   else
     SimulateSPAR();
 }
-
-void QucsRFDesignerWindow::PlotImpedanceTransformations() {}
 
 // S-parameter simulation using the built-in ladder SPAR simulator. This is used
 // only for SPAR simulations relying on the input/output port (complex)

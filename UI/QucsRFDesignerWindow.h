@@ -41,6 +41,7 @@
 // Tools
 #include "UI/AttenuatorDesignTool.h"
 #include "UI/FilterDesignTool.h"
+#include "UI/MatchingNetworkDesignTool.h"
 #include "UI/PowerCombiningTool.h"
 
 // Math operations
@@ -77,7 +78,6 @@ private slots: // Functions to launch the actions
   // Simulations
   void SimulateSPAR();
   void SimulateLadderSPAR();
-  void PlotImpedanceTransformations();
 
 private: // Actions
   void createActions();
@@ -92,7 +92,9 @@ private: // Actions
   QVector<QCustomPlot *> DisplayWindow;
   FilterDesignTool *Filter_Tool;           // Widget for filter design
   PowerCombiningTool *PowerCombining_Tool; // Widget for power combiner design
-  AttenuatorDesignTool *AttenuatorDesign_Tool;
+  AttenuatorDesignTool *AttenuatorDesign_Tool; // Widget for attenuator design
+  MatchingNetworkDesignTool
+      *MatchingNetworkDesign_Tool; // Widget for matching network design
 
   // ************************** Docks ********************************
   QDockWidget *dock_Schematic, *dock_Setup, *dock_DisplayWindow1,

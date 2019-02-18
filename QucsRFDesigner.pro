@@ -32,6 +32,7 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     AttenuatorDesign/QW_SeriesAttenuator.h \
     AttenuatorDesign/QW_ShuntAttenuator.h \
     Schematic/infoclasses.h \
+    UI/MatchingNetworkDesignTool.h
 
 
 SOURCES += main.cpp \
@@ -74,7 +75,8 @@ SOURCES += main.cpp \
     AttenuatorDesign/ReflectionAttenuator.cpp \
     AttenuatorDesign/QW_SeriesAttenuator.cpp \
     AttenuatorDesign/QW_ShuntAttenuator.cpp \
-    Schematic/SchematicContent.cpp
+    Schematic/SchematicContent.cpp \
+    UI/MatchingNetworkDesignTool.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 
