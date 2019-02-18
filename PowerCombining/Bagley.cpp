@@ -50,7 +50,6 @@ void PowerCombinerDesigner::Bagley() {
   Schematic.appendWire(TL2.ID, 1, N1.ID, 0);
   Schematic.appendWire(TermSpar.ID, 0, N1.ID, 0);
 
-  TermSpar.Connections.clear();
   TermSpar.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
                      Term, 90, 0, 120);
   TermSpar.val["Z"] = num2str(Specs.Z0, Resistance);
@@ -68,17 +67,14 @@ void PowerCombinerDesigner::Bagley() {
   int posx = -50;
   for (int i = 1; i < Specs.Noutputs; i++) {
     posx += 100;
-    TL.Connections.clear();
     TL.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
         TransmissionLine, 90, posx, 100);
     TL.val["Z0"] = num2str(Zbranch, Resistance);
     TL.val["Length"] = ConvertLengthFromM(Specs.units, lambda2);
     Schematic.appendComponent(TL);
-
     Schematic.appendWire(NI.ID, 0, TL.ID, 0);
 
-    TermSpar.Connections.clear();
     TermSpar.setParams(QString("T%1").arg(++Schematic.NumberComponents[Term]),
                        Term, 90, posx + 50, 120);
     TermSpar.val["Z"] = num2str(Specs.Z0, Resistance);

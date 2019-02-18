@@ -26,9 +26,6 @@ void PowerCombinerDesigner::MultistageWilkinson() {
   ComponentInfo TL, TL_Upper, TL_Lower;
   NodeInfo NI, Nupper, Nlower, Nupper_, Nlower_;
 
-  QString PreviousNode; // Auxiliar variable for connecting the current stage to
-                        // the previous one in the for loop
-
   if (Specs.Implementation == "Lumped LC") // CLC pi equivalent calculation
   {
     double w = 2 * M_PI * Specs.freq;
@@ -119,10 +116,7 @@ void PowerCombinerDesigner::MultistageWilkinson() {
         C_ = C[i];
       // Upper branch
       posx += 50;
-      (i == 0) ? PreviousNode = "N0"
-               : PreviousNode = QString("Nupper%1").arg(i - 1);
 
-      Lseries.Connections.clear();
       Lseries.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
           -90, posx, -75);
@@ -132,7 +126,6 @@ void PowerCombinerDesigner::MultistageWilkinson() {
       posx += 50;
 
       // Cshunt
-      Cshunt.Connections.clear();
       Cshunt.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
           Capacitor, 0, posx, -50);
@@ -177,10 +170,6 @@ void PowerCombinerDesigner::MultistageWilkinson() {
 
       posx -= 50;
       // Lower branch
-      (i == 0) ? PreviousNode = "N0"
-               : PreviousNode = QString("Nlower%1").arg(i - 1);
-
-      Lseries.Connections.clear();
       Lseries.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
           -90, posx, 75);
@@ -189,7 +178,6 @@ void PowerCombinerDesigner::MultistageWilkinson() {
 
       posx += 50;
       // Cshunt
-      Cshunt.Connections.clear();
       Cshunt.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
           Capacitor, 0, posx, 100);
@@ -231,9 +219,6 @@ void PowerCombinerDesigner::MultistageWilkinson() {
       posx += 50;
       // Upper branch TL
       // 1st transmission line
-      (i == 0) ? PreviousNode = "N1"
-               : PreviousNode = QString("Nupper%1").arg(i - 1);
-      TL_Upper.Connections.clear();
       TL_Upper.setParams(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
           TransmissionLine, 90, posx + 15, -50);
@@ -255,9 +240,6 @@ void PowerCombinerDesigner::MultistageWilkinson() {
 
       // Lower branch TL
       // 1st transmission line
-      (i == 0) ? PreviousNode = "N1"
-               : PreviousNode = QString("Nlower%1").arg(i - 1);
-      TL_Lower.Connections.clear();
       TL_Lower.setParams(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
           TransmissionLine, 90, posx + 15, 50);

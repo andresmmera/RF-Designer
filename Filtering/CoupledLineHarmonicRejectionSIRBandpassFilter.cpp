@@ -75,7 +75,6 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
           ((1 - (J[k] * Z0) / sin(theta) + (J[k] * J[k] * Z0 * Z0)) /
            (1 - (J[k] * J[k] * Z0 * Z0) / (tan(theta) * tan(theta)))); // Eq. 21
 
-      Coupled_Lines.Connections.clear();
       // Set connections
       Coupled_Lines.setParams(
           QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
@@ -88,7 +87,6 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
       posx += 75;
       posy += 10;
 
-      TL.Connections.clear();
       TL.setParams(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
           TransmissionLine, 90, posx, posy);
@@ -119,7 +117,6 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
          (1 - (J[k] * J[k] * Z0 * Z0) / (tan(theta) * tan(theta)))); // Eq. 21
 
     // Coupled lines
-    Coupled_Lines.Connections.clear();
     Coupled_Lines.setParams(
         QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
         CoupledLines, 90, posx, posy);
@@ -131,7 +128,6 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
     posx += 50;
     posy += 10;
 
-    TL.Connections.clear();
     TL.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
         TransmissionLine, 90, posx, posy);
@@ -162,7 +158,6 @@ void CoupledLineHarmonicRejectionSIRBandpassFilter::synthesize() {
        (1 - (J[N] * J[N] * Z0 * Z0) / (tan(theta) * tan(theta)))); // Eq. 21
 
   // Coupled lines
-  Coupled_Lines.Connections.clear();
   Coupled_Lines.setParams(
       QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
       CoupledLines, 90, posx, posy);

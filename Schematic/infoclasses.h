@@ -15,7 +15,6 @@ public:
   };
 
   QString ID;
-  QStringList Connections;
   ComponentType Type;
   double Rotation;
   QString Net1, Net2; // ID of the nodes where the component is connected
@@ -111,10 +110,7 @@ public:
     code += "\n";
     return code;
   };
-
-  unsigned int parameter;
   std::map<QString, QString> val; // freq, L1.L, C1.C,...
-
   double getVal(QString);
 };
 

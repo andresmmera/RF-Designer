@@ -57,7 +57,6 @@ void QuarterWaveFilters::synthesize() {
 
   // Build schematic
   int posx = 0;
-  QString PreviousNode = "NS", CurrentNode;
   QString PreviousComp;
 
   ComponentInfo TermSpar1(
@@ -70,9 +69,7 @@ void QuarterWaveFilters::synthesize() {
 
   for (int k = 0; k < N; k++) {
     posx += 100;
-    CurrentNode = QString("N%1").arg(k);
     // Quarter-wave transmission line
-    QW_TL.Connections.clear();
     QW_TL.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
         TransmissionLine, 90, posx, 0);
@@ -98,7 +95,6 @@ void QuarterWaveFilters::synthesize() {
     default:
     case Bandpass:
       Z = (M_PI * Z0 * bw) / (4 * gi[k]);
-      SC_Stub.Connections.clear();
       SC_Stub.setParams(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
           ShortStub, 0, posx + 50, 50);
@@ -112,7 +108,6 @@ void QuarterWaveFilters::synthesize() {
 
     case Bandstop:
       Z = (4 * Z0) / (M_PI * bw * gi[k]);
-      OC_Stub.Connections.clear();
       OC_Stub.setParams(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
           OpenStub, 0, posx + 50, 50);
@@ -122,15 +117,12 @@ void QuarterWaveFilters::synthesize() {
 
       // Wire: Node to stub
       Schematic.appendWire(NI.ID, 0, OC_Stub.ID, 1);
-
       break;
     }
     PreviousComp = NI.ID;
-    PreviousNode = CurrentNode;
   }
   posx += 100;
   // Quarter-wave transmission line
-  QW_TL.Connections.clear();
   QW_TL.setParams(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
       TransmissionLine, 90, posx, 0);

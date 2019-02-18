@@ -927,7 +927,6 @@ void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
     L_li = lambda0 / (2 * M_PI) *
            asin(2 * M_PI * Specification.fc * Kl * Cshunt_LP->at(j) /
                 Specification.maxZ);
-    Lseries.Connections.clear();
     Lseries.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
         TransmissionLine, -90, posx + 50, 0);
@@ -958,7 +957,6 @@ void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
     L_li = lambda0 / (2 * M_PI) *
            asin(2 * M_PI * Specification.fc * Lseries_LP_MINC /
                 Specification.maxZ);
-    Lseries.Connections.clear();
     Lseries.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
         TransmissionLine, 90, posx, 0);
@@ -993,7 +991,6 @@ void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
     L_li =
         lambda0 / (2 * M_PI) *
         asin(2 * M_PI * Specification.fc * Lshunt_LP_MINC / Specification.maxZ);
-    Lshunt.Connections.clear();
     Lshunt.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
         TransmissionLine, 0, posx, 30);
@@ -1005,7 +1002,6 @@ void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
   // Shunt capacitor
   // Microstrip Filters for RF/Microwave Applications. JIA-SHENG HONG. M. J.
   // LANCASTER. JOHN WILEY & SONS, INC. 2001. page 119. Eq. 5.9
-  Cshunt.Connections.clear();
   if (Specification.SemiLumpedISettings == ONLY_INDUCTORS) {
     if (Lseries_LP_MINC != 0) {
       Cshunt.setParams(
@@ -1027,7 +1023,6 @@ void EllipticFilter::Insert_LowpassSemilumpedMinC_Section(
 
   } else {
     // Series capacitor
-    Cshunt.Connections.clear();
     if (Lseries_LP_MINC != 0) {
       Cshunt.setParams(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
@@ -1306,7 +1301,6 @@ void EllipticFilter::Insert_HighpassSemilumpedMinL_Section(
   Schematic.appendComponent(Lshunt);
 
   // Shunt capacitor
-  Cshunt.Connections.clear();
   if (Cseries_LP->at(j) != 0) {
     if (Specification.SemiLumpedISettings == ONLY_INDUCTORS) {
       Cshunt.setParams(

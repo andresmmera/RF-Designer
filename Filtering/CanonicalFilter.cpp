@@ -100,7 +100,6 @@ void CanonicalFilter::SynthesizeLPF() {
     if (((Specification.isCLC) && (k % 2 == Kcontrol)) ||
         ((!Specification.isCLC) && (k % 2 != Kcontrol))) {
       // Shunt capacitor
-      Cshunt.Connections.clear();
       gi[k + 1] *= 1 / (2 * M_PI * Specification.fc *
                         Specification.ZS); // Lowpass to highpass transformation
       if ((semilumped == true) &&
@@ -150,7 +149,6 @@ void CanonicalFilter::SynthesizeLPF() {
                              // connected to this node
     } else {
       // Series inductor
-      Lseries.Connections.clear();
       gi[k + 1] *= Specification.ZS / (2 * M_PI * Specification.fc);
       if (semilumped == true) {
         // Microstrip Filters for RF/Microwave Applications. JIA-SHENG HONG. M.
@@ -217,7 +215,6 @@ void CanonicalFilter::SynthesizeHPF() {
     if (((Specification.isCLC) && (k % 2 == 0)) ||
         ((!Specification.isCLC) && (k % 2 != 0))) {
       // Shunt inductor
-      Lshunt.Connections.clear();
       gi[k + 1] = Specification.ZS / (2 * M_PI * Specification.fc * gi[k + 1]);
       if (semilumped == true) {
         Lshunt.setParams(QString("TLIN%1").arg(
@@ -264,7 +261,6 @@ void CanonicalFilter::SynthesizeHPF() {
                              // connected to this node
     } else {
       // Series capacitor
-      Cseries.Connections.clear();
       Cseries.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
           Capacitor, 90, posx, 0);
@@ -320,7 +316,6 @@ void CanonicalFilter::SynthesizeBPF() {
     if (((Specification.isCLC) && (k % 2 == 0)) ||
         ((!Specification.isCLC) && (k % 2 != 0))) {
       // Shunt capacitor
-      Cshunt.Connections.clear();
       Cshunt.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
           Capacitor, 0, posx - 25, 50);
@@ -334,7 +329,6 @@ void CanonicalFilter::SynthesizeBPF() {
       Schematic.appendComponent(Ground1);
 
       // Shunt inductor
-      Lshunt.Connections.clear();
       Lshunt.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
           0, posx + 25, 50);
@@ -375,7 +369,6 @@ void CanonicalFilter::SynthesizeBPF() {
       if (k == 0)
         posx += 50; // First element
       // Series inductor
-      Lseries.Connections.clear();
       Lseries.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
           -90, posx - 30, 0);
@@ -384,7 +377,6 @@ void CanonicalFilter::SynthesizeBPF() {
       Schematic.appendComponent(Lseries);
 
       // Series capacitor
-      Cseries.Connections.clear();
       Cseries.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
           Capacitor, 90, posx + 30, 0);
@@ -438,7 +430,6 @@ void CanonicalFilter::SynthesizeBSF() {
     if (((Specification.isCLC) && (k % 2 == 0)) ||
         ((!Specification.isCLC) && (k % 2 != 0))) {
       // Shunt capacitor
-      Cshunt.Connections.clear();
       Cshunt.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
           Capacitor, 0, posx, 100);
@@ -452,7 +443,6 @@ void CanonicalFilter::SynthesizeBSF() {
       Schematic.appendComponent(Ground1);
 
       // Shunt inductor
-      Lshunt.Connections.clear();
       Lshunt.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
           0, posx, 50);
@@ -502,7 +492,6 @@ void CanonicalFilter::SynthesizeBSF() {
       posx += 50;
 
       // Series inductor
-      Lseries.Connections.clear();
       Lseries.setParams(
           QString("L%1").arg(++Schematic.NumberComponents[Inductor]), Inductor,
           -90, posx, 30);
@@ -511,7 +500,7 @@ void CanonicalFilter::SynthesizeBSF() {
       Schematic.appendComponent(Lseries);
 
       // Series capacitor
-      Cseries.Connections.clear();
+
       Cseries.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
           Capacitor, 90, posx, -30);

@@ -59,7 +59,6 @@ void CoupledLineBandpassFilter::synthesize() {
       Z0e[k] = Z0 * (1 + J[k] * Z0 + J[k] * J[k] * Z0 * Z0); // Eq. 8.108a
       Z0o[k] = Z0 * (1 - J[k] * Z0 + J[k] * J[k] * Z0 * Z0); // Eq. 8.108b
 
-      Coupled_Lines.Connections.clear();
       // Set connections
       Coupled_Lines.setParams(
           QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
@@ -82,7 +81,6 @@ void CoupledLineBandpassFilter::synthesize() {
     Z0o[k] = Z0 * (1 - J[k] * Z0 + J[k] * J[k] * Z0 * Z0);      // Eq. 8.108b
 
     // Coupled lines
-    Coupled_Lines.Connections.clear();
     Coupled_Lines.setParams(
         QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
         CoupledLines, 90, posx, posy);
@@ -105,7 +103,6 @@ void CoupledLineBandpassFilter::synthesize() {
   Z0o[N] = Z0 * (1 - J[N] * Z0 + J[N] * J[N] * Z0 * Z0); // Eq. 8.108b
 
   // Coupled lines
-  Coupled_Lines.Connections.clear();
   Coupled_Lines.setParams(
       QString("COUPL%1").arg(++Schematic.NumberComponents[CoupledLines]),
       CoupledLines, 90, posx, posy);

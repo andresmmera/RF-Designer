@@ -33,7 +33,6 @@ void EndCoupled::synthesize() {
   int N = Specification.order; // Number of elements
   int posx = 0;
   QString PreviousComponent;
-  QString PreviousNode = QString("NS"), CurrentNode;
 
   double TL_length, theta, Baux = 0;
   double bw = Specification.bw / Specification.fc; // Fractional bandwidth
@@ -51,8 +50,6 @@ void EndCoupled::synthesize() {
 
   posx += 50;
   for (int k = 0; k <= N; k++) {
-    CurrentNode = QString("N%1").arg(k);
-
     if (k == 0) { // First element
       J = sqrt(.5 * M_PI * bw / (gi[0] * gi[1]));
     } else {
@@ -75,7 +72,6 @@ void EndCoupled::synthesize() {
 
     if (k > 0) {
       // Transmission line
-      TL.Connections.clear();
       TL.setParams(
           QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
           TransmissionLine, 90, posx, 0);
@@ -85,14 +81,11 @@ void EndCoupled::synthesize() {
 
       // Wire: TL to previous capacitor
       Schematic.appendWire(PreviousComponent, 1, TL.ID, 0);
-
       PreviousComponent = TL.ID;
-
       posx += 50;
     }
 
     // Series capacitor
-    Cseries.Connections.clear();
     Cseries.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
         90, posx, 0);

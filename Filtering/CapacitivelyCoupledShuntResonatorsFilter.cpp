@@ -38,8 +38,7 @@ void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
 
   int N = Specification.order; // Number of elements
   int posx = 0;
-  QString PreviousComponent, NextNode;
-  QString PreviousNode = QString("NS"), CurrentNode;
+  QString PreviousComponent;
 
   double delta = Specification.bw / Specification.fc; // Fractional bandwidth
   double w0 = 2 * M_PI * Specification.fc;
@@ -58,14 +57,10 @@ void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
   posx += 50;
 
   for (int k = 0; k < N; k++) {
-    CurrentNode = QString("N%1").arg(k);
-
     if (k == 0) { // First element
       J[k] = sqrt(M_PI * delta / (4 * gi[k + 1])) / Z0;
       C[k] = J[k] / (w0 * sqrt(1 - Z0 * Z0 * J[k] * J[k]));
       // Series capacitor
-      NextNode = QString("N%1").arg(k + 1);
-      Cseries.Connections.clear();
       Cseries.setParams(
           QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
           Capacitor, 90, posx, 0);
@@ -87,7 +82,6 @@ void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
       l[k - 1] += lambda0 / 4;
 
     // Short stub
-    SC_Stub.Connections.clear();
     SC_Stub.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
         ShortStub, 0, posx, 25);
@@ -100,8 +94,7 @@ void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
     Schematic.appendWire(SC_Stub.ID, 1, PreviousComponent, 1);
 
     // Series capacitor
-    NextNode = QString("N%1").arg(k + 1);
-    Cseries.Connections.clear();
+
     Cseries.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
         90, posx, 0);
@@ -122,10 +115,8 @@ void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
   l[N - 1] = lambda0 / 4 + (Z0 * w0 * deltaC[N - 1] / (2 * M_PI)) * lambda0;
   if (l[N - 1] < 0)
     l[N - 1] += lambda0 / 4;
-  CurrentNode = QString("N%1").arg(N);
 
   // Short stub
-  SC_Stub.Connections.clear();
   SC_Stub.setParams(
       QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
       ShortStub, 0, posx, 25);
@@ -135,8 +126,6 @@ void CapacitivelyCoupledShuntResonatorsFilter::synthesize() {
   posx += 50;
 
   // Series capacitor
-  NextNode = QString("N%1").arg(N + 1);
-  Cseries.Connections.clear();
   Cseries.setParams(QString("C%1").arg(++Schematic.NumberComponents[Capacitor]),
                     Capacitor, 90, posx, 0);
   Cseries.val["C"] = num2str(C[N], Capacitance);

@@ -36,7 +36,6 @@ void SteppedImpedanceFilter::synthesize() {
   int N = Specification.order; // Number of elements
   int posx = 0;
   QString PreviousComponent;
-  QString PreviousNode = QString("NS"), CurrentNode;
 
   double TL_length;
   double Zlow = Specification.minZ;
@@ -59,7 +58,6 @@ void SteppedImpedanceFilter::synthesize() {
     Kcontrol = 1;
   posx += 50;
   for (int k = 0; k < N; k++) {
-    CurrentNode = QString("N%1").arg(k);
     if (((Specification.isCLC) && (k % 2 == Kcontrol)) ||
         ((!Specification.isCLC) && (k % 2 != Kcontrol))) {
       // Replace shunt capacitor
@@ -72,7 +70,6 @@ void SteppedImpedanceFilter::synthesize() {
     }
 
     // Short transmission line
-    TL.Connections.clear();
     TL.setParams(
         QString("TLIN%1").arg(++Schematic.NumberComponents[TransmissionLine]),
         TransmissionLine, 90, posx, 0);

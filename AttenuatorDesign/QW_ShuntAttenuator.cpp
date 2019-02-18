@@ -108,7 +108,6 @@ void QW_ShuntAttenuator::synthesize() {
   Schematic.appendWire(Res3.ID, 0, Ground.ID, 0);
 
   if (Specs.Lumped_TL) {
-    Cshunt.Connections.clear();
     Cshunt.setParams(
         QString("C%1").arg(++Schematic.NumberComponents[Capacitor]), Capacitor,
         0, 150, 120);
