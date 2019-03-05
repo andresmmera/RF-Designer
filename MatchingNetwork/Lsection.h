@@ -1,5 +1,5 @@
 /***************************************************************************
-                                general.h
+                                Lsection.h
                                 ----------
     copyright            :  QUCS team
     author                :  2019 Andres Martinez-Mera
@@ -14,19 +14,20 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
-#ifndef GENERAL_H
-#define GENERAL_H
+#ifndef LSECTION_H
+#define LSECTION_H
+#include "Schematic/Network.h"
+#include "Schematic/SchematicContent.h"
+#include "Schematic/component.h"
 
-#include <QString>
-#include <cmath>
-#include <complex>
-enum Units { Capacitance, Inductance, Length, Resistance, Degrees, NoUnits };
+class Lsection : public Network {
+public:
+  Lsection();
+  virtual ~Lsection();
+  Lsection(MatchingNetworkDesignParameters);
+  void synthesize();
 
-QString RoundVariablePrecision(double);
-QString num2str(double, Units);
-QString num2str(std::complex<double>, Units);
-QString num2str(double);
-std::complex<double> Str2Complex(QString);
-QString ConvertLengthFromM(QString, double);
-
-#endif // GENERAL_H
+private:
+  struct MatchingNetworkDesignParameters Specs;
+};
+#endif // LSECTION_H

@@ -54,8 +54,9 @@ public:
   void appendWire(QString, int, QString, int, QColor);
   void appendNode(struct NodeInfo);
 
-  double getZin();
-  double getZout();
+  std::complex<double> getZin();
+  std::complex<double> getZout();
+
   QString getZinString();
   QString getZoutString();
 

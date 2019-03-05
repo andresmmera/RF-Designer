@@ -112,6 +112,8 @@ public:
   };
   std::map<QString, QString> val; // freq, L1.L, C1.C,...
   double getVal(QString);
+  std::complex<double> getValZ(QString);
+  double getScale(QString);
 };
 
 class WireInfo {

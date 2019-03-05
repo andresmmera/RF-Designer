@@ -30,7 +30,7 @@
 #include "Schematic/Network.h"
 #include "Schematic/SchematicContent.h"
 
-//#include "MatchingNetworkDesign/Lsection.h"
+#include "MatchingNetwork/Lsection.h"
 
 class MatchingNetworkDesignTool : public QWidget {
   Q_OBJECT
@@ -45,11 +45,13 @@ private slots:
 
 private:
   QLabel *Topology_Label, *Zin_Label, *Ohm_Zin_Label, *Zout_Label,
-      *Ohm_Zout_Label, *freqLabel;
-  QDoubleSpinBox *ZinSpinBox, *ZoutSpinBox, *freqSpinBox;
-  QComboBox *Topology_Combo, *FreqScaleCombo;
-  QCheckBox *LumpedImplementationCheckbox;
-  double getFreq();
+      *Ohm_Zout_Label, *FreqStart_Label, *FreqEnd_Label, *Zin_J, *Zout_J;
+  QDoubleSpinBox *ZinRSpinBox, *ZoutRSpinBox, *ZinISpinBox, *ZoutISpinBox,
+      *FreqStart_Spinbox, *FreqEnd_Spinbox;
+  QComboBox *Topology_Combo, *FreqStart_Scale_Combo, *FreqEnd_Scale_Combo;
+  QCheckBox *Broadband_Checkbox;
+  QRadioButton *Solution1_RB, *Solution2_RB;
+  double getScaleFreq(int);
 
   SchematicContent SchContent; // Schematic representation
 

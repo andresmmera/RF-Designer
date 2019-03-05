@@ -103,9 +103,13 @@ struct AttenuatorDesignParameters {
 };
 
 struct MatchingNetworkDesignParameters {
-  QString Topology; // Attenuator topology
-  double Zin;       // Input impedance
-  double Zout;      // Output impedance
+  QString Topology;          // Attenuator topology
+  std::complex<double> Zin;  // Input impedance
+  std::complex<double> Zout; // Output impedance
+  int Solution; // Some matching techniques yield several valid solutions to the
+                // matching problem
+  double freqStart;
+  double freqEnd;
 };
 
 struct PdissAtt {

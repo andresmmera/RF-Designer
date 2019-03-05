@@ -319,7 +319,7 @@ void Component::setComponentType(ComponentType CT) { CompType = CT; }
 
 ComponentType Component::getComponentType() { return CompType; }
 
-// Given the property name, this function returns its value in coplex format
+// Given the property name, this function returns its value in double format
 double ComponentInfo::getVal(QString Property) {
   QString val_ = this->val[Property];
   QString suffix;
@@ -336,33 +336,115 @@ double ComponentInfo::getVal(QString Property) {
       break;
     }
   }
+  scale = getScale(suffix);
 
+  // Remove the suffix from the string and convert the property to numerical
+  // format
+  QString val = val_.left(index);
+
+  return val.toDouble() * scale;
+}
+
+// Given the property name, this function returns its value in complex format
+std::complex<double> ComponentInfo::getValZ(QString Property) {
+  QString val_ = this->val[Property];
+  QString suffixR, suffixI;
+  double R, I;
+  val_.remove(" "); // Remove blank spaces (if exists)
+  double scaleR = 1, scaleI = 1;
+  int indexR, indexI;
+
+  // Separate the real from the imaginary part and put them in different QString
+  // variables
+  int index = val_.indexOf("j"); // Indicates where the j is.
+
+  if (index == -1) {
+    // Real number
+    double real_part = this->getVal("Z");
+    return std::complex<double>(real_part, 0);
+  }
+
+  double sign = 1;
+  if (val_[index - 1] == '-')
+    sign = -1;
+  QString realpart = val_.left(index - 1);
+  QString imagpart = val_.mid(index + 1);
+
+  // Now, we have to look inside the real and imaginary parts and see if they
+  // contain an scale factor (k, m, u, etc.)
+
+  // Real part
+  for (int i = 0; i < realpart.length(); i++) {
+    if (realpart.at(i).isLetter()) {
+      indexR = i;
+      suffixR = realpart.at(i);
+      break;
+    }
+  }
+  scaleR = getScale(suffixR);
+
+  // Is there the unit? Ïf yes, remove it
+  if (scaleR == -1) { // No Greek suffix
+    realpart = realpart.mid(0, indexR);
+    R = realpart.toDouble();
+  } else {
+    realpart = realpart.mid(0, indexR);
+    R = realpart.toDouble();
+    R *= scaleR;
+  }
+
+  // Imaginary part
+  for (int i = 0; i < imagpart.length(); i++) {
+    if (imagpart.at(i).isLetter()) {
+      indexI = i;
+      suffixI = imagpart.at(i);
+      break;
+    }
+  }
+  scaleI = getScale(suffixI);
+
+  // Is there the unit? Ïf yes, remove it
+  if (scaleI == -1) { // No Greek suffix
+    imagpart = imagpart.mid(0, indexI);
+    I = imagpart.toDouble();
+  } else {
+    imagpart = imagpart.mid(0, indexI);
+    I = imagpart.toDouble();
+    I *= scaleI;
+  }
+  return std::complex<double>(R, sign * I);
+}
+
+double ComponentInfo::getScale(QString suffix) {
   if (suffix == "f")
-    scale = 1e-15;
+    return 1e-15;
   else {
     if (suffix == "p")
-      scale = 1e-12;
+      return 1e-12;
     else {
       if (suffix == "n")
-        scale = 1e-9;
+        return 1e-9;
       else {
         if (suffix == "u")
-          scale = 1e-6;
+          return 1e-6;
         else {
           if (suffix == "m")
-            scale = 1e-3;
+            return 1e-3;
           else {
-            if (suffix == "K")
-              scale = 1e3;
+            if (suffix == "k")
+              return 1e3;
             else {
               if (suffix == "M")
-                scale = 1e6;
+                return 1e6;
               else {
                 if (suffix == "G")
-                  scale = 1e9;
+                  return 1e9;
                 else {
                   if (suffix == "T")
-                    scale = 1e12;
+                    return 1e12;
+                  else {
+                    return 1; // Not a Greek suffix. It must be the unit name
+                  }
                 }
               }
             }
@@ -371,24 +453,6 @@ double ComponentInfo::getVal(QString Property) {
       }
     }
   }
-
-  // Remove the suffix from the string and convert the property to numerical
-  // format
-  QString val = val_.left(index);
-
-  // Now, find out if the number is complex or real
-  /*if (index = val.indexOf("j"))
-  {//Need to separate the real from the imaginary part
-      double sign = 1;
-      if (val[index-1] == '-') sign = -1;
-      double realpart = val.left(index-1).toDouble();//Notice  we have to take
-  into account the sign double imagpart = val.right(index).toDouble(); return
-  std::complex<double>(realpart, sign*imagpart);
-  }
-  else
-  {*/
-  return val.toDouble() * scale;
-  //}
 }
 
 // This function draws the capacitor with the rotation specified by the Rotation

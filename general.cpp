@@ -30,54 +30,22 @@ QString RoundVariablePrecision(double val) {
                          precision); // Round to 'precision' decimals.
 }
 
+QString num2str(std::complex<double> Z, Units CompType) {
+  QString Real = num2str(Z.real());
+
+  if (abs(Z.imag()) < 1e-6)
+    return num2str(Z.real(), CompType);
+  else
+    Real = num2str(Z.real());
+
+  if (Z.imag() < 0)
+    return QString("%1 -j %2").arg(Real).arg(num2str(abs(Z.imag()), CompType));
+  else
+    return QString("%1 +j %2").arg(Real).arg(num2str(Z.imag(), CompType));
+}
+
 QString num2str(double Num, Units CompType) {
-  char c = 0;
-  double cal = std::abs(Num);
-  if (cal > 1e-20) {
-    cal = std::log10(cal) / 3.0;
-    if (cal < -0.2)
-      cal -= 0.98;
-    int Expo = int(cal);
-
-    if (Expo >= -5)
-      if (Expo <= 4)
-        switch (Expo) {
-        case -5:
-          c = 'f';
-          break;
-        case -4:
-          c = 'p';
-          break;
-        case -3:
-          c = 'n';
-          break;
-        case -2:
-          c = 'u';
-          break;
-        case -1:
-          c = 'm';
-          break;
-        case 1:
-          c = 'k';
-          break;
-        case 2:
-          c = 'M';
-          break;
-        case 3:
-          c = 'G';
-          break;
-        case 4:
-          c = 'T';
-          break;
-        }
-
-    if (c)
-      Num /= pow(10.0, double(3 * Expo));
-  }
-
-  QString Str = RoundVariablePrecision(Num);
-  if (c)
-    Str += c;
+  QString Str = num2str(Num);
   QString unit;
   switch (CompType) {
   case Capacitance:
@@ -150,13 +118,16 @@ QString num2str(double Num) {
 }
 
 std::complex<double> Str2Complex(QString num) {
+  // Remove whitespaces
+  for (int i = 0; i < num.length(); i++)
+    if (num.at(i).isSpace())
+      num.remove(i, 1);
 
   // Remove the suffix
   if (num.indexOf("Ohm") != -1)
     num.remove(num.indexOf("Ohm"), 3);
   int index = num.indexOf("j"); // Indicates where the j is.
-  if (index == -1)              // Actually, num is a real number
-  {
+  if (index == -1) {            // Actually, num is a real number
     return std::complex<double>(num.toDouble(), 0);
   }
 
@@ -167,7 +138,7 @@ std::complex<double> Str2Complex(QString num) {
   double realpart =
       num.left(index - 1)
           .toDouble(); // Notice  we have to take into account the sign
-  double imagpart = num.right(index).toDouble();
+  double imagpart = num.right(index - 1).toDouble();
   return std::complex<double>(realpart, sign * imagpart);
 }
 

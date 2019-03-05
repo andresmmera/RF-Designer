@@ -115,6 +115,8 @@ QucsRFDesignerWindow::QucsRFDesignerWindow() {
           SLOT(ReceiveNetworkFromDesignTools(SchematicContent)));
   connect(PowerCombining_Tool, SIGNAL(simulateNetwork(SchematicContent)), this,
           SLOT(ReceiveNetworkFromDesignTools(SchematicContent)));
+  connect(MatchingNetworkDesign_Tool, SIGNAL(simulateNetwork(SchematicContent)),
+          this, SLOT(ReceiveNetworkFromDesignTools(SchematicContent)));
   connect(AttenuatorDesign_Tool, SIGNAL(simulateNetwork(SchematicContent)),
           this, SLOT(ReceiveNetworkFromDesignTools(SchematicContent)));
 
@@ -358,8 +360,10 @@ void QucsRFDesignerWindow::SimulateLadderSPAR() {
   // Convert SchematicContent object data into NetworkInfo for SPAR simulation
   NetworkInfo NWI;
   std::vector<complex<double>> ZS(1), ZL(1);
-  ZS[0] = Str2Complex(SchContent.getZinString());  // Port 1 impedance
-  ZL[0] = Str2Complex(SchContent.getZoutString()); // Port 2 impedance
+  ZS[0] = SchContent.getZin(); // Str2Complex(SchContent.getZinString());  //
+                               // Port 1 impedance
+  ZL[0] = SchContent.getZout(); // Str2Complex(SchContent.getZoutString()); //
+                                // Port 2 impedance
   NWI.ZS = ZS;
   NWI.ZL = ZL;
   NWI.Ladder = SchContent.getComponents();
@@ -443,6 +447,7 @@ void QucsRFDesignerWindow::SwitchTabs(int tabindex) {
     break;
   case 1: // Matching
     dock_DisplayWindow2->hide();
+    MatchingNetworkDesign_Tool->design();
     break;
   case 2: // Power combining
     dock_DisplayWindow2->hide();

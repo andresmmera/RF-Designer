@@ -68,7 +68,7 @@ Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f) {
     case GND:
       continue;
     case Capacitor:
-      if (x[i].Rotation == 90) { // Series
+      if ((x[i].Rotation != 0) && ((int)x[i].Rotation % 90 == 0)) { // Series
         ABCD_t(0, 0) = 1.;
         ABCD_t(0, 1) = complex<double>(0, -1. / (w * x[i].getVal("C")));
         ABCD_t(1, 0) = 0;
@@ -81,7 +81,7 @@ Mat SparEngine::getABCDmatrix(QList<ComponentInfo> x, double f) {
       }
       break;
     case Inductor:
-      if (x[i].Rotation == -90) { // Series
+      if ((x[i].Rotation != 0) && ((int)x[i].Rotation % 90 == 0)) { // Series
         ABCD_t(0, 0) = 1.;
         ABCD_t(0, 1) = complex<double>(0, w * x[i].getVal("L"));
         ABCD_t(1, 0) = 0;

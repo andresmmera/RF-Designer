@@ -212,9 +212,11 @@ QMap<QString, QPen> SchematicContent::getDisplayGraphs() {
   return displayGraphs;
 }
 
-double SchematicContent::getZin() { return Comps[0].val["Z"].toDouble(); }
-double SchematicContent::getZout() {
-  return Comps[Comps.size() - 1].val["Z"].toDouble();
+std::complex<double> SchematicContent::getZin() {
+  return Comps[0].getValZ("Z");
+}
+std::complex<double> SchematicContent::getZout() {
+  return Comps[Comps.size() - 1].getValZ("Z");
 }
 
 QString SchematicContent::getZinString() { return Comps[0].val["Z"]; }
