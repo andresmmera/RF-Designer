@@ -20,13 +20,34 @@
 #include <QString>
 #include <cmath>
 #include <complex>
-enum Units { Capacitance, Inductance, Length, Resistance, Degrees, NoUnits };
+#include <deque>
+enum Units {
+  Capacitance,
+  Inductance,
+  Length,
+  Resistance,
+  Degrees,
+  Frequency,
+  NoUnits
+};
+
+struct S2P_DATA {
+  std::deque<double> Freq;
+  std::deque<std::complex<double>> S11;
+  std::deque<std::complex<double>> S12;
+  std::deque<std::complex<double>> S21;
+  std::deque<std::complex<double>> S22;
+};
 
 QString RoundVariablePrecision(double);
+QString RoundVariablePrecision(double, int);
 QString num2str(double, Units);
+QString num2str(double, int);
+QString num2str(double, int, Units);
 QString num2str(std::complex<double>, Units);
 QString num2str(double);
 std::complex<double> Str2Complex(QString);
 QString ConvertLengthFromM(QString, double);
+struct S2P_DATA Sort(struct S2P_DATA);
 
 #endif // GENERAL_H

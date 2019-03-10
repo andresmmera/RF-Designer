@@ -23,6 +23,10 @@ MatchingNetworkDesignTool::MatchingNetworkDesignTool() {
   Broadband_Checkbox = new QCheckBox("Broadband matching");
   MatchingNetworkDesignLayout->addWidget(Broadband_Checkbox, 0, 0);
 
+  // Broadband checkbox
+  TwoPort_Matching_Checkbox = new QCheckBox("Two-port matching");
+  MatchingNetworkDesignLayout->addWidget(TwoPort_Matching_Checkbox, 0, 1);
+
   // Topology
   Topology_Label = new QLabel("Topology");
   Topology_Combo = new QComboBox();
@@ -80,6 +84,10 @@ MatchingNetworkDesignTool::MatchingNetworkDesignTool() {
   MatchingNetworkDesignLayout->addWidget(ZinISpinBox, 2, 3);
   MatchingNetworkDesignLayout->addWidget(Ohm_Zin_Label, 2, 4);
 
+  // Edit S-parameters button
+  EditSPAR = new QPushButton("Edit device S-parameters");
+  MatchingNetworkDesignLayout->addWidget(EditSPAR, 3, 0, 1, 4);
+
   // Output impedance
   Zout_Label = new QLabel("Zout");
   ZoutRSpinBox = new QDoubleSpinBox();
@@ -94,11 +102,11 @@ MatchingNetworkDesignTool::MatchingNetworkDesignTool() {
   ZoutISpinBox->setSingleStep(0.5);
   ZoutISpinBox->setValue(0);
   Ohm_Zout_Label = new QLabel(QChar(0xa9, 0x03));
-  MatchingNetworkDesignLayout->addWidget(Zout_Label, 3, 0);
-  MatchingNetworkDesignLayout->addWidget(ZoutRSpinBox, 3, 1);
-  MatchingNetworkDesignLayout->addWidget(Zout_J, 3, 2);
-  MatchingNetworkDesignLayout->addWidget(ZoutISpinBox, 3, 3);
-  MatchingNetworkDesignLayout->addWidget(Ohm_Zout_Label, 3, 4);
+  MatchingNetworkDesignLayout->addWidget(Zout_Label, 4, 0);
+  MatchingNetworkDesignLayout->addWidget(ZoutRSpinBox, 4, 1);
+  MatchingNetworkDesignLayout->addWidget(Zout_J, 4, 2);
+  MatchingNetworkDesignLayout->addWidget(ZoutISpinBox, 4, 3);
+  MatchingNetworkDesignLayout->addWidget(Ohm_Zout_Label, 4, 4);
 
   // Frequency range. Start
   FreqStart_Label = new QLabel("freq");
@@ -116,9 +124,9 @@ MatchingNetworkDesignTool::MatchingNetworkDesignTool() {
   FreqStart_Scale_Combo = new QComboBox();
   FreqStart_Scale_Combo->addItems(FreqScale);
   FreqStart_Scale_Combo->setCurrentIndex(1);
-  MatchingNetworkDesignLayout->addWidget(FreqStart_Label, 4, 0);
-  MatchingNetworkDesignLayout->addWidget(FreqStart_Spinbox, 4, 1);
-  MatchingNetworkDesignLayout->addWidget(FreqStart_Scale_Combo, 4, 2);
+  MatchingNetworkDesignLayout->addWidget(FreqStart_Label, 5, 0);
+  MatchingNetworkDesignLayout->addWidget(FreqStart_Spinbox, 5, 1);
+  MatchingNetworkDesignLayout->addWidget(FreqStart_Scale_Combo, 5, 2);
 
   // Frequency range. End
   FreqEnd_Label = new QLabel("Freq. stop");
@@ -130,9 +138,9 @@ MatchingNetworkDesignTool::MatchingNetworkDesignTool() {
   FreqEnd_Spinbox->setSingleStep(1); // Step fixed to 1 Hz/kHz/MHz/GHz
   FreqEnd_Scale_Combo = new QComboBox();
   FreqEnd_Scale_Combo->addItems(FreqScale);
-  MatchingNetworkDesignLayout->addWidget(FreqEnd_Label, 5, 0);
-  MatchingNetworkDesignLayout->addWidget(FreqEnd_Spinbox, 5, 1);
-  MatchingNetworkDesignLayout->addWidget(FreqEnd_Scale_Combo, 5, 2);
+  MatchingNetworkDesignLayout->addWidget(FreqEnd_Label, 6, 0);
+  MatchingNetworkDesignLayout->addWidget(FreqEnd_Spinbox, 6, 1);
+  MatchingNetworkDesignLayout->addWidget(FreqEnd_Scale_Combo, 6, 2);
 
   // Since it is more common to design narrowband matching networks than
   // broadband, the end-freq widgets are hidden
@@ -146,6 +154,7 @@ MatchingNetworkDesignTool::MatchingNetworkDesignTool() {
           SLOT(UpdateDesignParameters()));
   connect(ZinISpinBox, SIGNAL(valueChanged(double)), this,
           SLOT(UpdateDesignParameters()));
+  connect(EditSPAR, SIGNAL(pressed()), this, SLOT(launchSPAR()));
   connect(ZoutRSpinBox, SIGNAL(valueChanged(double)), this,
           SLOT(UpdateDesignParameters()));
   connect(ZoutISpinBox, SIGNAL(valueChanged(double)), this,
@@ -256,3 +265,5 @@ double MatchingNetworkDesignTool::getScaleFreq(int index) {
   }
   return pow(10, exp);
 }
+
+void MatchingNetworkDesignTool::launchSPAR() { DS.show(); }

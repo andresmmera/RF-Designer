@@ -16,9 +16,73 @@
  ***************************************************************************/
 #include "general.h"
 
+// Sort by frequency an s-parameter data struct
+struct S2P_DATA Sort(struct S2P_DATA data) {
+
+  if (data.Freq.size() == 1)
+    return data;
+  std::deque<double> freq_sorted;
+  std::deque<std::complex<double>> S11_sorted, S12_sorted, S21_sorted,
+      S22_sorted;
+  std::deque<int> sort_vector;
+  double min = 1e20, last_min = -1;
+  int min_index;
+
+  do {
+    for (unsigned int i = 0; i < data.Freq.size(); i++) {
+      if ((data.Freq.at(i) < min) && (data.Freq.at(i) >= last_min)) {
+        min = data.Freq.at(i);
+        min_index = i;
+      }
+    }
+
+    if (min == last_min) {
+      // Duplicated data
+    } else {
+      sort_vector.push_back(min_index);
+      freq_sorted.push_back(min);
+      last_min = min;
+    }
+
+    data.Freq.erase(data.Freq.begin() + min_index);
+    min = 1e20;
+  } while (data.Freq.size() > 0);
+
+  // Resize vectors to the size of freq_sorted
+  S11_sorted.resize(freq_sorted.size());
+  S21_sorted.resize(freq_sorted.size());
+  S12_sorted.resize(freq_sorted.size());
+  S22_sorted.resize(freq_sorted.size());
+
+  // Now apply the same order in the other vectors
+  for (int i = 0; i < sort_vector.size(); i++) {
+    S11_sorted[i] = data.S11[sort_vector[i]];
+    S12_sorted[i] = data.S12[sort_vector[i]];
+    S21_sorted[i] = data.S21[sort_vector[i]];
+    S22_sorted[i] = data.S22[sort_vector[i]];
+  }
+
+  // Replace the sorted vectors in the SPAR structure
+  data.Freq.clear();
+  data.S11.clear();
+  data.S21.clear();
+  data.S12.clear();
+  data.S22.clear();
+
+  data.Freq = freq_sorted;
+  data.S11 = S11_sorted;
+  data.S12 = S12_sorted;
+  data.S21 = S21_sorted;
+  data.S22 = S22_sorted;
+
+  return data;
+}
+
 // Rounds a double number using the minimum number of decimal places
 QString RoundVariablePrecision(double val) {
-  int precision = 0; // By default, it takes 2 decimal places
+  return RoundVariablePrecision(val, 0);
+}
+QString RoundVariablePrecision(double val, int precision) {
   int sign = 1;
   if (val < 0)
     sign = -1;
@@ -45,7 +109,11 @@ QString num2str(std::complex<double> Z, Units CompType) {
 }
 
 QString num2str(double Num, Units CompType) {
-  QString Str = num2str(Num);
+  return num2str(Num, 0, CompType);
+}
+
+QString num2str(double Num, int precision, Units CompType) {
+  QString Str = num2str(Num, precision);
   QString unit;
   switch (CompType) {
   case Capacitance:
@@ -59,6 +127,10 @@ QString num2str(double Num, Units CompType) {
     break;
   case Degrees:
     unit = QString("º");
+    break;
+  case Frequency:
+    unit = QString("Hz");
+    break;
   default:
     break;
   }
@@ -66,7 +138,8 @@ QString num2str(double Num, Units CompType) {
   return Str;
 }
 
-QString num2str(double Num) {
+QString num2str(double Num) { return num2str(Num, 0); }
+QString num2str(double Num, int precision) {
   char c = 0;
   double cal = std::abs(Num);
   if (cal > 1e-20) {
@@ -111,7 +184,7 @@ QString num2str(double Num) {
       Num /= pow(10.0, double(3 * Expo));
   }
 
-  QString Str = RoundVariablePrecision(Num);
+  QString Str = RoundVariablePrecision(Num, precision);
   if (c)
     Str += c;
   return Str;

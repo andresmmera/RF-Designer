@@ -24,11 +24,13 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QRadioButton>
 #include <QWidget>
 
 #include "Schematic/Network.h"
 #include "Schematic/SchematicContent.h"
+#include "UI/DeviceSpar.h"
 
 #include "MatchingNetwork/Lsection.h"
 
@@ -42,6 +44,7 @@ public:
 private slots:
   void UpdateDesignParameters();
   void on_TopoCombo_currentIndexChanged(int);
+  void launchSPAR();
 
 private:
   QLabel *Topology_Label, *Zin_Label, *Ohm_Zin_Label, *Zout_Label,
@@ -49,11 +52,13 @@ private:
   QDoubleSpinBox *ZinRSpinBox, *ZoutRSpinBox, *ZinISpinBox, *ZoutISpinBox,
       *FreqStart_Spinbox, *FreqEnd_Spinbox;
   QComboBox *Topology_Combo, *FreqStart_Scale_Combo, *FreqEnd_Scale_Combo;
-  QCheckBox *Broadband_Checkbox;
+  QCheckBox *Broadband_Checkbox, *TwoPort_Matching_Checkbox;
   QRadioButton *Solution1_RB, *Solution2_RB;
+  QPushButton *EditSPAR;
   double getScaleFreq(int);
 
   SchematicContent SchContent; // Schematic representation
+  DeviceSPAR DS;
 
 signals:
   void simulateNetwork(SchematicContent);
