@@ -6,9 +6,9 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     Filtering/CanonicalFilter.h \
     Schematic/Network.h \
     Filtering/EllipticFilter.h \
-    SPAR/MathOperations.h \
     SPAR/sparengine.h \
     SPAR/mat.h \
+    SPAR/MathOperations.h \
     UI/QucsRFDesignerWindow.h \
     Filtering/DirectCoupledFilters.h \
     Filtering/LowpassPrototypeCoeffs.h \
@@ -34,7 +34,8 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     Schematic/infoclasses.h \
     UI/MatchingNetworkDesignTool.h \
     MatchingNetwork/Lsection.h \
-    UI/DeviceSpar.h
+    UI/DeviceSpar.h \
+    General/io.h
 
 
 SOURCES += main.cpp \
@@ -43,9 +44,9 @@ SOURCES += main.cpp \
     UI/preferencesdialog.cpp \
     Filtering/CanonicalFilter.cpp \
     Filtering/EllipticFilter.cpp \
-    SPAR/MathOperations.cpp \
     SPAR/sparengine.cpp \
     SPAR/mat.cpp \
+    SPAR/MathOperations.cpp \
     UI/QucsRFDesignerWindow.cpp \
     Filtering/DirectCoupledFilters.cpp \
     Filtering/LowpassPrototypeCoeffs.cpp \
@@ -80,7 +81,8 @@ SOURCES += main.cpp \
     Schematic/SchematicContent.cpp \
     UI/MatchingNetworkDesignTool.cpp \
     MatchingNetwork/Lsection.cpp \
-    UI/DeviceSpar.cpp
+    UI/DeviceSpar.cpp \
+    General/io.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 

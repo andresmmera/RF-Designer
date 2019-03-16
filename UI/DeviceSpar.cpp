@@ -90,25 +90,75 @@ DeviceSPAR::DeviceSPAR() {
   SPARDataLayout->addWidget(SPAR, 1, 0, 1, 3);
 
   // S2P file chooser
+  S2P_Groupbox = new QGroupBox("S2P file");
+  QGridLayout *S2P_File_Layout = new QGridLayout();
   S2PFileButton = new QPushButton("Browse S2P");
-  SPARDataLayout->addWidget(S2PFileButton, 2, 0);
   connect(S2PFileButton, SIGNAL(clicked(bool)), this, SLOT(LoadS2PFile()));
-  S2PFileButton->hide(); // By default this is hidden
+  S2P_File_Layout->addWidget(S2PFileButton, 0, 0);
+  fstartMatchingS2P_Label = new QLabel("Fstart matching");
+  fstartSpinbox = new QDoubleSpinBox();
+  fstartSpinbox->setMinimum(1);
+  fstartSpinbox->setMaximum(1e6);
+  fstartSpinbox->setDecimals(0);
+  fstartSpinbox->setValue(470);
+  fstartScaleCombo = new QComboBox();
+  fstartScaleCombo->addItems(FreqScale);
+  fstartScaleCombo->setCurrentIndex(1);
+  S2P_File_Layout->addWidget(fstartMatchingS2P_Label, 1, 0);
+  S2P_File_Layout->addWidget(fstartSpinbox, 1, 1);
+  S2P_File_Layout->addWidget(fstartScaleCombo, 1, 2);
+
+  fendMatchingS2P_Label = new QLabel("Fend matching");
+  fendSpinbox = new QDoubleSpinBox();
+  fendSpinbox->setMinimum(1);
+  fendSpinbox->setMaximum(1e6);
+  fendSpinbox->setDecimals(0);
+  fendSpinbox->setValue(860);
+  fendScaleCombo = new QComboBox();
+  fendScaleCombo->addItems(FreqScale);
+  fendScaleCombo->setCurrentIndex(1);
+  S2P_File_Layout->addWidget(fendMatchingS2P_Label, 2, 0);
+  S2P_File_Layout->addWidget(fendSpinbox, 2, 1);
+  S2P_File_Layout->addWidget(fendScaleCombo, 2, 2);
+  S2P_Groupbox->hide(); // By default this is hidden
+  S2P_Groupbox->setLayout(S2P_File_Layout);
+
+  SPARDataLayout->addWidget(S2P_Groupbox, 2, 0, 1, 3);
 
   // Data
   QGroupBox *DataWidget = new QGroupBox("Data display");
   QGridLayout *DataLayout = new QGridLayout();
 
   // Display real-imaginary or MA data
-  QWidget *RI_or_MA = new QWidget();
+  QWidget *data_format_Widget = new QWidget();
   RI_Radiobutton = new QRadioButton("R+jX");
   MA_RadioButton = new QRadioButton("Mag | Phase");
+  MdBA_RadioButton = new QRadioButton("Mag(dB) | Phase");
   RI_Radiobutton->setChecked(true);
   QGridLayout *RI_MA_GridLayout = new QGridLayout();
   RI_MA_GridLayout->addWidget(RI_Radiobutton, 0, 0);
   RI_MA_GridLayout->addWidget(MA_RadioButton, 0, 1);
-  RI_or_MA->setLayout(RI_MA_GridLayout);
-  DataLayout->addWidget(RI_or_MA, 1, 0, 1, 2);
+  data_format_Widget->setLayout(RI_MA_GridLayout);
+  DataLayout->addWidget(data_format_Widget, 1, 0, 1, 2);
+
+  // Angle units
+  RadDegGroupbox = new QGroupBox("Angle units");
+  QGridLayout *angle_units_layout = new QGridLayout();
+  DegRadiobutton = new QRadioButton("Degrees");
+  RadRadiobutton = new QRadioButton("Radians");
+  DegRadiobutton->setChecked(true);
+  angle_units_layout->addWidget(DegRadiobutton, 0, 0);
+  angle_units_layout->addWidget(RadRadiobutton, 0, 1);
+  RadDegGroupbox->setLayout(angle_units_layout);
+  DataLayout->addWidget(RadDegGroupbox, 1, 2, 1, 2);
+
+  // Connect radiobuttons to handle function
+  connect(RI_Radiobutton, SIGNAL(clicked(bool)), this, SLOT(PutDataInTable()));
+  connect(MA_RadioButton, SIGNAL(clicked(bool)), this, SLOT(PutDataInTable()));
+  connect(MdBA_RadioButton, SIGNAL(clicked(bool)), this,
+          SLOT(PutDataInTable()));
+  connect(DegRadiobutton, SIGNAL(clicked(bool)), this, SLOT(PutDataInTable()));
+  connect(RadRadiobutton, SIGNAL(clicked(bool)), this, SLOT(PutDataInTable()));
 
   S2PTable = new QTableWidget();
   S2PTable->setRowCount(0);
@@ -123,14 +173,14 @@ DeviceSPAR::DeviceSPAR() {
   S2PTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
   S2PTable->verticalHeader()->setResizeMode(QHeaderView::Stretch);
   DataWidget->setLayout(DataLayout);
-  DataLayout->addWidget(S2PTable, 2, 0, 1, 2);
+  DataLayout->addWidget(S2PTable, 2, 0, 1, 4);
   DeletePoint = new QPushButton("Remove sample");
   ClearAll = new QPushButton("Clear all");
   connect(ClearAll, SIGNAL(clicked(bool)), this, SLOT(ClearTable()));
   DataLayout->addWidget(DeletePoint, 3, 0);
   DataLayout->addWidget(ClearAll, 3, 1);
 
-  SPARDataLayout->addWidget(DataWidget, 3, 0, 1, 3);
+  SPARDataLayout->addWidget(DataWidget, 3, 0, 1, 4);
   this->setLayout(SPARDataLayout);
   this->setWindowTitle("S-parameter data entry tool");
 }
@@ -147,14 +197,23 @@ DeviceSPAR::~DeviceSPAR() {
   delete DeletePoint;
   delete ClearAll;
   delete SPAR;
+  delete S_Matrix_Label;
+  delete RadDegGroupbox;
+  delete S2P_Groupbox;
+  delete fstartMatchingS2P_Label;
+  delete fendMatchingS2P_Label;
+  delete fstartSpinbox;
+  delete fendSpinbox;
+  delete fstartScaleCombo;
+  delete fendScaleCombo;
 }
 
 void DeviceSPAR::UpdateS2PDataEntry() {
   if (AddS2PRadioButton->isChecked()) {
-    S2PFileButton->show();
+    S2P_Groupbox->show();
     SPAR->hide();
   } else {
-    S2PFileButton->hide();
+    S2P_Groupbox->hide();
     SPAR->show();
   }
 }
@@ -162,6 +221,9 @@ void DeviceSPAR::UpdateS2PDataEntry() {
 void DeviceSPAR::LoadS2PFile() {
   QString filename = QFileDialog::getOpenFileName(
       this, tr("Open S2P File"), "/home", tr("Touchstone S2P (*.s2p)"));
+  IO *readS2P = new IO();
+  readS2P->loadS2Pdata(filename.toStdString());
+  delete readS2P;
 }
 
 // Triggered when the user presses the "add single point" button
@@ -185,23 +247,23 @@ void DeviceSPAR::addSingleFreqData() {
   // natural units (default) or dB. On the other hand, the angle may be
   // expressed in degrees (default) or radians
 
-  std::complex<double> S11 =
+  std::complex<double> S11_ =
       ReadS2PFromUserInput(S2PInputTable->item(0, 0)->text());
-  std::complex<double> S12 =
+  std::complex<double> S12_ =
       ReadS2PFromUserInput(S2PInputTable->item(0, 1)->text());
-  std::complex<double> S21 =
+  std::complex<double> S21_ =
       ReadS2PFromUserInput(S2PInputTable->item(1, 0)->text());
-  std::complex<double> S22 =
+  std::complex<double> S22_ =
       ReadS2PFromUserInput(S2PInputTable->item(1, 1)->text());
 
   // Add the previous data to the internal data storage structures
-  DATA.Freq.push_back(freq);
-  DATA.S11.push_back(S11);
-  DATA.S12.push_back(S12);
-  DATA.S21.push_back(S21);
-  DATA.S22.push_back(S22);
+  Freq.push_back(freq);
+  S11.push_back(S11_);
+  S12.push_back(S12_);
+  S21.push_back(S21_);
+  S22.push_back(S22_);
 
-  DATA = Sort(DATA);
+  SortData();
 
   // Now, put the sorted data in the table
   PutDataInTable();
@@ -214,8 +276,9 @@ void DeviceSPAR::addSingleFreqData() {
 // This function writes the content of the class variable 'DATA' in the main
 // QTableWidget
 void DeviceSPAR::PutDataInTable() {
+
   S2PTable->clearContents();
-  for (int r = 0; r < DATA.Freq.size(); r++) {
+  for (int r = 0; r < Freq.size(); r++) {
     if (r >= S2PTable->rowCount()) {
       // Add a new row to the table
       S2PTable->insertRow(S2PTable->rowCount());
@@ -223,28 +286,20 @@ void DeviceSPAR::PutDataInTable() {
 
     // Add data to the row
     S2PTable->setItem(r, 0,
-                      new QTableWidgetItem(QString("%1").arg(num2str(
-                          DATA.Freq.at(r), 3, Frequency)))); // Frequency
+                      new QTableWidgetItem(QString("%1").arg(
+                          num2str(Freq.at(r), 3, Frequency)))); // Frequency
     S2PTable->setItem(
         r, 1,
-        new QTableWidgetItem(QString("%1+j%2")
-                                 .arg(DATA.S11.at(r).real())
-                                 .arg(DATA.S11.at(r).imag()))); // S11
+        new QTableWidgetItem(QString("%1").arg(rect2polar(S11.at(r))))); // S11
     S2PTable->setItem(
         r, 2,
-        new QTableWidgetItem(QString("%1+j%2")
-                                 .arg(DATA.S21.at(r).real())
-                                 .arg(DATA.S21.at(r).imag()))); // S11
+        new QTableWidgetItem(QString("%1").arg(rect2polar(S12.at(r))))); // S12
     S2PTable->setItem(
         r, 3,
-        new QTableWidgetItem(QString("%1+j%2")
-                                 .arg(DATA.S12.at(r).real())
-                                 .arg(DATA.S12.at(r).imag()))); // S11
+        new QTableWidgetItem(QString("%1").arg(rect2polar(S21.at(r))))); // S21
     S2PTable->setItem(
         r, 4,
-        new QTableWidgetItem(QString("%1+j%2")
-                                 .arg(DATA.S22.at(r).real())
-                                 .arg(DATA.S22.at(r).imag()))); // S11
+        new QTableWidgetItem(QString("%1").arg(rect2polar(S22.at(r))))); // S22
   }
 }
 
@@ -336,3 +391,107 @@ std::complex<double> DeviceSPAR::ReadS2PFromUserInput(QString data) {
 }
 
 void DeviceSPAR::ClearTable() { S2PTable->clear(); }
+
+QString DeviceSPAR::rect2polar(std::complex<double> Z) {
+  // Check the selected data format
+  bool MA_nu = MA_RadioButton->isChecked();
+  bool MA_dB = MdBA_RadioButton->isChecked();
+  bool deg = DegRadiobutton->isChecked();
+  QString angle_units, mag_units = "";
+
+  double mag, ang;
+
+  // Polar
+  if ((MA_nu) || (MA_dB)) {
+    mag = sqrt(Z.real() * Z.real() + Z.imag() * Z.imag());
+
+    // Angle
+    ang = atan2(Z.imag(), Z.real());
+    if (deg) { // Degrees
+      ang *= 180 / M_PI;
+      angle_units = "deg";
+    } else {
+      angle_units = QString("rad");
+    }
+
+    if (MA_dB) {
+      mag = 10 * log10(mag);
+      mag_units = "dB";
+    }
+    return QString("%1%2/%3%4")
+        .arg(mag)
+        .arg(mag_units)
+        .arg(ang)
+        .arg(angle_units);
+  } else {
+    // RI selected
+    if (Z.imag() < 0) {
+      return QString("%1-j%2").arg(Z.real()).arg(abs(Z.imag()));
+    } else {
+      return QString("%1+j%2").arg(Z.real()).arg(Z.imag());
+    }
+  }
+}
+
+// Sort by frequency an s-parameter data struct
+void DeviceSPAR::SortData() {
+
+  if (Freq.size() == 1)
+    return;
+  std::deque<double> freq_sorted;
+  std::deque<std::complex<double>> S11_sorted, S12_sorted, S21_sorted,
+      S22_sorted;
+  std::deque<int> sort_vector;
+  double min = 1e20, last_min = -1;
+  int min_index;
+
+  do {
+    for (unsigned int i = 0; i < Freq.size(); i++) {
+      if ((Freq.at(i) < min) && (Freq.at(i) >= last_min)) {
+        min = Freq.at(i);
+        min_index = i;
+      }
+    }
+
+    if (min == last_min) {
+      // Duplicated data
+    } else {
+      sort_vector.push_back(min_index);
+      freq_sorted.push_back(min);
+      last_min = min;
+    }
+
+    Freq.erase(Freq.begin() + min_index);
+    min = 1e20;
+  } while (Freq.size() > 0);
+
+  // Resize vectors to the size of freq_sorted
+  S11_sorted.resize(freq_sorted.size());
+  S21_sorted.resize(freq_sorted.size());
+  S12_sorted.resize(freq_sorted.size());
+  S22_sorted.resize(freq_sorted.size());
+
+  // Now apply the same order in the other vectors
+  for (unsigned int i = 0; i < sort_vector.size(); i++) {
+    S11_sorted[i] = S11[sort_vector[i]];
+    S12_sorted[i] = S12[sort_vector[i]];
+    S21_sorted[i] = S21[sort_vector[i]];
+    S22_sorted[i] = S22[sort_vector[i]];
+  }
+
+  // Replace the sorted vectors in the SPAR structure
+  Freq.clear();
+  S11.clear();
+  S21.clear();
+  S12.clear();
+  S22.clear();
+
+  for (unsigned int i = 0; i < S11_sorted.size(); i++) {
+    Freq.push_back(freq_sorted[i]);
+    S11.push_back(S11_sorted[i]);
+    S21.push_back(S21_sorted[i]);
+    S12.push_back(S12_sorted[i]);
+    S22.push_back(S22_sorted[i]);
+  }
+  return;
+}

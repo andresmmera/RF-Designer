@@ -46,7 +46,7 @@ Mat operator*(complex<double> z, Mat a) {
   return A;
 }
 
-// Scalar vectorial product
+// Scalar dequeial product
 complex<double> ScalarProduct(vec U, vec V) {
   if (V.size() != U.size())
     return -1e30;
@@ -76,16 +76,16 @@ vec Mat::getRow(unsigned int r) {
 }
 
 // Gets the real part of a row
-vector<double> Mat::getRowReal(unsigned int r) {
-  vector<double> V(cols);
+deque<double> Mat::getRowReal(unsigned int r) {
+  deque<double> V(cols);
   for (unsigned int i = 0; i < cols; i++)
     V[i] = real(data[r * cols + i]);
   return V;
 }
 
 // Gets the imaginary part of a row
-vector<double> Mat::getRowImag(unsigned int r) {
-  vector<double> V(cols);
+deque<double> Mat::getRowImag(unsigned int r) {
+  deque<double> V(cols);
   for (unsigned int i = 0; i < cols; i++)
     V[i] = imag(data[r * cols + i]);
   return V;
@@ -100,16 +100,16 @@ vec Mat::getCol(unsigned int c) {
 }
 
 // Gets the real part of a column
-vector<double> Mat::getColReal(unsigned int c) {
-  vector<double> V(rows);
+deque<double> Mat::getColReal(unsigned int c) {
+  deque<double> V(rows);
   for (unsigned int i = 0; i < rows; i++)
     V[i] = real(data[i * cols + c]);
   return V;
 }
 
 // Gets the imaginary part of a columns
-vector<double> Mat::getColImag(unsigned int c) {
-  vector<double> V(rows);
+deque<double> Mat::getColImag(unsigned int c) {
+  deque<double> V(rows);
   for (unsigned int i = 0; i < rows; i++)
     V[i] = imag(data[i * cols + c]);
   return V;

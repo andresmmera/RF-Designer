@@ -21,6 +21,8 @@
 #include <cmath>
 #include <complex>
 #include <deque>
+#include <vector>
+
 enum Units {
   Capacitance,
   Inductance,
@@ -32,11 +34,12 @@ enum Units {
 };
 
 struct S2P_DATA {
-  std::deque<double> Freq;
-  std::deque<std::complex<double>> S11;
-  std::deque<std::complex<double>> S12;
-  std::deque<std::complex<double>> S21;
-  std::deque<std::complex<double>> S22;
+  std::vector<double> Freq;
+  std::vector<std::complex<double>> S11;
+  std::vector<std::complex<double>> S12;
+  std::vector<std::complex<double>> S21;
+  std::vector<std::complex<double>> S22;
+  double Z0;
 };
 
 QString RoundVariablePrecision(double);
@@ -48,6 +51,5 @@ QString num2str(std::complex<double>, Units);
 QString num2str(double);
 std::complex<double> Str2Complex(QString);
 QString ConvertLengthFromM(QString, double);
-struct S2P_DATA Sort(struct S2P_DATA);
 
 #endif // GENERAL_H

@@ -360,8 +360,8 @@ void QucsRFDesignerWindow::SimulateLadderSPAR() {
   // Convert SchematicContent object data into NetworkInfo for SPAR simulation
   NetworkInfo NWI;
   std::vector<complex<double>> ZS(1), ZL(1);
-  ZS[0] = SchContent.getZin(); // Str2Complex(SchContent.getZinString());  //
-                               // Port 1 impedance
+  ZS[0] = SchContent.getZin();  // Str2Complex(SchContent.getZinString());  //
+                                // Port 1 impedance
   ZL[0] = SchContent.getZout(); // Str2Complex(SchContent.getZoutString()); //
                                 // Port 2 impedance
   NWI.ZS = ZS;

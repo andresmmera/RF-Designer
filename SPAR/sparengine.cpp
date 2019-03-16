@@ -151,10 +151,10 @@ void SparEngine::setSimulationSettings(SP_Analysis spa) {
 
 void SparEngine::run() {
   if (NI.ZS.size() == 1) {
-    NI.ZS = NI.ZS * ones(sim_settings.n_points);
+    NI.ZS = NI.ZS[0] * ones(sim_settings.n_points);
   }
   if (NI.ZL.size() == 1) {
-    NI.ZL = NI.ZL * ones(sim_settings.n_points);
+    NI.ZL = NI.ZL[0] * ones(sim_settings.n_points);
   }
 
   for (unsigned int i = 0; i < sim_settings.freq.size(); i++) {

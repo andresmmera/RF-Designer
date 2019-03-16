@@ -16,6 +16,7 @@
  ***************************************************************************/
 #ifndef DEVICESPAR_H
 #define DEVICESPAR_H
+#include "General/io.h"
 #include "general.h"
 #include <QComboBox>
 #include <QDoubleSpinBox>
@@ -30,6 +31,8 @@
 #include <QWidget>
 #include <complex>
 
+using namespace std;
+
 class DeviceSPAR : public QWidget {
   Q_OBJECT
 public:
@@ -39,20 +42,31 @@ public:
 private:
   QPushButton *S2P_File;
   QRadioButton *AddS2PRadioButton, *AddSingleFreqRadioButton, *RI_Radiobutton,
-      *MA_RadioButton;
-  QLabel *freqLabel, *S_Matrix_Label;
-  QDoubleSpinBox *freqSpinBox;
-  QComboBox *freqScaleCombo;
+      *MA_RadioButton, *DegRadiobutton, *RadRadiobutton, *MdBA_RadioButton;
+  QLabel *freqLabel, *S_Matrix_Label, *fstartMatchingS2P_Label,
+      *fendMatchingS2P_Label;
+  QDoubleSpinBox *freqSpinBox, *fstartSpinbox, *fendSpinbox;
+  QComboBox *freqScaleCombo, *fendScaleCombo, *fstartScaleCombo;
   QTableWidget *S2PTable, *S2PInputTable;
   QPushButton *AddPoint, *DeletePoint, *ClearAll, *S2PFileButton;
-  QGroupBox *SPAR;
-  struct S2P_DATA DATA;
+  QGroupBox *SPAR, *RadDegGroupbox, *S2P_Groupbox;
+
+  struct S2P_DATA
+      DATA; // Only for data transfer to main widget. It uses std::vector.
+            // However, std::deque is needed for handling data dynamically...
+  std::deque<std::complex<double>> S11, S12, S21, S22;
+  std::deque<double> Freq;
+  void SortData();
 
   std::complex<double> ReadS2PFromUserInput(QString);
-  void PutDataInTable();
+  QString rect2polar(std::complex<double>);
+  int loadS2Pdata(QString);
+  double getS2PfreqScale(string line);
+  string RemoveBlankSpaces(string line);
 
 private slots:
   void UpdateS2PDataEntry();
+  void PutDataInTable();
   void LoadS2PFile();
   void addSingleFreqData();
   void ClearTable();

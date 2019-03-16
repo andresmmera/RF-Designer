@@ -20,11 +20,11 @@
 
 #include <complex>
 #include <cstring>
+#include <deque>
 #include <iostream>
-#include <vector>
 using namespace std;
 
-typedef vector<complex<double>> vec;
+typedef deque<complex<double>> vec;
 
 class Mat {
 private:
@@ -52,10 +52,10 @@ public:
   vec getCol(unsigned int);
   void eye();
   void ones();
-  vector<double> getRowReal(unsigned int);
-  vector<double> getRowImag(unsigned int);
-  vector<double> getColReal(unsigned int);
-  vector<double> getColImag(unsigned int);
+  deque<double> getRowReal(unsigned int);
+  deque<double> getRowImag(unsigned int);
+  deque<double> getColReal(unsigned int);
+  deque<double> getColImag(unsigned int);
 };
 
 #endif // SPARENGINE_H

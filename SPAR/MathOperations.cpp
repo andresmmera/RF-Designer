@@ -1,19 +1,26 @@
-/***************************************************************************
-                                MathOperations.cpp
-                                ----------
-    copyright            :  QUCS team
-    author                :  2019 Andres Martinez-Mera
-    email                  :  andresmmera@protonmail.com
- ***************************************************************************/
+/*
+ * MathOperations.cpp - Math operations class implementation
+ *
+ * copyright (C) 2016 Andres Martinez-Mera <andresmartinezmera@gmail.com>
+ *
+ * This is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this package; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street - Fifth Floor,
+ * Boston, MA 02110-1301, USA.
+ *
+ *
+ */
 
-/***************************************************************************
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- *
- ***************************************************************************/
 #include "MathOperations.h"
 
 // Given two double parameters, it generates a N-dim vector whose values are
@@ -60,9 +67,8 @@ vector<complex<double>> interp(vector<double> f1, vector<complex<double>> Z,
   vector<double> realpart = getRealPart(Z);
   vector<double> imagpart = getImagPart(Z);
   vector<complex<double>> Z_(f2.size());
-
   // Check f2 \in f1
-  if ((min(f2) < min(f1)) || (max(f2) > max(f1))) {
+  if ((round(min(f2)) < round(min(f1))) || (round(max(f2)) > round(max(f1)))) {
     cout << "ERROR: Cannot interporlate a sequence defined outside the "
             "original one"
          << endl;
@@ -73,10 +79,13 @@ vector<complex<double>> interp(vector<double> f1, vector<complex<double>> Z,
     for (unsigned int ind = 0; ind < f1.size() - 1; ind++) {
       i1 = closestIndex(f2, f1[ind]);
       i2 = closestIndex(f2, f1[ind + 1]);
-      nslots = i2 - i1;
+      nslots =
+          i2 - i1; // Number of samples between two consecutive indexes of f1
 
-      step_r = (realpart[ind + 1] - realpart[ind]) / nslots;
-      step_i = (imagpart[ind + 1] - imagpart[ind]) / nslots;
+      step_r = (realpart[ind + 1] - realpart[ind]) /
+               nslots; // Slope of the real part
+      step_i = (imagpart[ind + 1] - imagpart[ind]) /
+               nslots; // Slope of the imaginary part
 
       for (unsigned int i = a; i <= nslots; i++, aux++) {
         realpart_ = realpart[ind] + i * step_r;
@@ -84,7 +93,8 @@ vector<complex<double>> interp(vector<double> f1, vector<complex<double>> Z,
         Z_[aux] = complex<double>(realpart_, imagpart_);
       }
       if (a == 0)
-        a = 1;
+        a = 1; // This trick is done in order to use the first sample of the
+               // first block
     }
   }
   return Z_;
@@ -96,7 +106,6 @@ unsigned int closestIndex(std::vector<double> vec, double value) {
   it = std::lower_bound(vec.begin(), vec.end(), value);
 
   unsigned int index = it - vec.begin();
-
   if (index > vec.size() - 1)
     index = vec.size() - 1;
   return index;
@@ -122,9 +131,23 @@ vector<double> getImagPart(vector<complex<double>> Z) {
   return imagpart;
 }
 
-// Conjugates a complex vector
+// Conjugates a complex number
 complex<double> conj(complex<double> Z) {
   return complex<double>(real(Z), -imag(Z));
+}
+
+// Conjugates a complex vector
+vector<complex<double>> conj(vector<complex<double>> Z) {
+  for (unsigned int i = 0; i < Z.size(); i++)
+    Z[i] = complex<double>(real(Z[i]), -imag(Z[i]));
+  return Z;
+}
+
+// Calculates the square root of the elements of the vector
+vector<double> sqrt(vector<double> U) {
+  for (unsigned int i = 0; i < U.size(); i++)
+    U[i] = sqrt(U[i]);
+  return U;
 }
 
 // Creates a N-dim ones vector
@@ -132,14 +155,6 @@ vector<double> ones(unsigned int N) {
   vector<double> V(N);
   for (unsigned int i = 0; i < N; i++)
     V[i] = 1;
-  return V;
-}
-
-// double * vector operation
-vector<double> operator*(double d, vector<double> Z) {
-  vector<double> V(Z.size());
-  for (unsigned int i = 0; i < Z.size(); i++)
-    V[i] = d * Z[i];
   return V;
 }
 
@@ -159,58 +174,109 @@ vector<double> operator-(double u, vector<double> V) {
   return V_;
 }
 
-/*
 // vector + vector operation
 vector<double> operator+(vector<double> U, vector<double> V) {
   vector<double> V_(U.size());
-  for (auto a = U.begin(), b=V.begin(), c = V_.begin(); a !=
-  U.begin()+(U.size()-1); ++a, ++b, ++c) *c = *a + *b; return V_;
+  for (auto a = U.begin(), b = V.begin(), c = V_.begin();
+       a != U.begin() + (U.size() - 1); ++a, ++b, ++c)
+    *c = *a + *b;
+  return V_;
+}
+
+vector<complex<double>> operator+(vector<double> U, vector<complex<double>> V) {
+  vector<complex<double>> Z(U.size());
+  for (unsigned int i = 0; i < V.size(); i++)
+    Z[i] = complex<double>(U[i], 0) + V[i];
+  return Z;
+}
+
+vector<complex<double>> operator-(vector<double> U, vector<complex<double>> V) {
+  vector<complex<double>> Z(U.size());
+  for (unsigned int i = 0; i < V.size(); i++)
+    Z[i] = complex<double>(U[i], 0) - V[i];
+  return Z;
 }
 
 // vector - vector operation
 vector<double> operator-(vector<double> U, vector<double> V) {
   vector<double> V_(U.size());
-  for (auto a = U.begin(), b=V.begin(), c = V_.begin(); a !=
-  U.begin()+(U.size()-1); ++a, ++b, ++c) *c = *a - *b; return V_;
+  for (unsigned int i = 0; i < V.size(); i++)
+    V_[i] = U[i] - V[i];
+  return V_;
+}
+
+// vector<double> - vector<double> operation
+vector<complex<double>> operator-(vector<complex<double>> U,
+                                  vector<complex<double>> V) {
+  vector<complex<double>> V_(U.size());
+  for (unsigned int i = 0; i < V.size(); i++)
+    V_[i] = U[i] - V[i];
+  return V_;
+}
+
+// double * vector operation
+vector<double> operator*(double d, vector<double> Z) {
+  vector<double> V(Z.size());
+  for (unsigned int i = 0; i < Z.size(); i++)
+    V[i] = d * Z[i];
+  return V;
 }
 
 // vector * vector dot operation
 vector<double> operator*(vector<double> U, vector<double> V) {
   vector<double> V_(U.size());
-  for (unsigned int i=0; i< U.size(); i++) V_[i] = U[i]*V[i];
+  for (unsigned int i = 0; i < U.size(); i++)
+    V_[i] = U[i] * V[i];
   return V_;
-}*/
+}
 
-// Complex vector * double vector
-vector<complex<double>> operator*(vector<complex<double>> U, vector<double> V) {
-  vector<complex<double>> result;
-  if (U.size() == V.size()) // Same length
-  {
-    for (unsigned int i = 0; i < V.size(); i++) {
-      result.push_back(U.at(i) * V.at(i));
-    }
-  }
-  if (U.size() == 1) // U is scalar
-  {
-    for (unsigned int i = 0; i < V.size(); i++) {
-      result.push_back(U.at(0) * V.at(i));
-    }
-  }
-  if (V.size() == 1) // V is scalar
-  {
-    for (unsigned int i = 0; i < U.size(); i++) {
-      result.push_back(V.at(0) * U.at(i));
-    }
-  }
-  return result;
+vector<complex<double>> operator*(double d, vector<complex<double>> Z) {
+  vector<complex<double>> V(Z.size());
+  for (unsigned int i = 0; i < Z.size(); i++)
+    V[i] = d * Z[i];
+  return V;
+}
+
+vector<complex<double>> operator*(complex<double> Z, vector<double> V) {
+  vector<complex<double>> vec(V.size());
+  for (unsigned int i = 0; i < V.size(); i++)
+    vec[i] = Z * V[i];
+  return vec;
+}
+
+// vector<complex> * vector<complex> dot product operation
+vector<complex<double>> operator*(vector<complex<double>> U,
+                                  vector<complex<double>> V) {
+  vector<complex<double>> V_(U.size());
+  for (unsigned int i = 0; i < U.size(); i++)
+    V_[i] = U[i] * V[i];
+  return V_;
+}
+
+complex<double> operator/(double d, complex<double> z) {
+  return d * conj(z) / (abs(z) * abs(z));
+}
+
+vector<complex<double>> operator/(vector<double> U, vector<complex<double>> V) {
+  vector<complex<double>> Z(U.size());
+  for (unsigned int i = 0; i < Z.size(); i++)
+    Z[i] = U[i] / V[i];
+  return Z;
+}
+
+vector<complex<double>> operator/(vector<complex<double>> U,
+                                  vector<complex<double>> V) {
+  vector<complex<double>> Z(U.size());
+  for (unsigned int i = 0; i < Z.size(); i++)
+    Z[i] = U[i] / V[i];
+  return Z;
 }
 
 vector<double> operator/(vector<double> V, double k) {
-  vector<double> result;
-  for (unsigned int i = 0; i < V.size(); i++) {
-    result.push_back(V.at(i) / k);
-  }
-  return result;
+  vector<double> vec(V.size());
+  for (unsigned int i = 0; i < V.size(); i++)
+    vec[i] = V[i] / k;
+  return vec;
 }
 
 // Prints the content of a real vector in the standard output
