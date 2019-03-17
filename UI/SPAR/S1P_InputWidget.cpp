@@ -1,5 +1,5 @@
 /***************************************************************************
-                                DeviceSpar.cpp
+                                S1P_InputWidget.cpp
                                 ----------
     copyright            :  QUCS team
     author                :  2019 Andres Martinez-Mera
@@ -14,28 +14,45 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
-#include "DeviceSpar.h"
+#include "S1P_InputWidget.h"
 
-DeviceSPAR::DeviceSPAR() {
+S1P_InputWidget::S1P_InputWidget() {
+
   QGridLayout *SPARDataLayout = new QGridLayout();
-
   // Data entry mode
-  QWidget *S2PWidget = new QWidget();
-  QHBoxLayout *S2PLayout = new QHBoxLayout();
-  AddS2PRadioButton = new QRadioButton("Add S2P");
-  connect(AddS2PRadioButton, SIGNAL(clicked(bool)), this,
-          SLOT(UpdateS2PDataEntry()));
+  QWidget *S1PWidget = new QWidget();
+  QHBoxLayout *S1PLayout = new QHBoxLayout();
+  AddS1PRadioButton = new QRadioButton("Add S1P");
+  connect(AddS1PRadioButton, SIGNAL(clicked(bool)), this,
+          SLOT(UpdateS1PDataEntry()));
   AddSingleFreqRadioButton = new QRadioButton("Enter single frequency");
   AddSingleFreqRadioButton->setChecked(true);
   connect(AddSingleFreqRadioButton, SIGNAL(clicked(bool)), this,
-          SLOT(UpdateS2PDataEntry()));
-  S2PLayout->addWidget(AddS2PRadioButton);
-  S2PLayout->addWidget(AddSingleFreqRadioButton);
-  S2PWidget->setLayout(S2PLayout);
-  SPARDataLayout->addWidget(S2PWidget, 0, 0, 1, 3);
+          SLOT(UpdateS1PDataEntry()));
+  S1PLayout->addWidget(AddS1PRadioButton);
+  S1PLayout->addWidget(AddSingleFreqRadioButton);
+  S1PWidget->setLayout(S1PLayout);
+  SPARDataLayout->addWidget(S1PWidget, 0, 0, 1, 3);
 
   // Data entry widget
   QGridLayout *SPAR_GridLayout = new QGridLayout();
+
+  // Impedance or S-parameter data chooser
+  InputData_GroupBox = new QGroupBox("Data entry format");
+  QHBoxLayout *DataChooserInputLayout = new QHBoxLayout();
+  Z_EntryData_RadioButton = new QRadioButton("Impedance data (Z)");
+  connect(Z_EntryData_RadioButton, SIGNAL(clicked(bool)), this,
+          SLOT(ChangeSZMode()));
+  S_EntryData_RadioButton = new QRadioButton("S-parameter data");
+  S_EntryData_RadioButton->setChecked(true);
+  connect(S_EntryData_RadioButton, SIGNAL(clicked(bool)), this,
+          SLOT(ChangeSZMode()));
+
+  DataChooserInputLayout->addWidget(Z_EntryData_RadioButton);
+  DataChooserInputLayout->addWidget(S_EntryData_RadioButton);
+  InputData_GroupBox->setLayout(DataChooserInputLayout);
+  SPAR_GridLayout->addWidget(InputData_GroupBox, 0, 0, 1, 4);
+
   // Frequency
   QStringList FreqScale;
   FreqScale << "GHz"
@@ -52,50 +69,60 @@ DeviceSPAR::DeviceSPAR() {
   freqScaleCombo = new QComboBox();
   freqScaleCombo->addItems(FreqScale);
   freqScaleCombo->setCurrentIndex(1);
-  SPAR_GridLayout->addWidget(freqLabel, 0, 0);
-  SPAR_GridLayout->addWidget(freqSpinBox, 0, 1);
-  SPAR_GridLayout->addWidget(freqScaleCombo, 0, 2);
+  SPAR_GridLayout->addWidget(freqLabel, 1, 0);
+  SPAR_GridLayout->addWidget(freqSpinBox, 1, 1);
+  SPAR_GridLayout->addWidget(freqScaleCombo, 1, 2);
+
+  // Reference impedance
+  Z0Label = new QLabel("Z0");
+  Z0_SpinBox = new QDoubleSpinBox();
+  Z0_SpinBox->setMinimum(1);
+  Z0_SpinBox->setMaximum(1e3);
+  Z0_SpinBox->setDecimals(0);
+  Z0_SpinBox->setValue(50);
+  Z0_Ohm_Label = new QLabel(QChar(0xa9, 0x03));
+  SPAR_GridLayout->addWidget(Z0Label, 2, 0);
+  SPAR_GridLayout->addWidget(Z0_SpinBox, 2, 1);
+  SPAR_GridLayout->addWidget(Z0_Ohm_Label, 2, 2);
 
   // Add point
   AddPoint = new QPushButton("Add sample");
-  SPAR_GridLayout->addWidget(AddPoint, 1, 0);
+  SPAR_GridLayout->addWidget(AddPoint, 3, 0);
   connect(AddPoint, SIGNAL(clicked(bool)), this, SLOT(addSingleFreqData()));
 
   // S-matrix label
   S_Matrix_Label = new QLabel("S-matrix");
   S_Matrix_Label->setStyleSheet("font-weight: bold; color: black");
   S_Matrix_Label->setAlignment(Qt::AlignCenter);
-  SPAR_GridLayout->addWidget(S_Matrix_Label, 2, 0, 1, 3);
+  SPAR_GridLayout->addWidget(S_Matrix_Label, 4, 0, 1, 3);
 
   // S-matrix input
-  SPAR = new QGroupBox("S-parameter input");
+  SPAR = new QGroupBox("Impedance data entry");
+
   SPAR->setToolTip(QString(
       "Use '/' or ';' as separator between magnitude and phase. "
       "Use \"deg\" or 'º' for degrees and \"r\" or \"rad\" for radians"));
-  S2PInputTable = new QTableWidget();
-  S2PInputTable->setRowCount(2);
-  S2PInputTable->setColumnCount(2);
-  S2PInputTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-  S2PInputTable->verticalHeader()->setResizeMode(QHeaderView::Stretch);
-  S2PInputTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  S1PInputTable = new QTableWidget();
+  S1PInputTable->setRowCount(1);
+  S1PInputTable->setColumnCount(1);
+  S1PInputTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+  S1PInputTable->verticalHeader()->setResizeMode(QHeaderView::Stretch);
+  S1PInputTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   // Enter some sample data
-  S2PInputTable->setItem(0, 0, new QTableWidgetItem("0.1/30"));
-  S2PInputTable->setItem(0, 1, new QTableWidgetItem("20/155"));
-  S2PInputTable->setItem(1, 0, new QTableWidgetItem("0.05/10"));
-  S2PInputTable->setItem(1, 1, new QTableWidgetItem("0.1/55"));
+  S1PInputTable->setItem(0, 0, new QTableWidgetItem("0.1/30"));
 
-  SPAR_GridLayout->addWidget(S2PInputTable, 3, 0, 1, 3);
+  SPAR_GridLayout->addWidget(S1PInputTable, 5, 0, 1, 3);
   SPAR->setLayout(SPAR_GridLayout);
 
   SPARDataLayout->addWidget(SPAR, 1, 0, 1, 3);
 
-  // S2P file chooser
-  S2P_Groupbox = new QGroupBox("S2P file");
-  QGridLayout *S2P_File_Layout = new QGridLayout();
-  S2PFileButton = new QPushButton("Browse S2P");
-  connect(S2PFileButton, SIGNAL(clicked(bool)), this, SLOT(LoadS2PFile()));
-  S2P_File_Layout->addWidget(S2PFileButton, 0, 0);
-  fstartMatchingS2P_Label = new QLabel("Fstart matching");
+  // S1P file chooser
+  S1P_Groupbox = new QGroupBox("S1P file");
+  QGridLayout *S1P_File_Layout = new QGridLayout();
+  S1PFileButton = new QPushButton("Browse S1P");
+  connect(S1PFileButton, SIGNAL(clicked(bool)), this, SLOT(LoadS1PFile()));
+  S1P_File_Layout->addWidget(S1PFileButton, 0, 0);
+  fstartMatchingS1P_Label = new QLabel("Fstart matching");
   fstartSpinbox = new QDoubleSpinBox();
   fstartSpinbox->setMinimum(1);
   fstartSpinbox->setMaximum(1e6);
@@ -104,11 +131,11 @@ DeviceSPAR::DeviceSPAR() {
   fstartScaleCombo = new QComboBox();
   fstartScaleCombo->addItems(FreqScale);
   fstartScaleCombo->setCurrentIndex(1);
-  S2P_File_Layout->addWidget(fstartMatchingS2P_Label, 1, 0);
-  S2P_File_Layout->addWidget(fstartSpinbox, 1, 1);
-  S2P_File_Layout->addWidget(fstartScaleCombo, 1, 2);
+  S1P_File_Layout->addWidget(fstartMatchingS1P_Label, 1, 0);
+  S1P_File_Layout->addWidget(fstartSpinbox, 1, 1);
+  S1P_File_Layout->addWidget(fstartScaleCombo, 1, 2);
 
-  fendMatchingS2P_Label = new QLabel("Fend matching");
+  fendMatchingS1P_Label = new QLabel("Fend matching");
   fendSpinbox = new QDoubleSpinBox();
   fendSpinbox->setMinimum(1);
   fendSpinbox->setMaximum(1e6);
@@ -117,13 +144,13 @@ DeviceSPAR::DeviceSPAR() {
   fendScaleCombo = new QComboBox();
   fendScaleCombo->addItems(FreqScale);
   fendScaleCombo->setCurrentIndex(1);
-  S2P_File_Layout->addWidget(fendMatchingS2P_Label, 2, 0);
-  S2P_File_Layout->addWidget(fendSpinbox, 2, 1);
-  S2P_File_Layout->addWidget(fendScaleCombo, 2, 2);
-  S2P_Groupbox->hide(); // By default this is hidden
-  S2P_Groupbox->setLayout(S2P_File_Layout);
+  S1P_File_Layout->addWidget(fendMatchingS1P_Label, 2, 0);
+  S1P_File_Layout->addWidget(fendSpinbox, 2, 1);
+  S1P_File_Layout->addWidget(fendScaleCombo, 2, 2);
+  S1P_Groupbox->hide(); // By default this is hidden
+  S1P_Groupbox->setLayout(S1P_File_Layout);
 
-  SPARDataLayout->addWidget(S2P_Groupbox, 2, 0, 1, 3);
+  SPARDataLayout->addWidget(S1P_Groupbox, 2, 0, 1, 3);
 
   // Data
   QGroupBox *DataWidget = new QGroupBox("Data display");
@@ -160,80 +187,80 @@ DeviceSPAR::DeviceSPAR() {
   connect(DegRadiobutton, SIGNAL(clicked(bool)), this, SLOT(PutDataInTable()));
   connect(RadRadiobutton, SIGNAL(clicked(bool)), this, SLOT(PutDataInTable()));
 
-  S2PTable = new QTableWidget();
-  S2PTable->setRowCount(0);
-  S2PTable->setColumnCount(5);
+  S1PTable = new QTableWidget();
+  S1PTable->setRowCount(0);
+  S1PTable->setColumnCount(3);
   QStringList Labels;
   Labels << "Freq"
          << "S11"
-         << "S12"
-         << "S21"
-         << "S22";
-  S2PTable->setHorizontalHeaderLabels(Labels);
-  S2PTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-  S2PTable->verticalHeader()->setResizeMode(QHeaderView::Stretch);
+         << "Z11";
+  S1PTable->setHorizontalHeaderLabels(Labels);
+  S1PTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+  S1PTable->verticalHeader()->setResizeMode(QHeaderView::Stretch);
   DataWidget->setLayout(DataLayout);
-  DataLayout->addWidget(S2PTable, 2, 0, 1, 4);
+  DataLayout->addWidget(S1PTable, 2, 0, 1, 4);
+  DataLayout->addWidget(new QLabel(QString("Z0 = 50%1").arg(QChar(0xa9, 0x03))),
+                        3, 0);
   DeletePoint = new QPushButton("Remove sample");
   ClearAll = new QPushButton("Clear all");
   connect(ClearAll, SIGNAL(clicked(bool)), this, SLOT(ClearTable()));
-  DataLayout->addWidget(DeletePoint, 3, 0);
-  DataLayout->addWidget(ClearAll, 3, 1);
+  DataLayout->addWidget(DeletePoint, 4, 0);
+  DataLayout->addWidget(ClearAll, 4, 1);
 
   SPARDataLayout->addWidget(DataWidget, 3, 0, 1, 4);
+
   this->setLayout(SPARDataLayout);
-  this->setWindowTitle("S-parameter data entry tool");
 }
 
-DeviceSPAR::~DeviceSPAR() {
-  delete AddS2PRadioButton;
+S1P_InputWidget::~S1P_InputWidget() {
+  delete AddS1PRadioButton;
   delete AddSingleFreqRadioButton;
   delete freqLabel;
   delete freqScaleCombo;
   delete freqSpinBox;
   delete RI_Radiobutton;
-  delete S2PTable;
-  delete S2PInputTable;
+  delete S1PTable;
+  delete S1PInputTable;
   delete DeletePoint;
   delete ClearAll;
   delete SPAR;
   delete S_Matrix_Label;
   delete RadDegGroupbox;
-  delete S2P_Groupbox;
-  delete fstartMatchingS2P_Label;
-  delete fendMatchingS2P_Label;
+  delete S1P_Groupbox;
+  delete fstartMatchingS1P_Label;
+  delete fendMatchingS1P_Label;
   delete fstartSpinbox;
   delete fendSpinbox;
   delete fstartScaleCombo;
   delete fendScaleCombo;
+  delete InputData_GroupBox;
+  delete S_EntryData_RadioButton;
+  delete Z_EntryData_RadioButton;
 }
 
-void DeviceSPAR::UpdateS2PDataEntry() {
-  if (AddS2PRadioButton->isChecked()) {
-    S2P_Groupbox->show();
+void S1P_InputWidget::UpdateS1PDataEntry() {
+  if (AddS1PRadioButton->isChecked()) {
+    S1P_Groupbox->show();
     SPAR->hide();
   } else {
-    S2P_Groupbox->hide();
+    S1P_Groupbox->hide();
     SPAR->show();
   }
 }
 
-void DeviceSPAR::LoadS2PFile() {
+void S1P_InputWidget::LoadS1PFile() {
   QString filename = QFileDialog::getOpenFileName(
-      this, tr("Open S2P File"), "/home", tr("Touchstone S2P (*.s2p)"));
+      this, tr("Open S1P File"), "/home", tr("Touchstone S1P (*.S1P)"));
   if (filename.isEmpty())
     return;
 
-  IO *readS2P = new IO();
-  readS2P->loadS2Pdata(filename.toStdString());
-  S2P_DATA data = readS2P->getS2P();
+  IO *readS1P = new IO();
+  readS1P->loadS1Pdata(filename.toStdString(), LOAD);
+  S1P_DATA data = readS1P->getS1P(LOAD);
 
   // Clear previous data
   Freq.clear();
   S11.clear();
-  S12.clear();
-  S21.clear();
-  S22.clear();
   ClearTable();
 
   // Matching band
@@ -247,17 +274,14 @@ void DeviceSPAR::LoadS2PFile() {
     if ((data.Freq[i] < fstart) || (data.Freq[i] > fend))
       continue;
     Freq.push_back(data.Freq[i]);
-    S11.push_back(data.S11[i]);
-    S21.push_back(data.S21[i]);
-    S12.push_back(data.S12[i]);
-    S22.push_back(data.S22[i]);
+    S11.push_back(data.Z11[i]);
   }
 
-  delete readS2P; // No longer needed
+  delete readS1P; // No longer needed
   PutDataInTable();
 }
 
-double DeviceSPAR::getFreqScale(QString fscale) {
+double S1P_InputWidget::getFreqScale(QString fscale) {
   double scale;
   if (fscale == "GHz")
     scale = 1e9;
@@ -271,33 +295,34 @@ double DeviceSPAR::getFreqScale(QString fscale) {
 }
 
 // Triggered when the user presses the "add single point" button
-void DeviceSPAR::addSingleFreqData() {
+void S1P_InputWidget::addSingleFreqData() {
 
   // Read frequency from the interface
   QString fscale = freqScaleCombo->currentText();
   double freq = freqSpinBox->value() * getFreqScale(fscale);
 
-  // Read the S matrix
+  // Read the S11 or Z11 data
   // The data may be entered as R+jX or MA. The magnitude may be entered in
   // natural units (default) or dB. On the other hand, the angle may be
   // expressed in degrees (default) or radians
 
-  std::complex<double> S11_ =
-      ReadS2PFromUserInput(S2PInputTable->item(0, 0)->text());
-  std::complex<double> S12_ =
-      ReadS2PFromUserInput(S2PInputTable->item(0, 1)->text());
-  std::complex<double> S21_ =
-      ReadS2PFromUserInput(S2PInputTable->item(1, 0)->text());
-  std::complex<double> S22_ =
-      ReadS2PFromUserInput(S2PInputTable->item(1, 1)->text());
+  std::complex<double> X =
+      ReadS1PFromUserInput(S1PInputTable->item(0, 0)->text());
+  std::complex<double> Z0 = std::complex<double>(50, 0);
+
+  // Is the input an s-parameter or an impedance?
+  if (Z_EntryData_RadioButton->isChecked()) {
+    Z11.push_back(X);
+    S11.push_back((X - Z0) / (X + Z0));
+  } else {
+    // The data entered is the reflection coefficient
+    S11.push_back(X);
+    Z11.push_back(Z0 * (complex<double>(1, 0) + X) /
+                  (complex<double>(1, 0) - X));
+  }
 
   // Add the previous data to the internal data storage structures
   Freq.push_back(freq);
-  S11.push_back(S11_);
-  S12.push_back(S12_);
-  S21.push_back(S21_);
-  S22.push_back(S22_);
-
   SortData();
 
   // Now, put the sorted data in the table
@@ -310,7 +335,7 @@ void DeviceSPAR::addSingleFreqData() {
 
 // This function writes the content of the class variable 'DATA' in the main
 // QTableWidget
-void DeviceSPAR::PutDataInTable() {
+void S1P_InputWidget::PutDataInTable() {
 
   // Check the MA-RI settings
   if (MA_RadioButton->isChecked()) {
@@ -321,34 +346,28 @@ void DeviceSPAR::PutDataInTable() {
     RadDegGroupbox->setEnabled(false);
   }
 
-  S2PTable->clearContents();
+  S1PTable->clearContents();
   for (int r = 0; r < Freq.size(); r++) {
-    if (r >= S2PTable->rowCount()) {
+    if (r >= S1PTable->rowCount()) {
       // Add a new row to the table
-      S2PTable->insertRow(S2PTable->rowCount());
+      S1PTable->insertRow(S1PTable->rowCount());
     }
 
     // Add data to the row
-    S2PTable->setItem(r, 0,
+    S1PTable->setItem(r, 0,
                       new QTableWidgetItem(QString("%1").arg(
                           num2str(Freq.at(r), 3, Frequency)))); // Frequency
-    S2PTable->setItem(
+    S1PTable->setItem(
         r, 1,
         new QTableWidgetItem(QString("%1").arg(rect2polar(S11.at(r))))); // S11
-    S2PTable->setItem(
+    S1PTable->setItem(
         r, 2,
-        new QTableWidgetItem(QString("%1").arg(rect2polar(S12.at(r))))); // S12
-    S2PTable->setItem(
-        r, 3,
-        new QTableWidgetItem(QString("%1").arg(rect2polar(S21.at(r))))); // S21
-    S2PTable->setItem(
-        r, 4,
-        new QTableWidgetItem(QString("%1").arg(rect2polar(S22.at(r))))); // S22
+        new QTableWidgetItem(QString("%1").arg(rect2polar(Z11.at(r))))); // Z11
   }
 }
 
 // This function converts a QString complex data into std::complex
-std::complex<double> DeviceSPAR::ReadS2PFromUserInput(QString data) {
+std::complex<double> S1P_InputWidget::ReadS1PFromUserInput(QString data) {
   QString R, I, M, A;
   double R_, I_, M_, A_;
   int sign = 1;
@@ -434,9 +453,9 @@ std::complex<double> DeviceSPAR::ReadS2PFromUserInput(QString data) {
   }
 }
 
-void DeviceSPAR::ClearTable() { S2PTable->clear(); }
+void S1P_InputWidget::ClearTable() { S1PTable->clear(); }
 
-QString DeviceSPAR::rect2polar(std::complex<double> Z) {
+QString S1P_InputWidget::rect2polar(std::complex<double> Z) {
   // Check the selected data format
   bool MA_nu = MA_RadioButton->isChecked();
   bool MA_dB = MdBA_RadioButton->isChecked();
@@ -478,13 +497,12 @@ QString DeviceSPAR::rect2polar(std::complex<double> Z) {
 }
 
 // Sort by frequency an s-parameter data struct
-void DeviceSPAR::SortData() {
+void S1P_InputWidget::SortData() {
 
   if (Freq.size() == 1)
     return;
   std::deque<double> freq_sorted;
-  std::deque<std::complex<double>> S11_sorted, S12_sorted, S21_sorted,
-      S22_sorted;
+  std::deque<std::complex<double>> S11_sorted, Z11_sorted;
   std::deque<int> sort_vector;
   double min = 1e20, last_min = -1;
   int min_index;
@@ -511,31 +529,41 @@ void DeviceSPAR::SortData() {
 
   // Resize vectors to the size of freq_sorted
   S11_sorted.resize(freq_sorted.size());
-  S21_sorted.resize(freq_sorted.size());
-  S12_sorted.resize(freq_sorted.size());
-  S22_sorted.resize(freq_sorted.size());
+  Z11_sorted.resize(freq_sorted.size());
 
   // Now apply the same order in the other vectors
   for (unsigned int i = 0; i < sort_vector.size(); i++) {
     S11_sorted[i] = S11[sort_vector[i]];
-    S12_sorted[i] = S12[sort_vector[i]];
-    S21_sorted[i] = S21[sort_vector[i]];
-    S22_sorted[i] = S22[sort_vector[i]];
+    Z11_sorted[i] = Z11[sort_vector[i]];
   }
 
   // Replace the sorted vectors in the SPAR structure
   Freq.clear();
   S11.clear();
-  S21.clear();
-  S12.clear();
-  S22.clear();
+  Z11.clear();
 
   for (unsigned int i = 0; i < S11_sorted.size(); i++) {
     Freq.push_back(freq_sorted[i]);
     S11.push_back(S11_sorted[i]);
-    S21.push_back(S21_sorted[i]);
-    S12.push_back(S12_sorted[i]);
-    S22.push_back(S22_sorted[i]);
+    Z11.push_back(Z11_sorted[i]);
   }
   return;
+}
+
+// This function is triggered when the user changes the data input mode and
+// modifies the visibility of the UI elements
+void S1P_InputWidget::ChangeSZMode() {
+  if (Z_EntryData_RadioButton->isChecked()) {
+    // Z mode
+    S_Matrix_Label->setText(QString("Impedance [%1]").arg(QChar(0xa9, 0x03)));
+    Z0Label->hide();
+    Z0_Ohm_Label->hide();
+    Z0_SpinBox->hide();
+  } else {
+    // S mode
+    S_Matrix_Label->setText("Reflection coefficient");
+    Z0Label->show();
+    Z0_Ohm_Label->show();
+    Z0_SpinBox->show();
+  }
 }

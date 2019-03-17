@@ -52,6 +52,7 @@ public:
                        // different frecuencies, so it is necessary to have
   // common frequency vector for pairing ZS and ZL.
   S2P_DATA getS2P();
+  S1P_DATA getS1P(terminal);
 
 private:
   vector<double> fS, fL, fAMP; // Frequencies at which the input source, load

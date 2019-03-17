@@ -20,12 +20,17 @@
 MatchingNetworkDesignTool::MatchingNetworkDesignTool() {
   QGridLayout *MatchingNetworkDesignLayout = new QGridLayout();
   // Broadband checkbox
-  Broadband_Checkbox = new QCheckBox("Broadband matching");
+  Broadband_Checkbox = new QCheckBox("Freq. dependent load");
   MatchingNetworkDesignLayout->addWidget(Broadband_Checkbox, 0, 0);
+  connect(Broadband_Checkbox, SIGNAL(clicked(bool)), this,
+          SLOT(FreqDependentLoad()));
 
   // Broadband checkbox
   TwoPort_Matching_Checkbox = new QCheckBox("Two-port matching");
   MatchingNetworkDesignLayout->addWidget(TwoPort_Matching_Checkbox, 0, 1);
+  TwoPort_Matching_Checkbox->setChecked(false);
+  connect(TwoPort_Matching_Checkbox, SIGNAL(clicked(bool)), this,
+          SLOT(SwitchSingle_TwoPort_MatchingMode()));
 
   // Topology
   Topology_Label = new QLabel("Topology");
@@ -86,6 +91,7 @@ MatchingNetworkDesignTool::MatchingNetworkDesignTool() {
 
   // Edit S-parameters button
   EditSPAR = new QPushButton("Edit device S-parameters");
+  EditSPAR->hide();
   MatchingNetworkDesignLayout->addWidget(EditSPAR, 3, 0, 1, 4);
 
   // Output impedance
@@ -102,11 +108,15 @@ MatchingNetworkDesignTool::MatchingNetworkDesignTool() {
   ZoutISpinBox->setSingleStep(0.5);
   ZoutISpinBox->setValue(0);
   Ohm_Zout_Label = new QLabel(QChar(0xa9, 0x03));
+  EditS1P = new QPushButton("S1P");
+  EditS1P->hide();
+  connect(EditS1P, SIGNAL(clicked(bool)), this, SLOT(launchS1P()));
   MatchingNetworkDesignLayout->addWidget(Zout_Label, 4, 0);
   MatchingNetworkDesignLayout->addWidget(ZoutRSpinBox, 4, 1);
   MatchingNetworkDesignLayout->addWidget(Zout_J, 4, 2);
   MatchingNetworkDesignLayout->addWidget(ZoutISpinBox, 4, 3);
   MatchingNetworkDesignLayout->addWidget(Ohm_Zout_Label, 4, 4);
+  MatchingNetworkDesignLayout->addWidget(EditS1P, 4, 1);
 
   // Frequency range. Start
   FreqStart_Label = new QLabel("freq");
@@ -199,6 +209,7 @@ MatchingNetworkDesignTool::~MatchingNetworkDesignTool() {
   delete FreqEnd_Label;
   delete FreqEnd_Scale_Combo;
   delete FreqEnd_Spinbox;
+  delete EditS1P;
 }
 
 void MatchingNetworkDesignTool::UpdateDesignParameters() {
@@ -266,4 +277,37 @@ double MatchingNetworkDesignTool::getScaleFreq(int index) {
   return pow(10, exp);
 }
 
-void MatchingNetworkDesignTool::launchSPAR() { DS.show(); }
+void MatchingNetworkDesignTool::launchSPAR() { S2PW.show(); }
+
+// This function is triggered when the user activates or deactivates the
+// two-port matching option
+void MatchingNetworkDesignTool::SwitchSingle_TwoPort_MatchingMode() {
+  if (TwoPort_Matching_Checkbox->isChecked()) {
+    // Make visible two-port matching widgets and hide the single-port stuff
+    EditSPAR->show();
+  } else {
+    // Make visible single-port matching input widgets and hide the two-port
+    // stuff
+    EditSPAR->hide();
+  }
+}
+
+// This function is triggered when the user activates the frequency-dependent
+// load option
+void MatchingNetworkDesignTool::FreqDependentLoad() {
+  if (Broadband_Checkbox->isChecked()) {
+    EditS1P->show();
+    ZoutISpinBox->hide();
+    ZoutRSpinBox->hide();
+    Zout_J->hide();
+    Ohm_Zout_Label->hide();
+  } else {
+    EditS1P->hide();
+    ZoutISpinBox->show();
+    ZoutRSpinBox->show();
+    Zout_J->show();
+    Ohm_Zout_Label->show();
+  }
+}
+
+void MatchingNetworkDesignTool::launchS1P() { S1PW.show(); }

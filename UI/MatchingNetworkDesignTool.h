@@ -30,7 +30,8 @@
 
 #include "Schematic/Network.h"
 #include "Schematic/SchematicContent.h"
-#include "UI/DeviceSpar.h"
+#include "UI/SPAR/S1P_InputWidget.h"
+#include "UI/SPAR/S2P_InputWidget.h"
 
 #include "MatchingNetwork/Lsection.h"
 
@@ -45,6 +46,9 @@ private slots:
   void UpdateDesignParameters();
   void on_TopoCombo_currentIndexChanged(int);
   void launchSPAR();
+  void launchS1P();
+  void SwitchSingle_TwoPort_MatchingMode();
+  void FreqDependentLoad();
 
 private:
   QLabel *Topology_Label, *Zin_Label, *Ohm_Zin_Label, *Zout_Label,
@@ -54,11 +58,12 @@ private:
   QComboBox *Topology_Combo, *FreqStart_Scale_Combo, *FreqEnd_Scale_Combo;
   QCheckBox *Broadband_Checkbox, *TwoPort_Matching_Checkbox;
   QRadioButton *Solution1_RB, *Solution2_RB;
-  QPushButton *EditSPAR;
+  QPushButton *EditSPAR, *EditS1P;
   double getScaleFreq(int);
 
   SchematicContent SchContent; // Schematic representation
-  DeviceSPAR DS;
+  S2P_InputWidget S2PW;
+  S1P_InputWidget S1PW;
 
 signals:
   void simulateNetwork(SchematicContent);

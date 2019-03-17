@@ -688,3 +688,14 @@ string IO::Num2String(int x) {
 }
 
 S2P_DATA IO::getS2P() { return DeviceS2P; }
+
+S1P_DATA IO::getS1P(terminal T) {
+  S1P_DATA DeviceS1P;
+  if (T == SOURCE) {
+    DeviceS1P.Z11 = ZS;
+  } else { // Load
+    DeviceS1P.Z11 = ZL;
+  }
+  DeviceS1P.Freq = freq;
+  return DeviceS1P;
+}

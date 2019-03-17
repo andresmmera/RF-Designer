@@ -34,8 +34,9 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     Schematic/infoclasses.h \
     UI/MatchingNetworkDesignTool.h \
     MatchingNetwork/Lsection.h \
-    UI/DeviceSpar.h \
-    General/io.h
+    General/io.h \
+    UI/SPAR/S1P_InputWidget.h \
+    UI/SPAR/S2P_InputWidget.h
 
 
 SOURCES += main.cpp \
@@ -81,8 +82,9 @@ SOURCES += main.cpp \
     Schematic/SchematicContent.cpp \
     UI/MatchingNetworkDesignTool.cpp \
     MatchingNetwork/Lsection.cpp \
-    UI/DeviceSpar.cpp \
-    General/io.cpp
+    General/io.cpp \
+    UI/SPAR/S1P_InputWidget.cpp \
+    UI/SPAR/S2P_InputWidget.cpp
 
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 

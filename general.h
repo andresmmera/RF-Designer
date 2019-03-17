@@ -42,6 +42,11 @@ struct S2P_DATA {
   double Z0;
 };
 
+struct S1P_DATA {
+  std::vector<double> Freq;
+  std::vector<std::complex<double>> Z11;
+};
+
 QString RoundVariablePrecision(double);
 QString RoundVariablePrecision(double, int);
 QString num2str(double, Units);

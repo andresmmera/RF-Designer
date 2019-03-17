@@ -1,5 +1,5 @@
 /***************************************************************************
-                                DeviceSpar.h
+                                S2P_InputWidget.h
                                 ----------
     copyright            :  QUCS team
     author                :  2019 Andres Martinez-Mera
@@ -14,8 +14,8 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
-#ifndef DEVICESPAR_H
-#define DEVICESPAR_H
+#ifndef S2P_InputWidget_H
+#define S2P_InputWidget_H
 #include "General/io.h"
 #include "general.h"
 #include <QComboBox>
@@ -33,23 +33,24 @@
 
 using namespace std;
 
-class DeviceSPAR : public QWidget {
+class S2P_InputWidget : public QWidget {
   Q_OBJECT
 public:
-  DeviceSPAR();
-  ~DeviceSPAR();
+  S2P_InputWidget();
+  ~S2P_InputWidget();
 
 private:
   QPushButton *S2P_File;
   QRadioButton *AddS2PRadioButton, *AddSingleFreqRadioButton, *RI_Radiobutton,
       *MA_RadioButton, *DegRadiobutton, *RadRadiobutton, *MdBA_RadioButton;
   QLabel *freqLabel, *S_Matrix_Label, *fstartMatchingS2P_Label,
-      *fendMatchingS2P_Label;
-  QDoubleSpinBox *freqSpinBox, *fstartSpinbox, *fendSpinbox;
+      *fendMatchingS2P_Label, *Z0Label, *Z0_Ohm_Label;
+  QDoubleSpinBox *freqSpinBox, *fstartSpinbox, *fendSpinbox, *Z0_SpinBox;
   QComboBox *freqScaleCombo, *fendScaleCombo, *fstartScaleCombo;
   QTableWidget *S2PTable, *S2PInputTable;
   QPushButton *AddPoint, *DeletePoint, *ClearAll, *S2PFileButton;
   QGroupBox *SPAR, *RadDegGroupbox, *S2P_Groupbox;
+  QTabWidget *SelectionTab;
 
   struct S2P_DATA
       DATA; // Only for data transfer to main widget. It uses std::vector.
@@ -73,4 +74,4 @@ private slots:
   void ClearTable();
 };
 
-#endif // DEVICESPAR_H
+#endif // S2P_InputWidget_H
