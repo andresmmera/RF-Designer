@@ -63,6 +63,7 @@ private:
   int loadS2Pdata(QString);
   double getS2PfreqScale(string line);
   string RemoveBlankSpaces(string line);
+  double getFreqScale(QString);
 
 private slots:
   void UpdateS2PDataEntry();

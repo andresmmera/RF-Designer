@@ -373,6 +373,7 @@ int IO::loadS2Pdata(std::string filepath) {
   fAMP = freq;
 
   // Resize vectors
+  DeviceS2P.Freq.resize(S11.size());
   DeviceS2P.S11.resize(S11.size());
   DeviceS2P.S12.resize(S11.size());
   DeviceS2P.S21.resize(S11.size());
@@ -380,6 +381,7 @@ int IO::loadS2Pdata(std::string filepath) {
 
   // Transfer the data to S2P_DATA
   for (int i = 0; i < S21.size(); i++) {
+    DeviceS2P.Freq[i] = freq[i];
     DeviceS2P.S11[i] = S11[i];
     DeviceS2P.S12[i] = S21[i];
     DeviceS2P.S21[i] = S12[i];
@@ -684,3 +686,5 @@ string IO::Num2String(int x) {
   s << x;
   return s.str();
 }
+
+S2P_DATA IO::getS2P() { return DeviceS2P; }

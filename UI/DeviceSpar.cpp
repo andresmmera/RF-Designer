@@ -221,16 +221,43 @@ void DeviceSPAR::UpdateS2PDataEntry() {
 void DeviceSPAR::LoadS2PFile() {
   QString filename = QFileDialog::getOpenFileName(
       this, tr("Open S2P File"), "/home", tr("Touchstone S2P (*.s2p)"));
+  if (filename.isEmpty())
+    return;
+
   IO *readS2P = new IO();
   readS2P->loadS2Pdata(filename.toStdString());
-  delete readS2P;
+  S2P_DATA data = readS2P->getS2P();
+
+  // Clear previous data
+  Freq.clear();
+  S11.clear();
+  S12.clear();
+  S21.clear();
+  S22.clear();
+  ClearTable();
+
+  // Matching band
+  double fstart =
+      fstartSpinbox->value() * getFreqScale(fstartScaleCombo->currentText());
+  double fend =
+      fendSpinbox->value() * getFreqScale(fendScaleCombo->currentText());
+
+  for (int i = 0; i < data.Freq.size(); i++) {
+    // Filter data input according to the matching band specified by the user
+    if ((data.Freq[i] < fstart) || (data.Freq[i] > fend))
+      continue;
+    Freq.push_back(data.Freq[i]);
+    S11.push_back(data.S11[i]);
+    S21.push_back(data.S21[i]);
+    S12.push_back(data.S12[i]);
+    S22.push_back(data.S22[i]);
+  }
+
+  delete readS2P; // No longer needed
+  PutDataInTable();
 }
 
-// Triggered when the user presses the "add single point" button
-void DeviceSPAR::addSingleFreqData() {
-
-  // Read frequency from the interface
-  QString fscale = freqScaleCombo->currentText();
+double DeviceSPAR::getFreqScale(QString fscale) {
   double scale;
   if (fscale == "GHz")
     scale = 1e9;
@@ -240,7 +267,15 @@ void DeviceSPAR::addSingleFreqData() {
     scale = 1e3;
   else
     scale = 1;
-  double freq = freqSpinBox->value() * scale;
+  return scale;
+}
+
+// Triggered when the user presses the "add single point" button
+void DeviceSPAR::addSingleFreqData() {
+
+  // Read frequency from the interface
+  QString fscale = freqScaleCombo->currentText();
+  double freq = freqSpinBox->value() * getFreqScale(fscale);
 
   // Read the S matrix
   // The data may be entered as R+jX or MA. The magnitude may be entered in
@@ -276,6 +311,15 @@ void DeviceSPAR::addSingleFreqData() {
 // This function writes the content of the class variable 'DATA' in the main
 // QTableWidget
 void DeviceSPAR::PutDataInTable() {
+
+  // Check the MA-RI settings
+  if (MA_RadioButton->isChecked()) {
+    // Enable deg/rag controls
+    RadDegGroupbox->setEnabled(true);
+  } else {
+    // Disable deg/rag controls
+    RadDegGroupbox->setEnabled(false);
+  }
 
   S2PTable->clearContents();
   for (int r = 0; r < Freq.size(); r++) {

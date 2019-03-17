@@ -51,7 +51,7 @@ public:
   vector<double> freq; // More often than not, ZS and ZL are sampled at
                        // different frecuencies, so it is necessary to have
   // common frequency vector for pairing ZS and ZL.
-  S2P_DATA DeviceS2P;
+  S2P_DATA getS2P();
 
 private:
   vector<double> fS, fL, fAMP; // Frequencies at which the input source, load
@@ -67,6 +67,7 @@ private:
 
   string Num2String(int x);
   string Num2String(double x);
+  S2P_DATA DeviceS2P;
 
   void generateConstant_s1p(string, complex<double>);
 };
