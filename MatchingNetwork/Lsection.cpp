@@ -35,6 +35,7 @@ void Lsection::synthesize() {
   ComponentInfo TermSpar2(
       QString("T%1").arg(++Schematic.NumberComponents[Term]), Term, 0, 200, 0);
   TermSpar2.val["Z"] = num2str(Specs.Zout, Resistance);
+  TermSpar2.val["ZF"] = num2str(Specs.ZoutF, Resistance);
 
   ComponentInfo Shunt, Series, Ground;
   NodeInfo NI;
@@ -43,9 +44,28 @@ void Lsection::synthesize() {
   double w0 = 2.0 * M_PI * Specs.freqStart;
   double L, C, X, B;
 
+  // If the load is frequency-dependent, we need to find the index corresponding
+  // to that frequency
+  int index;
+  if (Specs.Zout.size() > 0) {
+    // Frequency dependent load find the closest index to the desired frequency
+    double min_diff = 1e20;
+    for (int i = 0; i < Specs.ZoutF.size(); i++) {
+      if (abs(Specs.ZoutF[i] - Specs.freqStart) < min_diff) {
+        // Update min_diff
+        min_diff = abs(Specs.ZoutF[i] - Specs.freqStart);
+        // Update index
+        index = i;
+      }
+    }
+  } else {
+    // Constant load over frequency
+    index = 0;
+  }
+
   double Z0 = Specs.Zin.real();
-  double RL = Specs.Zout.real();
-  double XL = Specs.Zout.imag();
+  double RL = Specs.Zout[index].real();
+  double XL = Specs.Zout[index].imag();
 
   if (Z0 > RL) {
     // ZS -------- X -- ZL
@@ -194,5 +214,4 @@ void Lsection::synthesize() {
   Schematic.clearGraphs();
   Schematic.appendGraph(QString("S[2,1]"), QPen(Qt::red, 1, Qt::SolidLine));
   Schematic.appendGraph(QString("S[1,1]"), QPen(Qt::blue, 1, Qt::SolidLine));
-  Schematic.appendGraph(QString("S[2,2]"), QPen(Qt::green, 1, Qt::SolidLine));
 }

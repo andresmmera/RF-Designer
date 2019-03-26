@@ -193,8 +193,11 @@ S2P_InputWidget::S2P_InputWidget() {
   DeletePoint = new QPushButton("Remove sample");
   ClearAll = new QPushButton("Clear all");
   connect(ClearAll, SIGNAL(clicked(bool)), this, SLOT(ClearTable()));
+  ReadyButton = new QPushButton("Update data");
+  connect(ReadyButton, SIGNAL(clicked(bool)), this, SLOT(ReadyButtonHandle()));
   DataLayout->addWidget(DeletePoint, 4, 0);
   DataLayout->addWidget(ClearAll, 4, 1);
+  DataLayout->addWidget(ReadyButton, 4, 2);
 
   SPARDataLayout->addWidget(DataWidget, 3, 0, 1, 4);
 
@@ -246,6 +249,7 @@ void S2P_InputWidget::LoadS2PFile() {
   IO *readS2P = new IO();
   readS2P->loadS2Pdata(filename.toStdString());
   S2P_DATA data = readS2P->getS2P();
+  Z0 = readS2P->getZ0();
 
   // Clear previous data
   Freq.clear();
@@ -557,4 +561,23 @@ void S2P_InputWidget::SortData() {
     S22.push_back(S22_sorted[i]);
   }
   return;
+}
+
+void S2P_InputWidget::ReadyButtonHandle() {
+  S2P_DATA data;
+  data.Freq.resize(Freq.size());
+  data.S11.resize(Freq.size());
+  data.S12.resize(Freq.size());
+  data.S21.resize(Freq.size());
+  data.S22.resize(Freq.size());
+  for (int i = 0; i < Freq.size(); i++) {
+    data.Freq[i] = Freq[i];
+    data.S11[i] = S11[i];
+    data.S12[i] = S12[i];
+    data.S21[i] = S21[i];
+    data.S22[i] = S22[i];
+  }
+
+  data.Z0 = 50;
+  emit sendData(data);
 }

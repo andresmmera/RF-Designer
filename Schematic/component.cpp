@@ -345,6 +345,75 @@ double ComponentInfo::getVal(QString Property) {
   return val.toDouble() * scale;
 }
 
+std::vector<double> ComponentInfo::getRealVector(QString Property) {
+  QString vector_str = this->val[Property];
+  std::vector<double> V;
+
+  // Get the number of elements and set the size of the vector accordingly
+  int N = vector_str.count(";");
+  if (N == 0) { // Just only one value
+    V.resize(1);
+    V[0] = getVal(Property);
+    return V;
+  }
+
+  V.resize(N);
+
+  // Tokenize the string
+  QRegExp separator{";"};
+  QStringList list;
+  int mem = 0;
+  for (int i = 0; i < vector_str.size(); ++i) {
+    if (i == vector_str.indexOf(separator, i)) {
+      list.append(
+          vector_str.mid(mem, i - mem)); // append the string between separators
+      mem = i + 1;
+    }
+  }
+
+  // Now, convert each element of the QStringList object into a
+  // std::double item and put that into the std::vector above defined
+  for (int i = 0; i < list.size(); i++) {
+    V[i] = list.at(i).toDouble();
+  }
+  return V;
+}
+
+std::vector<std::complex<double>>
+ComponentInfo::getComplexVectorZ(QString Property) {
+  QString vector_str = this->val[Property];
+  std::vector<std::complex<double>> Z;
+
+  // Get the number of elements and set the size of the vector accordingly
+  int N = vector_str.count(";");
+  if (N == 0) { // Just only one value
+    Z.resize(1);
+    Z[0] = getValZ(Property);
+    return Z;
+  }
+
+  Z.resize(N);
+
+  // Tokenize the string
+  QRegExp separator{";"};
+  QStringList list;
+  int mem = 0;
+  for (int i = 0; i < vector_str.size(); ++i) {
+    if (i == vector_str.indexOf(separator, i)) {
+      list.append(
+          vector_str.mid(mem, i - mem)); // append the string between separators
+      mem = i + 1;
+    }
+  }
+
+  // Now, convert each element of the QStringList object into a
+  // std::complex<double> item and put that into the std::vector above defined
+  for (int i = 0; i < list.size(); i++) {
+    Z[i] = Str2Complex(list.at(i));
+  }
+  return Z;
+}
+
 // Given the property name, this function returns its value in complex format
 std::complex<double> ComponentInfo::getValZ(QString Property) {
   QString val_ = this->val[Property];

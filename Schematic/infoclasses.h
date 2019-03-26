@@ -113,6 +113,8 @@ public:
   std::map<QString, QString> val; // freq, L1.L, C1.C,...
   double getVal(QString);
   std::complex<double> getValZ(QString);
+  std::vector<std::complex<double>> getComplexVectorZ(QString);
+  std::vector<double> getRealVector(QString);
   double getScale(QString);
 };
 

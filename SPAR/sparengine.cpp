@@ -44,6 +44,32 @@ Mat SparEngine::getSparams(QList<ComponentInfo> x, complex<double> zs,
   return S;
 }
 
+complex<double> SparEngine::getInputReflectionCoefficient(
+    QList<ComponentInfo> x, complex<double> zs, complex<double> zl, double f) {
+  // Calculate ABCD parameters
+  Mat ABCD = getABCDmatrix(x, f);
+  Mat S;
+  // Convert ABCD to S parameters referred to the input (REAL)
+  S(0, 0) = (ABCD(0, 0) + ABCD(0, 1) / zs - ABCD(1, 0) * zs - ABCD(1, 1)) /
+            (ABCD(0, 0) + ABCD(0, 1) / zs + ABCD(1, 0) * zs + ABCD(1, 1));
+  S(0, 1) = (2. * (ABCD(0, 0) * ABCD(1, 1) - ABCD(0, 1) * ABCD(1, 0))) /
+            (ABCD(0, 0) + ABCD(0, 1) / zs + ABCD(1, 0) * zs + ABCD(1, 1));
+  S(1, 0) = (2) / (ABCD(0, 0) + ABCD(0, 1) / zs + ABCD(1, 0) * zs + ABCD(1, 1));
+  S(1, 1) = (-ABCD(0, 0) + ABCD(0, 1) / zs - ABCD(1, 0) * zs + ABCD(1, 1)) /
+            (ABCD(0, 0) + ABCD(0, 1) / zs + ABCD(1, 0) * zs + ABCD(1, 1));
+
+  complex<double> gamma_in, gamma_out;
+  // Calculate the output reflection coefficient with respect to the reference
+  // impedance (source, real)
+  gamma_out = (zl - zs) / (zs + zl);
+
+  // Now calculate the input reflection coefficient. Pozar 571
+  gamma_in = S(0, 0) + (S(0, 1) * S(1, 0) * gamma_out) /
+                           (complex<double>(1, 0) - S(1, 1) * gamma_out);
+
+  return gamma_in;
+}
+
 QMap<QString, vector<complex<double>>> SparEngine::getData() {
   QMap<QString, vector<complex<double>>> data;
   data["S[2,1]"] = S21;
@@ -157,6 +183,56 @@ void SparEngine::run() {
     NI.ZL = NI.ZL[0] * ones(sim_settings.n_points);
   }
 
+  if (NI.ZLF.size() > 1) {
+    // We need to check that the frequency sweep does not exceed the definition
+    // of the load
+
+    // The start of the freq. sweep is lower than the load definition, but the
+    // upper end isn't
+    if ((sim_settings.freq.front() <= NI.ZLF.front()) &&
+        (sim_settings.freq.back() <= NI.ZLF.back())) {
+      sim_settings.freq =
+          linspace(NI.ZLF.front(), sim_settings.freq.back(), 500);
+    } else {
+      // The end of the freq. sweep is higher than the load definition, but the
+      // begining isn't
+      if ((sim_settings.freq.front() >= NI.ZLF.front()) &&
+          (sim_settings.freq.back() >= NI.ZLF.back())) {
+        sim_settings.freq =
+            linspace(sim_settings.freq.front(), NI.ZLF.back(), 500);
+      } else {
+        // Both ends lie outside the load definition
+        if ((sim_settings.freq.front() <= NI.ZLF.front()) &&
+            (sim_settings.freq.back() <= NI.ZLF.back())) {
+          sim_settings.freq = linspace(NI.ZLF.front(), NI.ZLF.back(), 500);
+        } else {
+          if (sim_settings.freq.front() <= 0) {
+            sim_settings.freq = linspace(NI.ZLF.front(), NI.ZLF.back(), 500);
+          } else {
+            // The whole frequency sweep inside the range of definition of the
+            // load. Do nothing.
+          }
+        }
+      }
+    }
+
+    // Interpolate ZL according to the frequency definition
+    NI.ZL = interp(NI.ZLF, NI.ZL,
+                   sim_settings.freq); // Interpolation using input data
+  }
+
+  /*if (!NI.getInputReflectionCoefficient) { // Get the input reflection
+                                           // coefficient
+    complex<double> gamma_in;
+
+    for (unsigned int i = 0; i < sim_settings.freq.size(); i++) {
+      gamma_in = getInputReflectionCoefficient(
+          NI.Ladder, NI.ZS.at(i), NI.ZL.at(i), sim_settings.freq.at(i));
+      S11.push_back(gamma_in);
+    }
+
+  } else { */// Get the two-port s-parameter simulation referred to the source and
+           // load
   for (unsigned int i = 0; i < sim_settings.freq.size(); i++) {
     Mat S = getSparams(NI.Ladder, NI.ZS.at(i), NI.ZL.at(i),
                        sim_settings.freq.at(i));
@@ -165,6 +241,7 @@ void SparEngine::run() {
     S22.push_back(S(1, 1));
     S12.push_back(S(0, 1));
   }
+  //  }
 }
 
 vector<complex<double>> SparEngine::getSij(int i, int j) {

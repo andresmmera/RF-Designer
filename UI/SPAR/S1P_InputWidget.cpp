@@ -122,31 +122,6 @@ S1P_InputWidget::S1P_InputWidget() {
   S1PFileButton = new QPushButton("Browse S1P");
   connect(S1PFileButton, SIGNAL(clicked(bool)), this, SLOT(LoadS1PFile()));
   S1P_File_Layout->addWidget(S1PFileButton, 0, 0);
-  fstartMatchingS1P_Label = new QLabel("Fstart matching");
-  fstartSpinbox = new QDoubleSpinBox();
-  fstartSpinbox->setMinimum(1);
-  fstartSpinbox->setMaximum(1e6);
-  fstartSpinbox->setDecimals(0);
-  fstartSpinbox->setValue(470);
-  fstartScaleCombo = new QComboBox();
-  fstartScaleCombo->addItems(FreqScale);
-  fstartScaleCombo->setCurrentIndex(1);
-  S1P_File_Layout->addWidget(fstartMatchingS1P_Label, 1, 0);
-  S1P_File_Layout->addWidget(fstartSpinbox, 1, 1);
-  S1P_File_Layout->addWidget(fstartScaleCombo, 1, 2);
-
-  fendMatchingS1P_Label = new QLabel("Fend matching");
-  fendSpinbox = new QDoubleSpinBox();
-  fendSpinbox->setMinimum(1);
-  fendSpinbox->setMaximum(1e6);
-  fendSpinbox->setDecimals(0);
-  fendSpinbox->setValue(860);
-  fendScaleCombo = new QComboBox();
-  fendScaleCombo->addItems(FreqScale);
-  fendScaleCombo->setCurrentIndex(1);
-  S1P_File_Layout->addWidget(fendMatchingS1P_Label, 2, 0);
-  S1P_File_Layout->addWidget(fendSpinbox, 2, 1);
-  S1P_File_Layout->addWidget(fendScaleCombo, 2, 2);
   S1P_Groupbox->hide(); // By default this is hidden
   S1P_Groupbox->setLayout(S1P_File_Layout);
 
@@ -204,8 +179,12 @@ S1P_InputWidget::S1P_InputWidget() {
   DeletePoint = new QPushButton("Remove sample");
   ClearAll = new QPushButton("Clear all");
   connect(ClearAll, SIGNAL(clicked(bool)), this, SLOT(ClearTable()));
+
+  ReadyButton = new QPushButton("Update data");
+  connect(ReadyButton, SIGNAL(clicked(bool)), this, SLOT(ReadyButtonHandle()));
   DataLayout->addWidget(DeletePoint, 4, 0);
   DataLayout->addWidget(ClearAll, 4, 1);
+  DataLayout->addWidget(ReadyButton, 4, 2);
 
   SPARDataLayout->addWidget(DataWidget, 3, 0, 1, 4);
 
@@ -224,18 +203,13 @@ S1P_InputWidget::~S1P_InputWidget() {
   delete DeletePoint;
   delete ClearAll;
   delete SPAR;
-  delete S_Matrix_Label;
   delete RadDegGroupbox;
   delete S1P_Groupbox;
-  delete fstartMatchingS1P_Label;
-  delete fendMatchingS1P_Label;
-  delete fstartSpinbox;
-  delete fendSpinbox;
-  delete fstartScaleCombo;
-  delete fendScaleCombo;
   delete InputData_GroupBox;
   delete S_EntryData_RadioButton;
   delete Z_EntryData_RadioButton;
+
+  delete S_Matrix_Label;
 }
 
 void S1P_InputWidget::UpdateS1PDataEntry() {
@@ -261,20 +235,16 @@ void S1P_InputWidget::LoadS1PFile() {
   // Clear previous data
   Freq.clear();
   S11.clear();
+  Z11.clear();
   ClearTable();
 
-  // Matching band
-  double fstart =
-      fstartSpinbox->value() * getFreqScale(fstartScaleCombo->currentText());
-  double fend =
-      fendSpinbox->value() * getFreqScale(fendScaleCombo->currentText());
-
-  for (int i = 0; i < data.Freq.size(); i++) {
-    // Filter data input according to the matching band specified by the user
-    if ((data.Freq[i] < fstart) || (data.Freq[i] > fend))
-      continue;
+  for (unsigned int i = 0; i < data.Freq.size(); i++) {
     Freq.push_back(data.Freq[i]);
-    S11.push_back(data.Z11[i]);
+    Z11.push_back(data.Z11[i]);
+    // The data given by the IO object is an impedance. It is needed to
+    // calculate the reflection coefficient
+    std::complex<double> Z0(50, 0);
+    S11.push_back((Z0 - data.Z11[i]) / (Z0 + data.Z11[i]));
   }
 
   delete readS1P; // No longer needed
@@ -566,4 +536,15 @@ void S1P_InputWidget::ChangeSZMode() {
     Z0_Ohm_Label->show();
     Z0_SpinBox->show();
   }
+}
+
+void S1P_InputWidget::ReadyButtonHandle() {
+  S1P_DATA data;
+  data.Freq.resize(Freq.size());
+  data.Z11.resize(Freq.size());
+  for (int i = 0; i < Freq.size(); i++) {
+    data.Freq[i] = Freq[i];
+    data.Z11[i] = Z11[i];
+  }
+  emit sendData(data);
 }

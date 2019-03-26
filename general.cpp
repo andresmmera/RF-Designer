@@ -77,6 +77,39 @@ QString num2str(double Num, int precision, Units CompType) {
 }
 
 QString num2str(double Num) { return num2str(Num, 0); }
+
+QString num2str(std::vector<double> Num, int precision) {
+  if (Num.size() == 1) {
+    // Scalar
+    return num2str(Num[0], Resistance);
+  } else {
+    // Data depends on the frequency. Just append data in a QString separated by
+    // ;
+    QString data;
+    for (int i = 0; i < Num.size(); i++) {
+      data += QString("%1;").arg(Num[i]);
+    }
+    return data;
+  }
+}
+
+QString num2str(std::vector<std::complex<double>> Num, int precision) {
+  if (Num.size() == 1) {
+    // Scalar
+    return num2str(Num[0], Resistance);
+  } else {
+    // Data depends on the frequency. Just append data in a QString separated by
+    // ;
+    QString data;
+    for (int i = 0; i < Num.size(); i++) {
+      if (Num[i].imag() > 0)
+        data += QString("%1+j%2;").arg(Num[i].real()).arg(Num[i].imag());
+      else
+        data += QString("%1-j%2;").arg(Num[i].real()).arg(-Num[i].imag());
+    }
+    return data;
+  }
+}
 QString num2str(double Num, int precision) {
   char c = 0;
   double cal = std::abs(Num);
@@ -149,7 +182,7 @@ std::complex<double> Str2Complex(QString num) {
   double realpart =
       num.left(index - 1)
           .toDouble(); // Notice  we have to take into account the sign
-  double imagpart = num.right(index - 1).toDouble();
+  double imagpart = num.mid(index + 1).toDouble();
   return std::complex<double>(realpart, sign * imagpart);
 }
 

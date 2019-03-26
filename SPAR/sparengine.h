@@ -32,12 +32,16 @@ public:
   Mat getSparams(QList<ComponentInfo>, complex<double>, complex<double>,
                  double);
   Mat getABCDmatrix(QList<ComponentInfo>, double);
+  complex<double> getInputReflectionCoefficient(QList<ComponentInfo>,
+                                                complex<double>,
+                                                complex<double>, double);
   void setNetwork(NetworkInfo);
   void setSimulationSettings(SP_Analysis);
   QMap<QString, vector<complex<double>>> getData();
   void run();
   vector<complex<double>> getSij(int, int);
   vector<double> getFreq();
+  bool gamma_in;
 
 private:
   NetworkInfo NI;

@@ -40,6 +40,7 @@ public:
                // simulator. It's faster than using Qucs, but it is
                // restricted to ladder networks
   QString getQucsNetlist();
+  bool getInputReflectionCoefficient = false;
 
 private:
   void assignNetToWiresConnectedToNode(QString, QString);
@@ -55,7 +56,8 @@ public:
   void appendNode(struct NodeInfo);
 
   std::complex<double> getZin();
-  std::complex<double> getZout();
+  std::vector<std::complex<double>> getZout();
+  std::vector<double> getZoutFreq();
 
   QString getZinString();
   QString getZoutString();

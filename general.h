@@ -53,6 +53,8 @@ QString num2str(double, Units);
 QString num2str(double, int);
 QString num2str(double, int, Units);
 QString num2str(std::complex<double>, Units);
+QString num2str(std::vector<std::complex<double>>, int);
+QString num2str(std::vector<double>, int);
 QString num2str(double);
 std::complex<double> Str2Complex(QString);
 QString ConvertLengthFromM(QString, double);

@@ -49,6 +49,7 @@ private slots:
   void launchS1P();
   void SwitchSingle_TwoPort_MatchingMode();
   void FreqDependentLoad();
+  void BroadbandHandler();
 
 private:
   QLabel *Topology_Label, *Zin_Label, *Ohm_Zin_Label, *Zout_Label,
@@ -56,17 +57,26 @@ private:
   QDoubleSpinBox *ZinRSpinBox, *ZoutRSpinBox, *ZinISpinBox, *ZoutISpinBox,
       *FreqStart_Spinbox, *FreqEnd_Spinbox;
   QComboBox *Topology_Combo, *FreqStart_Scale_Combo, *FreqEnd_Scale_Combo;
-  QCheckBox *Broadband_Checkbox, *TwoPort_Matching_Checkbox;
+  QCheckBox *TwoPort_Matching_Checkbox, *FreqDep_Checkbox;
   QRadioButton *Solution1_RB, *Solution2_RB;
   QPushButton *EditSPAR, *EditS1P;
+  QRadioButton *BroadbandRadioButton, *SingleFrequencyRadiobutton;
+  QGroupBox *FreqModeSelectionGroupbox;
   double getScaleFreq(int);
 
   SchematicContent SchContent; // Schematic representation
-  S2P_InputWidget S2PW;
-  S1P_InputWidget S1PW;
+  S1P_InputWidget *S1PW;
+  S2P_InputWidget *S2PW;
+
+  S1P_DATA DATA_S1P;
+  S2P_DATA DATA_S2P;
 
 signals:
   void simulateNetwork(SchematicContent);
+
+private slots:
+  void ReceiveS1PData(S1P_DATA);
+  void ReceiveS2PData(S2P_DATA);
 };
 
 #endif // MATCHINGNETWORKDESIGNTOOL_H

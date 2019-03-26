@@ -18,19 +18,46 @@
 #include "Schematic/component.h"
 
 MatchingNetworkDesignTool::MatchingNetworkDesignTool() {
+  S1PW = new S1P_InputWidget();
+  S2PW = new S2P_InputWidget();
+
+  // Set some sample sample data for broadband matching
+  DATA_S1P.Freq.resize(200);
+  DATA_S1P.Z11.resize(200);
+  for (int i = 0; i < 200; i++) {
+    DATA_S1P.Freq[i] = (900 + i) * 1e6;
+    DATA_S1P.Z11[i] = std::complex<double>(25, 0);
+  }
+
   QGridLayout *MatchingNetworkDesignLayout = new QGridLayout();
-  // Broadband checkbox
-  Broadband_Checkbox = new QCheckBox("Freq. dependent load");
-  MatchingNetworkDesignLayout->addWidget(Broadband_Checkbox, 0, 0);
-  connect(Broadband_Checkbox, SIGNAL(clicked(bool)), this,
+
+  // Freq. dependent checkbox
+  FreqDep_Checkbox = new QCheckBox("Freq. dependent load");
+  MatchingNetworkDesignLayout->addWidget(FreqDep_Checkbox, 0, 0);
+  connect(FreqDep_Checkbox, SIGNAL(clicked(bool)), this,
           SLOT(FreqDependentLoad()));
 
-  // Broadband checkbox
+  // Two-port checkbox
   TwoPort_Matching_Checkbox = new QCheckBox("Two-port matching");
   MatchingNetworkDesignLayout->addWidget(TwoPort_Matching_Checkbox, 0, 1);
   TwoPort_Matching_Checkbox->setChecked(false);
   connect(TwoPort_Matching_Checkbox, SIGNAL(clicked(bool)), this,
           SLOT(SwitchSingle_TwoPort_MatchingMode()));
+
+  // Groupbox for the frequency settings
+  FreqModeSelectionGroupbox = new QGroupBox("Matching band settings");
+  BroadbandRadioButton = new QRadioButton("Broadband matching");
+  SingleFrequencyRadiobutton = new QRadioButton("Single freq.");
+  SingleFrequencyRadiobutton->setChecked(true);
+  QHBoxLayout *FreqSettingsLayout = new QHBoxLayout();
+  FreqSettingsLayout->addWidget(SingleFrequencyRadiobutton);
+  FreqSettingsLayout->addWidget(BroadbandRadioButton);
+  FreqModeSelectionGroupbox->setLayout(FreqSettingsLayout);
+  MatchingNetworkDesignLayout->addWidget(FreqModeSelectionGroupbox, 0, 2);
+  connect(BroadbandRadioButton, SIGNAL(clicked(bool)), this,
+          SLOT(BroadbandHandler()));
+  connect(SingleFrequencyRadiobutton, SIGNAL(clicked(bool)), this,
+          SLOT(BroadbandHandler()));
 
   // Topology
   Topology_Label = new QLabel("Topology");
@@ -139,12 +166,12 @@ MatchingNetworkDesignTool::MatchingNetworkDesignTool() {
   MatchingNetworkDesignLayout->addWidget(FreqStart_Scale_Combo, 5, 2);
 
   // Frequency range. End
-  FreqEnd_Label = new QLabel("Freq. stop");
+  FreqEnd_Label = new QLabel("Fstop");
   FreqEnd_Spinbox = new QDoubleSpinBox();
   FreqEnd_Spinbox->setMinimum(1);
   FreqEnd_Spinbox->setMaximum(1e6);
   FreqEnd_Spinbox->setDecimals(0);
-  FreqEnd_Spinbox->setValue(1000);
+  FreqEnd_Spinbox->setValue(1200);
   FreqEnd_Spinbox->setSingleStep(1); // Step fixed to 1 Hz/kHz/MHz/GHz
   FreqEnd_Scale_Combo = new QComboBox();
   FreqEnd_Scale_Combo->addItems(FreqScale);
@@ -182,13 +209,18 @@ MatchingNetworkDesignTool::MatchingNetworkDesignTool() {
   connect(Solution2_RB, SIGNAL(clicked(bool)), this,
           SLOT(UpdateDesignParameters()));
 
+  // Connect data entry tools to main form
+  connect(S1PW, SIGNAL(sendData(S1P_DATA)), this,
+          SLOT(ReceiveS1PData(S1P_DATA)));
+  connect(S2PW, SIGNAL(sendData(S2P_DATA)), this,
+          SLOT(ReceiveS2PData(S2P_DATA)));
+
   this->setLayout(MatchingNetworkDesignLayout);
 
   on_TopoCombo_currentIndexChanged(0);
 }
 
 MatchingNetworkDesignTool::~MatchingNetworkDesignTool() {
-  delete Broadband_Checkbox;
   delete Topology_Label;
   delete Topology_Combo;
   delete Solution1_RB;
@@ -210,31 +242,62 @@ MatchingNetworkDesignTool::~MatchingNetworkDesignTool() {
   delete FreqEnd_Scale_Combo;
   delete FreqEnd_Spinbox;
   delete EditS1P;
+  delete S1PW;
+  delete S2PW;
+  delete BroadbandRadioButton;
+  delete FreqDep_Checkbox;
+  delete SingleFrequencyRadiobutton;
+  delete FreqModeSelectionGroupbox;
 }
 
 void MatchingNetworkDesignTool::UpdateDesignParameters() {
   MatchingNetworkDesignParameters Specs;
+
+  // Get the frequency band where matching is needed
+  Specs.freqStart = FreqStart_Spinbox->value() *
+                    getScaleFreq(FreqStart_Scale_Combo->currentIndex());
+  Specs.freqEnd = FreqEnd_Spinbox->value() *
+                  getScaleFreq(FreqEnd_Scale_Combo->currentIndex());
+
+  if (Specs.freqStart > Specs.freqEnd) {
+    // Well, this is wrong
+    return;
+  }
+
+  // Update port impedances
   Specs.Zin = std::complex<double>(ZinRSpinBox->value(), ZinISpinBox->value());
-  Specs.Zout =
-      std::complex<double>(ZoutRSpinBox->value(), ZoutISpinBox->value());
+  if (BroadbandRadioButton->isChecked()) {
+    // Broadband mode
+
+    // Resize vectors
+    Specs.Zout.resize(DATA_S1P.Z11.size());
+    Specs.ZoutF.resize(DATA_S1P.Z11.size());
+    Specs.Zout = DATA_S1P.Z11;
+    Specs.ZoutF = DATA_S1P.Freq;
+
+    Specs.BroadbandMode = true;
+  } else {
+    // Narrowband mode
+    Specs.Zout.resize(1);
+    Specs.Zout[0] =
+        std::complex<double>(ZoutRSpinBox->value(), ZoutISpinBox->value());
+    Specs.BroadbandMode = false;
+  }
+
   Specs.Topology = Topology_Combo->currentText();
   if (Solution1_RB->isChecked())
     Specs.Solution = 1;
   else
     Specs.Solution = 2;
 
-  Specs.freqStart = FreqStart_Spinbox->value() *
-                    getScaleFreq(FreqStart_Scale_Combo->currentIndex());
-  Specs.freqEnd = FreqEnd_Spinbox->value() *
-                  getScaleFreq(FreqEnd_Scale_Combo->currentIndex());
-
+  // Design the matching network
   if (Specs.Topology == "L-section") {
     Lsection *L = new Lsection(Specs);
     L->synthesize();
     SchContent = L->Schematic;
     delete L;
   }
-
+  SchContent.getInputReflectionCoefficient = true;
   // EMIT SIGNAL TO SIMULATE
   emit simulateNetwork(SchContent);
 }
@@ -277,7 +340,7 @@ double MatchingNetworkDesignTool::getScaleFreq(int index) {
   return pow(10, exp);
 }
 
-void MatchingNetworkDesignTool::launchSPAR() { S2PW.show(); }
+void MatchingNetworkDesignTool::launchSPAR() { S2PW->show(); }
 
 // This function is triggered when the user activates or deactivates the
 // two-port matching option
@@ -295,12 +358,20 @@ void MatchingNetworkDesignTool::SwitchSingle_TwoPort_MatchingMode() {
 // This function is triggered when the user activates the frequency-dependent
 // load option
 void MatchingNetworkDesignTool::FreqDependentLoad() {
-  if (Broadband_Checkbox->isChecked()) {
+  if (FreqDep_Checkbox->isChecked()) {
     EditS1P->show();
     ZoutISpinBox->hide();
     ZoutRSpinBox->hide();
     Zout_J->hide();
     Ohm_Zout_Label->hide();
+    // Set broadband mode on
+    BroadbandRadioButton->blockSignals(true);
+    SingleFrequencyRadiobutton->blockSignals(true);
+    BroadbandRadioButton->setChecked(true);
+    SingleFrequencyRadiobutton->setChecked(false);
+    BroadbandRadioButton->blockSignals(false);
+    SingleFrequencyRadiobutton->blockSignals(false);
+    BroadbandHandler(); // Set UI in broadband mode
   } else {
     EditS1P->hide();
     ZoutISpinBox->show();
@@ -310,4 +381,34 @@ void MatchingNetworkDesignTool::FreqDependentLoad() {
   }
 }
 
-void MatchingNetworkDesignTool::launchS1P() { S1PW.show(); }
+// This function is called when the user selects the broadband matching option.
+// For broadband matching, it is needed to hide the frequency selection widget
+void MatchingNetworkDesignTool::BroadbandHandler() {
+  if (BroadbandRadioButton->isChecked()) {
+    // Broadband matching
+    FreqStart_Label->setText("Fstart");
+    FreqEnd_Label->show();
+    FreqEnd_Spinbox->show();
+    FreqEnd_Scale_Combo->show();
+  } else {
+    // Narrowband matching
+    FreqStart_Label->setText("freq");
+    FreqEnd_Label->hide();
+    FreqEnd_Spinbox->hide();
+    FreqEnd_Scale_Combo->hide();
+  }
+}
+
+void MatchingNetworkDesignTool::launchS1P() { S1PW->show(); }
+
+void MatchingNetworkDesignTool::ReceiveS1PData(S1P_DATA D) {
+  DATA_S1P = D;
+  if (DATA_S1P.Freq.size() > 1) {
+    // Enable broadband mode
+    FreqDep_Checkbox->blockSignals(true);
+    FreqDep_Checkbox->setEnabled(true);
+    FreqDep_Checkbox->blockSignals(false);
+  }
+}
+
+void MatchingNetworkDesignTool::ReceiveS2PData(S2P_DATA D) { DATA_S2P = D; }

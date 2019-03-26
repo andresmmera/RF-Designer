@@ -48,7 +48,7 @@ private:
   QDoubleSpinBox *freqSpinBox, *fstartSpinbox, *fendSpinbox, *Z0_SpinBox;
   QComboBox *freqScaleCombo, *fendScaleCombo, *fstartScaleCombo;
   QTableWidget *S2PTable, *S2PInputTable;
-  QPushButton *AddPoint, *DeletePoint, *ClearAll, *S2PFileButton;
+  QPushButton *AddPoint, *DeletePoint, *ClearAll, *S2PFileButton, *ReadyButton;
   QGroupBox *SPAR, *RadDegGroupbox, *S2P_Groupbox;
   QTabWidget *SelectionTab;
 
@@ -57,6 +57,7 @@ private:
             // However, std::deque is needed for handling data dynamically...
   std::deque<std::complex<double>> S11, S12, S21, S22;
   std::deque<double> Freq;
+  double Z0;
   void SortData();
 
   std::complex<double> ReadS2PFromUserInput(QString);
@@ -72,6 +73,10 @@ private slots:
   void LoadS2PFile();
   void addSingleFreqData();
   void ClearTable();
+  void ReadyButtonHandle();
+
+signals:
+  void sendData(S2P_DATA);
 };
 
 #endif // S2P_InputWidget_H

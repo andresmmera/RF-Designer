@@ -693,9 +693,11 @@ S1P_DATA IO::getS1P(terminal T) {
   S1P_DATA DeviceS1P;
   if (T == SOURCE) {
     DeviceS1P.Z11 = ZS;
+    DeviceS1P.Freq = fS;
   } else { // Load
     DeviceS1P.Z11 = ZL;
+    DeviceS1P.Freq = fL;
   }
-  DeviceS1P.Freq = freq;
+
   return DeviceS1P;
 }

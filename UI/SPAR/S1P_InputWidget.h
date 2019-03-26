@@ -44,12 +44,11 @@ private:
   QRadioButton *AddS1PRadioButton, *AddSingleFreqRadioButton, *RI_Radiobutton,
       *MA_RadioButton, *DegRadiobutton, *RadRadiobutton, *MdBA_RadioButton,
       *Z_EntryData_RadioButton, *S_EntryData_RadioButton;
-  QLabel *freqLabel, *S_Matrix_Label, *fstartMatchingS1P_Label,
-      *fendMatchingS1P_Label, *Z0Label, *Z0_Ohm_Label;
-  QDoubleSpinBox *freqSpinBox, *fstartSpinbox, *fendSpinbox, *Z0_SpinBox;
-  QComboBox *freqScaleCombo, *fendScaleCombo, *fstartScaleCombo;
+  QLabel *freqLabel, *S_Matrix_Label, *Z0Label, *Z0_Ohm_Label;
+  QDoubleSpinBox *freqSpinBox, *Z0_SpinBox;
+  QComboBox *freqScaleCombo;
   QTableWidget *S1PTable, *S1PInputTable;
-  QPushButton *AddPoint, *DeletePoint, *ClearAll, *S1PFileButton;
+  QPushButton *AddPoint, *DeletePoint, *ClearAll, *S1PFileButton, *ReadyButton;
   QGroupBox *SPAR, *RadDegGroupbox, *S1P_Groupbox, *InputData_GroupBox;
   QTabWidget *SelectionTab;
 
@@ -75,6 +74,10 @@ private slots:
   void addSingleFreqData();
   void ClearTable();
   void ChangeSZMode();
+  void ReadyButtonHandle();
+
+signals:
+  void sendData(S1P_DATA);
 };
 
 #endif // S1P_InputWidget_H

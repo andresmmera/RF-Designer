@@ -215,8 +215,12 @@ QMap<QString, QPen> SchematicContent::getDisplayGraphs() {
 std::complex<double> SchematicContent::getZin() {
   return Comps[0].getValZ("Z");
 }
-std::complex<double> SchematicContent::getZout() {
-  return Comps[Comps.size() - 1].getValZ("Z");
+std::vector<std::complex<double>> SchematicContent::getZout() {
+  return Comps[Comps.size() - 1].getComplexVectorZ("Z");
+}
+
+std::vector<double> SchematicContent::getZoutFreq() {
+  return Comps[Comps.size() - 1].getRealVector("ZF");
 }
 
 QString SchematicContent::getZinString() { return Comps[0].val["Z"]; }

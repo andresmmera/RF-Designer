@@ -53,6 +53,7 @@ public:
   // common frequency vector for pairing ZS and ZL.
   S2P_DATA getS2P();
   S1P_DATA getS1P(terminal);
+  double getZ0() { return DeviceS2P.Z0; }
 
 private:
   vector<double> fS, fL, fAMP; // Frequencies at which the input source, load

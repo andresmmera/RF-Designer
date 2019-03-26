@@ -75,9 +75,12 @@ struct FilterSpecifications {
 struct NetworkInfo {
   std::vector<std::complex<double>> ZS;
   std::vector<std::complex<double>> ZL;
+  std::vector<double> ZLF; // Some network parameters (load, s2p) only work for
+                           // a discrete set of frequencies
   QStringList topology;
   QList<struct ComponentInfo>
       Ladder; // Contains the ID of the components and their properties
+  bool getInputReflectionCoefficient;
 };
 
 struct PowerCombinerParams {
@@ -103,13 +106,15 @@ struct AttenuatorDesignParameters {
 };
 
 struct MatchingNetworkDesignParameters {
-  QString Topology;          // Attenuator topology
-  std::complex<double> Zin;  // Input impedance
-  std::complex<double> Zout; // Output impedance
+  QString Topology;                       // Attenuator topology
+  std::complex<double> Zin;               // Input impedance
+  std::vector<std::complex<double>> Zout; // Output impedance
   int Solution; // Some matching techniques yield several valid solutions to the
                 // matching problem
   double freqStart;
   double freqEnd;
+  std::vector<double> ZoutF;
+  bool BroadbandMode;
 };
 
 struct PdissAtt {
