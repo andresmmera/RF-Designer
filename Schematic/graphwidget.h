@@ -44,7 +44,7 @@
 #include "Schematic/SchematicContent.h"
 #include "Schematic/structures.h"
 #include <QMap>
-#include <QtGui/QGraphicsView>
+#include <QGraphicsView>
 #include <deque>
 
 class Node;

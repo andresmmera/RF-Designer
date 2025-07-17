@@ -79,6 +79,7 @@ SOURCES += main.cpp \
 SOURCES += Schematic/node.cpp Schematic/graphwidget.cpp qcustomplot.cpp
 
 QT += widgets
+QT += widgets printsupport
 QT += sql
 QT += svg
 RESOURCES = resources.qrc
