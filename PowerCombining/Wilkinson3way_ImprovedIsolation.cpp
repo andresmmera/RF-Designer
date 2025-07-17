@@ -1,7 +1,6 @@
 /***************************************************************************
                                 Wilkinson3way_ImprovedIsolation.cpp
                                 ----------
-    copyright            :  QUCS team
     author                :  2019 Andres Martinez-Mera
     email                  :  andresmmera@protonmail.com
  ***************************************************************************/

@@ -1,7 +1,7 @@
 /***************************************************************************
                                 QucsRFDesignerWindow.cpp
                                 ----------
-    copyright            :  QUCS team
+
     author                :  2019 Andres Martinez-Mera
     email                  :  andresmmera@protonmail.com
  ***************************************************************************/
@@ -14,9 +14,9 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
-#include "QucsRFDesignerWindow.h"
+#include "RFDesignerWindow.h"
 
-QucsRFDesignerWindow::QucsRFDesignerWindow() {
+RFDesignerWindow::RFDesignerWindow() {
   //************** Dock setup ******************
   dock_Schematic = new QDockWidget("Schematic");
   dock_Setup = new QDockWidget("");
@@ -122,7 +122,7 @@ QucsRFDesignerWindow::QucsRFDesignerWindow() {
   Filter_Tool->design();
 }
 
-QucsRFDesignerWindow::~QucsRFDesignerWindow() {
+RFDesignerWindow::~RFDesignerWindow() {
   delete PreferencesAction;
   delete RFToolBar;
   delete SchematicWidget;
@@ -140,36 +140,36 @@ delete TeePiLayout;*/
 }
 
 // Launches the preferences window
-void QucsRFDesignerWindow::PreferencesWindow() {
+void RFDesignerWindow::PreferencesWindow() {
   PreferencesDialog *PD = new PreferencesDialog();
   PD->show();
   connect(PD, SIGNAL(sendSettings(ToolSettings)), this,
           SLOT(ReceiveSettings(ToolSettings)));
 }
 
-void QucsRFDesignerWindow::ReceiveSettings(ToolSettings TS) {
+void RFDesignerWindow::ReceiveSettings(ToolSettings TS) {
   Tool_Settings = TS;
   UpdateWindows();
 }
 
 // This functions creates the connect() pairs to set up the actions
-void QucsRFDesignerWindow::createActions() {
+void RFDesignerWindow::createActions() {
   PreferencesAction = new QAction("Settings", this);
   PreferencesAction->setStatusTip("Set up preferences");
   connect(PreferencesAction, SIGNAL(triggered()), this,
           SLOT(PreferencesWindow()));
 }
 
-void QucsRFDesignerWindow::createMenus() {
+void RFDesignerWindow::createMenus() {
   RFToolBar = addToolBar(tr("RFtools"));
   PreferencesAction->setIcon(QIcon(":/bitmaps/Settings.png"));
   RFToolBar->addAction(PreferencesAction);
 }
 
 // This function updates the content of the schematic window and the display
-void QucsRFDesignerWindow::UpdateWindows() {}
+void RFDesignerWindow::UpdateWindows() {}
 
-void QucsRFDesignerWindow::updateGraph(
+void RFDesignerWindow::updateGraph(
     int DisplayID, vector<double> freq_,
     QMap<QString, vector<complex<double>>> data) {
   DisplayWindow[DisplayID]->clearGraphs();
@@ -195,7 +195,7 @@ void QucsRFDesignerWindow::updateGraph(
   DisplayWindow[DisplayID]->replot();
 }
 
-void QucsRFDesignerWindow::updateGraph(int DisplayID, vector<double> Pin_,
+void RFDesignerWindow::updateGraph(int DisplayID, vector<double> Pin_,
                                        QMap<QString, vector<double>> data,
                                        QMap<QString, QPen> TraceProperties,
                                        QString xlabel, QString ylabel) {
@@ -230,7 +230,7 @@ void QucsRFDesignerWindow::updateGraph(int DisplayID, vector<double> Pin_,
   DisplayWindow[DisplayID]->replot();
 }
 
-void QucsRFDesignerWindow::plotPoints(int DisplayID,
+void RFDesignerWindow::plotPoints(int DisplayID,
                                       QMap<QString, QPointF> InterceptPoints,
                                       QString style) {
   QMapIterator<QString, QPointF> MapIT(InterceptPoints);
@@ -292,7 +292,7 @@ void QucsRFDesignerWindow::plotPoints(int DisplayID,
 
 // This function loads the Qucs dataset and converts it into a QMap structure
 QMap<QString, vector<complex<double>>>
-QucsRFDesignerWindow::loadQucsDataSet(QString dataset_path) {
+RFDesignerWindow::loadQucsDataSet(QString dataset_path) {
   QFile file(dataset_path);
   QMap<QString, vector<complex<double>>> data;
   QString variable;
@@ -332,24 +332,24 @@ QucsRFDesignerWindow::loadQucsDataSet(QString dataset_path) {
   return data;
 }
 
-void QucsRFDesignerWindow::ReceiveNetworkFromDesignTools(SchematicContent SI) {
+void RFDesignerWindow::ReceiveNetworkFromDesignTools(SchematicContent SI) {
   SchContent = SI;
   simulate();
 }
 
-void QucsRFDesignerWindow::simulate() {
+void RFDesignerWindow::simulate() {
   if (!SchContent.getDescription().contains("NOT LADDER"))
     SimulateLadderSPAR();
   else
     SimulateSPAR();
 }
 
-void QucsRFDesignerWindow::PlotImpedanceTransformations() {}
+void RFDesignerWindow::PlotImpedanceTransformations() {}
 
 // S-parameter simulation using the built-in ladder SPAR simulator. This is used
 // only for SPAR simulations relying on the input/output port (complex)
 // impedances
-void QucsRFDesignerWindow::SimulateLadderSPAR() {
+void RFDesignerWindow::SimulateLadderSPAR() {
   QCPRange xAxisRange = DisplayWindow[0]->xAxis->range();
   DisplayWindow[0]->yAxis->setLabel("dB");
   DisplayWindow[0]->xAxis->setLabel("MHz");
@@ -397,7 +397,7 @@ void QucsRFDesignerWindow::SimulateLadderSPAR() {
 }
 
 // S-parameter simulation using qucsator
-void QucsRFDesignerWindow::SimulateSPAR() {
+void RFDesignerWindow::SimulateSPAR() {
   QCPRange xAxisRange = DisplayWindow[0]->xAxis->range();
   DisplayWindow[0]->yAxis->setLabel("dB");
   DisplayWindow[0]->xAxis->setLabel("MHz");
@@ -447,7 +447,7 @@ void QucsRFDesignerWindow::SimulateSPAR() {
   updateGraph(0, real(freq), data);
 }
 
-void QucsRFDesignerWindow::SwitchTabs(int tabindex) {
+void RFDesignerWindow::SwitchTabs(int tabindex) {
   switch (tabindex) {
   case 0: // Filtering
     dock_DisplayWindow2->hide();
@@ -471,4 +471,4 @@ void QucsRFDesignerWindow::SwitchTabs(int tabindex) {
 // that is firstly catched by the GraphWidget and then is retransmitted to the
 // main class. This function is the one that handles such signals so it must
 // take into account the current tool.
-void QucsRFDesignerWindow::ComponentSelected(ComponentInfo CI) {}
+void RFDesignerWindow::ComponentSelected(ComponentInfo CI) {}

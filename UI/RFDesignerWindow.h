@@ -1,7 +1,7 @@
 /***************************************************************************
-                                QucsRFDesignerWindow.h
+                                RFDesignerWindow.h
                                 ----------
-    copyright            :  QUCS team
+
     author                :  2019 Andres Martinez-Mera
     email                  :  andresmmera@protonmail.com
  ***************************************************************************/
@@ -14,8 +14,8 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
-#ifndef QucsRFDesignerWindow_H
-#define QucsRFDesignerWindow_H
+#ifndef RFDesignerWindow_H
+#define RFDesignerWindow_H
 #include <QColor>
 #include <QComboBox>
 #include <QDockWidget>
@@ -34,7 +34,7 @@
 #include "SPAR/sparengine.h"
 #include "Schematic/component.h"
 #include "Schematic/graphwidget.h"
-#include "UI/QucsRFDesignerWindow.h"
+#include "UI/RFDesignerWindow.h"
 #include "UI/preferencesdialog.h"
 #include "qcustomplot.h"
 
@@ -50,11 +50,11 @@ struct ToolSettings {
   QString PathToQucsator;
 };
 
-class QucsRFDesignerWindow : public QMainWindow {
+class RFDesignerWindow : public QMainWindow {
   Q_OBJECT
 public:
-  QucsRFDesignerWindow();
-  ~QucsRFDesignerWindow();
+  RFDesignerWindow();
+  ~RFDesignerWindow();
   QTabWidget *TabWidget;
 
 private:
@@ -113,4 +113,4 @@ private: // Actions
   void plotPoints(int, QMap<QString, QPointF>, QString);
 };
 
-#endif // QucsRFDesignerWindow_H
+#endif // RFDesignerWindow_H

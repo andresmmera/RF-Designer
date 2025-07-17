@@ -3,7 +3,6 @@
         <file>bitmaps/Settings.png</file>
         <file>bitmaps/SmithChartIcon.png</file>
         <file>bitmaps/capacitor.svg</file>
-        <file>bitmaps/qucsRFdesigner.svg</file>
         <file>bitmaps/SeriesCapacitor.jpg</file>
         <file>bitmaps/OpenCircuitStub.png</file>
         <file>bitmaps/SeriesCapacitor.png</file>
@@ -13,5 +12,6 @@
         <file>bitmaps/ShuntInductor.png</file>
         <file>bitmaps/TransmissionLine.png</file>
         <file>bitmaps/RemoveIcon.png</file>
+        <file>bitmaps/RFdesigner.svg</file>
     </qresource>
 </RCC>

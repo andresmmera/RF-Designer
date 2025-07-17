@@ -2,6 +2,7 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     Schematic/component.h \
     Schematic/symbol.h \
     Schematic/wire.h \
+    UI/RFDesignerWindow.h \
     UI/preferencesdialog.h \
     Filtering/CanonicalFilter.h \
     Schematic/Network.h \
@@ -9,7 +10,6 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
     SPAR/MathOperations.h \
     SPAR/sparengine.h \
     SPAR/mat.h \
-    UI/QucsRFDesignerWindow.h \
     Filtering/DirectCoupledFilters.h \
     Filtering/LowpassPrototypeCoeffs.h \
     UI/FilterDesignTool.h \
@@ -37,13 +37,13 @@ HEADERS += Schematic/node.h Schematic/graphwidget.h qcustomplot.h \
 SOURCES += main.cpp \
     Schematic/component.cpp \
     Schematic/wire.cpp \
+    UI/RFDesignerWindow.cpp \
     UI/preferencesdialog.cpp \
     Filtering/CanonicalFilter.cpp \
     Filtering/EllipticFilter.cpp \
     SPAR/MathOperations.cpp \
     SPAR/sparengine.cpp \
     SPAR/mat.cpp \
-    UI/QucsRFDesignerWindow.cpp \
     Filtering/DirectCoupledFilters.cpp \
     Filtering/LowpassPrototypeCoeffs.cpp \
     UI/FilterDesignTool.cpp \

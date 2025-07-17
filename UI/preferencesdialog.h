@@ -1,7 +1,7 @@
 /***************************************************************************
                                 preferencesdialog.h
                                 ----------
-    copyright            :  QUCS team
+
     author                :  2019 Andres Martinez-Mera
     email                  :  andresmmera@protonmail.com
  ***************************************************************************/
@@ -17,7 +17,7 @@
 #ifndef PREFERENCESDIALOG_H
 #define PREFERENCESDIALOG_H
 
-#include "UI/QucsRFDesignerWindow.h"
+#include "UI/RFDesignerWindow.h"
 
 #include <QFileDialog>
 #include <QGridLayout>

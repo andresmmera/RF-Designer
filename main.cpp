@@ -1,7 +1,6 @@
 /***************************************************************************
                                 main.cpp
                                 ----------
-    copyright            :  QUCS team
     author                :  2019 Andres Martinez-Mera
     email                  :  andresmmera@protonmail.com
  ***************************************************************************/
@@ -14,13 +13,13 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
-#include "UI/QucsRFDesignerWindow.h"
+#include "UI/RFDesignerWindow.h"
 #include <QtGui>
 
 int main(int argc, char **argv) {
   QApplication app(argc, argv);
-  QucsRFDesignerWindow mainWindow;
-  mainWindow.setWindowIcon(QIcon(":/bitmaps/qucsRFdesigner.svg"));
+  RFDesignerWindow mainWindow;
+  mainWindow.setWindowIcon(QIcon(":/bitmaps/RFdesigner.svg"));
   mainWindow.showMaximized();
   return app.exec();
 }

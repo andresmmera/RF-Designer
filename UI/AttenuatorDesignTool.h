@@ -1,7 +1,7 @@
 /***************************************************************************
                                 AttenuatorDesignTool.cpp
                                 ----------
-    copyright            :  QUCS team
+
     author                :  2019 Andres Martinez-Mera
     email                  :  andresmmera@protonmail.com
  ***************************************************************************/
