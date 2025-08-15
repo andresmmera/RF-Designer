@@ -26,7 +26,7 @@ static const double Pi = 3.14159265358979323846264338327950288419717;
 
 Wire::Wire(Symbol *sourceNode, int ps, Symbol *destNode, int pd)
     : arrowSize(10) {
-  setAcceptedMouseButtons(0);
+  setAcceptedMouseButtons(Qt::NoButton);
   source = sourceNode;
   dest = destNode;
   port_num_source = ps;
@@ -37,7 +37,7 @@ Wire::Wire(Symbol *sourceNode, int ps, Symbol *destNode, int pd)
   adjust();
 }
 
-Wire::Wire() : arrowSize(10) { setAcceptedMouseButtons(0); }
+Wire::Wire() : arrowSize(10) { setAcceptedMouseButtons(Qt::NoButton); }
 
 void Wire::setSource(Symbol *sourceNode, int port) {
   source = sourceNode;

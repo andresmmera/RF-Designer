@@ -44,16 +44,6 @@ void SchematicContent::assignNetToWiresConnectedToNode(QString NodeID,
 }
 
 QString SchematicContent::getQucsNetlist() {
-  // Build Qucs netlist
-  /* QString QucsNetlist;
-   QString codestr;
-   for (int i = 0; i < Comps.length(); i++) {
-     codestr = Comps[i].getQucs();
-     if (!codestr.isEmpty())
-       QucsNetlist += codestr;
-   }
-   return QucsNetlist;*/
-
   // Firstly, find those wires connected to ground
   // Check if the wire is connected to ground
   for (int i = 0; i < Wires.length(); i++) {

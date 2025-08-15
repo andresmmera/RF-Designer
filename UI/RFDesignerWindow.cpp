@@ -177,14 +177,15 @@ void RFDesignerWindow::updateGraph(
   double k = 1e6;
   freq_ = freq_ / k; // Convert to MHz
 
-  QVector<double> freq =
-      QVector<double>::fromStdVector(freq_); // Get frequency axis
+  QVector<double> freq(freq_.begin(), freq_.end()); // Get frequency axis
+
   QMapIterator<QString, QPen> MapIT(SchContent.getDisplayGraphs());
 
   while (MapIT.hasNext()) {
     MapIT.next();
-    std::vector<double> aux = 20 * log(abs(data[MapIT.key()]));
-    QVector<double> trace = QVector<double>::fromStdVector(aux);
+    std::vector<double> aux = 20 * log(abs(data[MapIT.key()]));  
+    QVector<double> trace(aux.begin(), aux.end());
+
     DisplayWindow[DisplayID]->addGraph();
     QString title = MapIT.key();
     DisplayWindow[DisplayID]->graph()->setName(title);
@@ -202,13 +203,14 @@ void RFDesignerWindow::updateGraph(int DisplayID, vector<double> Pin_,
   DisplayWindow[DisplayID]->clearGraphs();
   DisplayWindow[DisplayID]->clearItems();
 
-  QVector<double> Pin =
-      QVector<double>::fromStdVector(Pin_); // Get frequency axis
+  QVector<double> Pin(Pin_.begin(), Pin_.end());
+
   QMapIterator<QString, vector<double>> MapIT(data);
 
   while (MapIT.hasNext()) {
     MapIT.next();
-    QVector<double> trace = QVector<double>::fromStdVector(data[MapIT.key()]);
+    QVector<double> trace(data[MapIT.key()].begin(), data[MapIT.key()].end());
+
     DisplayWindow[DisplayID]->addGraph();
     QString title = MapIT.key();
     title.append(QString(" (dBm)"));
@@ -432,7 +434,7 @@ void RFDesignerWindow::SimulateSPAR() {
   QFile file("netlist");
   if (file.open(QIODevice::WriteOnly)) {
     QTextStream stream(&file);
-    stream << netlist << endl;
+    stream << netlist << Qt::endl;
   }
   file.close();
   system("qucsator -i netlist -o data.dat");

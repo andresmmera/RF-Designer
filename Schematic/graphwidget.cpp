@@ -85,7 +85,7 @@ void GraphWidget::timerEvent(QTimerEvent *event) {
 }
 
 void GraphWidget::wheelEvent(QWheelEvent *event) {
-  scaleView(pow((double)2, -event->delta() / 240.0));
+    scaleView(pow((double)2, -event->angleDelta().y() / 240.0));
 }
 
 void GraphWidget::scaleView(qreal scaleFactor) {
@@ -93,8 +93,9 @@ void GraphWidget::scaleView(qreal scaleFactor) {
                      .scale(scaleFactor, scaleFactor)
                      .mapRect(QRectF(0, 0, 1, 1))
                      .width();
-  if (factor < 0.07 || factor > 100)
-    return;
+    if ((factor < 0.07) || (factor > 100)) {
+        return;
+    }
 
   scale(scaleFactor, scaleFactor);
 }
@@ -103,7 +104,7 @@ void GraphWidget::scaleView(qreal scaleFactor) {
 void GraphWidget::shuffle() {
   foreach (QGraphicsItem *item, scene()->items()) {
     if (qgraphicsitem_cast<Node *>(item))
-      item->setPos(-150 + qrand() % 300, -150 + qrand() % 300);
+      item->setPos(-150 + QRandomGenerator::global()->bounded(300), -150 + QRandomGenerator::global()->bounded(300));
   }
 }
 

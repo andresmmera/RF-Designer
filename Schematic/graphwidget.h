@@ -46,6 +46,7 @@
 #include <QMap>
 #include <QGraphicsView>
 #include <deque>
+#include <QRandomGenerator>
 
 class Node;
 class Wire;
