@@ -1,0 +1,27 @@
+<map id="Tools/Filtering/FilterDesignTool.h" name="Tools/Filtering/FilterDesignTool.h">
+<area shape="rect" id="Node000001" title="GUI and control logic for RF filter design and synthesis (definition)" alt="" coords="500,5,695,45"/>
+<area shape="rect" id="Node000002" href="$dc/d97/DirectCoupledFilterAdjustResonatorValuesWindow_8cpp.html" title="Window to define the values of the resonator components in direct&#45;coupled filters." alt="" coords="244,93,476,148"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="538,53,428,96,426,91,536,48"/>
+<area shape="rect" id="Node000003" href="$d7/d91/FilterDesignTool_8cpp.html" title="GUI and control logic for RF filter design and synthesis (implementation)" alt="" coords="500,101,695,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="600,59,600,101,595,101,595,59"/>
+<area shape="rect" id="Node000004" href="$d4/df4/qucs-s-spar-viewer_8h.html" title="Main application class for S&#45;parameter viewer (and its RF circuit synthesis tools)" alt="" coords="719,108,894,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="653,48,782,105,780,110,651,53"/>
+<area shape="rect" id="Node000005" href="$d0/d63/dataset__management_8cpp.html" title="Implementation of the functions related to the data management." alt="" coords="5,203,216,229"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="756,140,707,151,573,170,468,178,363,185,228,199,179,206,178,201,228,193,362,180,468,173,573,165,706,145,755,134"/>
+<area shape="rect" id="Node000006" href="$d3/d75/limits_8cpp.html" title="Implementation of the functions related to the limits management." alt="" coords="240,203,344,229"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="755,140,707,151,609,166,531,174,454,182,357,199,328,206,327,201,355,193,454,176,531,168,608,161,706,145,753,134"/>
+<area shape="rect" id="Node000007" href="$d4/d19/markers_8cpp.html" title="Implementation of the functions related to the markers management." alt="" coords="368,203,488,229"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="751,139,707,151,501,199,472,206,471,201,499,193,706,145,750,134"/>
+<area shape="rect" id="Node000008" href="$d9/d88/qucs-s-spar-viewer_8cpp.html" title="Main application class for S&#45;parameter viewer (implementation)" alt="" coords="512,203,701,229"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="771,141,633,206,630,201,769,137"/>
+<area shape="rect" id="Node000009" href="$d1/d93/read__Sparam__data__files_8cpp.html" title="Implementation of the functions related to the data import." alt="" coords="725,196,888,236"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="809,147,809,196,804,196,804,147"/>
+<area shape="rect" id="Node000010" href="$da/d08/session__management_8cpp.html" title="Implementation of the functions related to the session management." alt="" coords="912,203,1123,229"/>
+<area shape="poly" id="edge9_Node000004_Node000010" title=" " alt="" coords="846,136,992,201,990,206,844,141"/>
+<area shape="rect" id="Node000011" href="$d3/d62/tools_8cpp.html" title="Implementation of the functions related to the tools management." alt="" coords="1147,203,1245,229"/>
+<area shape="poly" id="edge10_Node000004_Node000011" title=" " alt="" coords="877,134,998,160,1135,193,1161,201,1159,206,1134,199,997,165,876,139"/>
+<area shape="rect" id="Node000012" href="$df/d47/trace__management_8cpp.html" title="Implementation of the functions related to the trace management." alt="" coords="1269,203,1464,229"/>
+<area shape="poly" id="edge11_Node000004_Node000012" title=" " alt="" coords="890,133,1258,193,1301,201,1300,206,1257,199,890,138"/>
+<area shape="rect" id="Node000013" href="$df/d0a/main_8cpp.html" title="Main file." alt="" coords="1488,203,1571,229"/>
+<area shape="poly" id="edge12_Node000004_Node000013" title=" " alt="" coords="908,123,1025,131,1168,144,1323,164,1477,193,1501,201,1500,206,1475,199,1322,170,1167,149,1024,136,908,129"/>
+</map>

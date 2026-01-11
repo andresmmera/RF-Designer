@@ -1,0 +1,29 @@
+<map id="PlotWidgets/rectangularplotwidget.cpp" name="PlotWidgets/rectangularplotwidget.cpp">
+<area shape="rect" id="Node000001" title="Widget for displaying rectangular (Cartesian) plots with dual y&#45;axes (implementation)" alt="" coords="713,5,987,31"/>
+<area shape="rect" id="Node000002" href="$dd/d1d/rectangularplotwidget_8h.html" title="Widget for displaying rectangular (Cartesian) plots with dual y&#45;axes (definition)" alt="" coords="761,79,939,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="853,31,853,65,847,65,847,31"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,152,217,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="761,104,231,154,231,149,761,98"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="241,152,339,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="762,104,577,124,353,154,352,149,577,119,761,99"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="363,152,465,177"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="777,107,479,155,478,149,776,101"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="490,152,621,177"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="803,107,617,151,616,146,802,101"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="645,152,748,177"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="826,106,735,149,733,144,824,102"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="773,152,839,177"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="845,106,823,142,818,139,840,103"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="864,152,924,177"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="860,103,882,139,877,142,855,106"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="949,152,1005,177"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="872,102,945,143,943,147,869,106"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="1029,152,1140,177"/>
+<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="888,101,1034,145,1033,151,887,107"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="1164,152,1243,177"/>
+<area shape="poly" id="edge11_Node000002_Node000012" title=" " alt="" coords="911,101,1151,149,1150,154,910,107"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="1267,152,1345,177"/>
+<area shape="poly" id="edge12_Node000002_Node000013" title=" " alt="" coords="939,101,1083,121,1253,149,1252,154,1082,126,939,106"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="1370,152,1429,177"/>
+<area shape="poly" id="edge13_Node000002_Node000014" title=" " alt="" coords="939,96,1127,115,1241,130,1357,149,1356,155,1240,135,1127,120,938,102"/>
+</map>

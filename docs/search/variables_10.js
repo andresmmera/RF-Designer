@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['scale_5fx_0',['scale_x',['../d6/d1a/classSchematicExporter.html#a7b91e4cb8d3ee1a4135588ae4fbc8870',1,'SchematicExporter']]],
+  ['scale_5fy_1',['scale_y',['../d6/d1a/classSchematicExporter.html#a54f247e84560d679875edc04a85308bc',1,'SchematicExporter']]],
+  ['scalecombobox_2',['scaleComboBox',['../d1/d81/structMarkerProperties.html#a5d3ef44ff127302996b09345aeaf06fd',1,'MarkerProperties']]],
+  ['schematic_3',['Schematic',['../d5/d16/classNetwork.html#a18c4ac582102779da804825a3500bd62',1,'Network']]],
+  ['separator_4',['Separator',['../d9/d3e/structLimitProperties.html#a4decbd19cdaad27f4c0312412d004920',1,'LimitProperties']]],
+  ['showvalues_5',['showValues',['../db/d4f/structRectangularPlotWidget_1_1AxisSettings.html#aed11741aaf20bcc835c9e11340873eba',1,'RectangularPlotWidget::AxisSettings']]],
+  ['sim_5fpath_6',['sim_path',['../d7/d68/structMatchingNetworkDesignParameters.html#ae77783a9744085bf30a5c55de7c4888a',1,'MatchingNetworkDesignParameters']]],
+  ['smatrix_7',['Smatrix',['../d6/d33/structComponent__SPAR.html#aa797d35224a57cff8d2f9da5b106bd83',1,'Component_SPAR']]],
+  ['solution_8',['Solution',['../d7/d68/structMatchingNetworkDesignParameters.html#a781b1427f67944440ff9620ebf7c1420',1,'MatchingNetworkDesignParameters']]],
+  ['sparams_9',['sparams',['../d9/d26/structMatchingData.html#a698336a6f179af8eef9bfa2ed22a40ce',1,'MatchingData']]],
+  ['specification_10',['Specification',['../de/d4b/classAttenuatorBase.html#a052d362e17bd99087f9ca22505237562',1,'AttenuatorBase']]],
+  ['start_5ffreq_11',['Start_Freq',['../d9/d3e/structLimitProperties.html#ac6aa892b828d066ef58cfec46f69ee7f',1,'LimitProperties']]],
+  ['start_5ffreq_5fscale_12',['Start_Freq_Scale',['../d9/d3e/structLimitProperties.html#a4bd3194f798875422af84549b40a0651',1,'LimitProperties']]],
+  ['start_5fvalue_13',['Start_Value',['../d9/d3e/structLimitProperties.html#aedf6af37a1721bddf0ba6be002d03c28',1,'LimitProperties']]],
+  ['stop_5ffreq_14',['Stop_Freq',['../d9/d3e/structLimitProperties.html#aecc53629015c695744887f574c416401',1,'LimitProperties']]],
+  ['stop_5ffreq_5fscale_15',['Stop_Freq_Scale',['../d9/d3e/structLimitProperties.html#ac5173175e5c101c833b8a25c92b58ca5',1,'LimitProperties']]],
+  ['stop_5fvalue_16',['Stop_Value',['../d9/d3e/structLimitProperties.html#aff23cea74e1a970cef7aae75fd2b9872',1,'LimitProperties']]],
+  ['substrate_17',['Substrate',['../d1/d70/classMicrostripClass.html#a8b9bf7e8f0467f04ab17de9431c2e0af',1,'MicrostripClass']]]
+];

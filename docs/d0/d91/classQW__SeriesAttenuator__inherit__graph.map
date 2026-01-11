@@ -1,0 +1,7 @@
+<map id="QW_SeriesAttenuator" name="QW_SeriesAttenuator">
+<area shape="rect" id="Node000001" title="Quarter wavelength first&#45;series attenuator synthesis Reference: The PIN diode circuit designer&#39;s hand..." alt="" coords="5,152,167,177"/>
+<area shape="rect" id="Node000002" href="$de/d4b/classAttenuatorBase.html" title="Abstract base class for RF attenuator implementations." alt="" coords="25,79,147,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,118,89,152,83,152,83,118"/>
+<area shape="rect" id="Node000003" href="$d5/d16/classNetwork.html" title="Abstract base class for network implementations." alt="" coords="47,5,125,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="89,44,89,79,83,79,83,44"/>
+</map>

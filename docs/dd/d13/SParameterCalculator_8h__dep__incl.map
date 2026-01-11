@@ -1,0 +1,49 @@
+<map id="SPAR/SParameterCalculator.h" name="SPAR/SParameterCalculator.h">
+<area shape="rect" id="Node000001" title="S&#45;parameter network analysis calculator." alt="" coords="1439,5,1649,31"/>
+<area shape="rect" id="Node000002" href="$dd/d5d/SParameterCalculator_8cpp.html" title="S&#45;parameter network analysis calculator (implementation)" alt="" coords="5,93,232,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1425,21,1205,23,911,31,579,49,410,63,244,81,165,96,164,91,244,76,409,58,579,44,911,25,1205,17,1425,16"/>
+<area shape="rect" id="Node000003" href="$d8/dcb/CoupledLines_8cpp.html" title="Implementation of function for the S&#45;parameter analysis of the ideal coupled lines." alt="" coords="257,86,445,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1425,21,1238,23,996,32,727,50,590,64,456,81,419,89,418,83,456,76,589,58,726,45,996,27,1238,18,1425,16"/>
+<area shape="rect" id="Node000004" href="$de/d6d/IdealCoupler_8cpp.html" title="Implementation of function for the S&#45;parameter analysis of the ideal coupler." alt="" coords="469,86,657,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1425,24,1273,28,1084,38,877,55,670,81,633,88,632,83,669,76,876,50,1084,33,1273,23,1425,18"/>
+<area shape="rect" id="Node000005" href="$de/d0c/IdealTransmissionLine_8cpp.html" title="Implementation of function for the S&#45;parameter analysis of ideal transmission lines." alt="" coords="681,86,879,126"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1425,28,1178,46,1034,61,891,81,854,88,853,83,890,76,1033,56,1177,41,1424,22"/>
+<area shape="rect" id="Node000006" href="$dc/d4d/MicrostripCoupledLines_8cpp.html" title="Implementation of function for the S&#45;parameter analysis of the microstrip coupled lines." alt="" coords="903,79,1108,133"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1433,35,1284,55,1120,81,1109,83,1108,78,1120,76,1283,50,1432,30"/>
+<area shape="rect" id="Node000007" href="$d0/d8f/MicrostripOpen_8cpp.html" title="Implementation of function for the S&#45;parameter analysis of the microstrip open line." alt="" coords="1133,79,1321,133"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1489,37,1321,82,1320,77,1487,32"/>
+<area shape="rect" id="Node000008" href="$d4/d1f/MicrostripStep_8cpp.html" title="Implementation of function for the S&#45;parameter analysis of the microstrip step line." alt="" coords="1345,79,1533,133"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1521,42,1472,81,1469,77,1517,37"/>
+<area shape="rect" id="Node000009" href="$d1/d85/MicrostripVia_8cpp.html" title="Implementation of function for the S&#45;parameter analysis of the microstrip via." alt="" coords="1557,79,1745,133"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1571,37,1620,77,1616,81,1567,42"/>
+<area shape="rect" id="Node000010" href="$d7/dee/SP__Component_8cpp.html" title="Implementation of function for the S&#45;parameter analysis of the S&#45;parameter block device." alt="" coords="1769,86,1957,126"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1601,32,1793,83,1792,88,1599,37"/>
+<area shape="rect" id="Node000011" href="$d1/ddf/matrix__operations_8cpp.html" title="Implementation of functions for matrix operations." alt="" coords="1981,93,2187,119"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1655,30,1804,50,1968,76,2038,91,2037,96,1968,81,1804,55,1655,35"/>
+<area shape="rect" id="Node000012" href="$d7/d5f/misc_8cpp.html" title="Implementation of support functions for the built&#45;in S&#45;parameter simulator." alt="" coords="2211,93,2328,119"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1663,18,1777,23,1912,33,2056,50,2199,76,2244,91,2242,96,2198,81,2056,55,1911,38,1777,28,1663,23"/>
+<area shape="rect" id="Node000013" href="$d6/d9b/output_8cpp.html" title="Implementation of the Touchstone export code and output data via terminal console." alt="" coords="2352,93,2480,119"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1663,16,1802,19,1972,28,2157,46,2341,76,2389,91,2388,96,2339,81,2156,52,1971,34,1801,25,1663,21"/>
+<area shape="rect" id="Node000014" href="$dc/ddd/parser_8cpp.html" title="Implementation of the netlist parsing functions." alt="" coords="2505,93,2631,119"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1663,20,2101,39,2328,55,2421,65,2493,76,2541,91,2540,96,2491,81,2420,70,2327,61,2101,44,1663,25"/>
+<area shape="rect" id="Node000015" href="$d4/df4/qucs-s-spar-viewer_8h.html" title="Main application class for S&#45;parameter viewer (and its RF circuit synthesis tools)" alt="" coords="2655,93,2830,119"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1663,20,2176,40,2447,56,2644,76,2707,91,2706,96,2644,81,2446,61,2175,45,1663,25"/>
+<area shape="rect" id="Node000016" href="$d0/d63/dataset__management_8cpp.html" title="Implementation of the functions related to the data management." alt="" coords="1941,189,2152,214"/>
+<area shape="poly" id="edge15_Node000015_Node000016" title=" " alt="" coords="2693,125,2644,136,2510,156,2405,164,2299,170,2164,184,2114,191,2113,186,2164,179,2299,165,2404,159,2510,150,2644,131,2691,120"/>
+<area shape="rect" id="Node000017" href="$d3/d75/limits_8cpp.html" title="Implementation of the functions related to the limits management." alt="" coords="2176,189,2280,214"/>
+<area shape="poly" id="edge16_Node000015_Node000017" title=" " alt="" coords="2691,125,2645,136,2546,152,2468,159,2391,167,2293,184,2264,191,2263,186,2291,179,2390,162,2468,154,2545,147,2643,131,2690,120"/>
+<area shape="rect" id="Node000018" href="$d4/d19/markers_8cpp.html" title="Implementation of the functions related to the markers management." alt="" coords="2304,189,2424,214"/>
+<area shape="poly" id="edge17_Node000015_Node000018" title=" " alt="" coords="2688,125,2645,136,2437,184,2408,191,2406,186,2435,179,2643,131,2687,120"/>
+<area shape="rect" id="Node000019" href="$d9/d88/qucs-s-spar-viewer_8cpp.html" title="Main application class for S&#45;parameter viewer (implementation)" alt="" coords="2448,189,2637,214"/>
+<area shape="poly" id="edge18_Node000015_Node000019" title=" " alt="" coords="2707,127,2569,191,2566,186,2705,122"/>
+<area shape="rect" id="Node000020" href="$d1/d93/read__Sparam__data__files_8cpp.html" title="Implementation of the functions related to the data import." alt="" coords="2661,181,2824,221"/>
+<area shape="poly" id="edge19_Node000015_Node000020" title=" " alt="" coords="2745,132,2745,181,2740,181,2740,132"/>
+<area shape="rect" id="Node000021" href="$da/d08/session__management_8cpp.html" title="Implementation of the functions related to the session management." alt="" coords="2848,189,3059,214"/>
+<area shape="poly" id="edge20_Node000015_Node000021" title=" " alt="" coords="2782,122,2928,186,2926,191,2780,127"/>
+<area shape="rect" id="Node000022" href="$d3/d62/tools_8cpp.html" title="Implementation of the functions related to the tools management." alt="" coords="3083,189,3181,214"/>
+<area shape="poly" id="edge21_Node000015_Node000022" title=" " alt="" coords="2813,119,2934,145,3071,179,3097,186,3095,191,3070,184,2933,150,2812,124"/>
+<area shape="rect" id="Node000023" href="$df/d47/trace__management_8cpp.html" title="Implementation of the functions related to the trace management." alt="" coords="3205,189,3400,214"/>
+<area shape="poly" id="edge22_Node000015_Node000023" title=" " alt="" coords="2826,118,3194,179,3237,186,3236,191,3193,184,2826,123"/>
+<area shape="rect" id="Node000024" href="$df/d0a/main_8cpp.html" title="Main file." alt="" coords="3424,189,3507,214"/>
+<area shape="poly" id="edge23_Node000015_Node000024" title=" " alt="" coords="2844,109,2961,116,3104,129,3259,150,3413,179,3437,186,3436,191,3411,184,3258,155,3103,135,2960,122,2844,114"/>
+</map>

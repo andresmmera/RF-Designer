@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['addcomponent_0',['addcomponent',['../db/d91/classSParameterCalculator.html#adb99be1e490ee5ed5ac8b839b46dedc9',1,'SParameterCalculator::addComponent(ComponentType_SPAR type, const string &amp;name, const vector&lt; int &gt; &amp;nodes, QMap&lt; QString, Complex &gt; Zvalue)'],['../db/d91/classSParameterCalculator.html#a65475df9e72352a50be94eab85fe2b85',1,'SParameterCalculator::addComponent(ComponentType_SPAR type, const string &amp;name, const vector&lt; int &gt; &amp;nodes, QMap&lt; QString, QList&lt; double &gt; &gt; freqDepData)'],['../db/d91/classSParameterCalculator.html#a1ab18917acfdad1fc056ffc3fb4f9dac',1,'SParameterCalculator::addComponent(ComponentType_SPAR type, const string &amp;name, const vector&lt; int &gt; &amp;nodes, QMap&lt; QString, double &gt; value)']]],
+  ['addfile_1',['addFile',['../db/db7/classQucs__S__SPAR__Viewer.html#a64e9dbd718b521f9672d6155ff6a1f60',1,'Qucs_S_SPAR_Viewer']]],
+  ['addlimit_2',['addLimit',['../d8/dee/classRectangularPlotWidget.html#a26e67047732c8e4519293199c882ef52',1,'RectangularPlotWidget']]],
+  ['addmarker_3',['addmarker',['../de/d80/classPolarPlotWidget.html#af369ab44df39e8f5a6f6d27c1eae6b60',1,'PolarPlotWidget::addMarker()'],['../d8/dee/classRectangularPlotWidget.html#a0d429577fe24d761f72fa84edeb73562',1,'RectangularPlotWidget::addMarker()'],['../d9/dca/classSmithChartWidget.html#aa35971ba9ce443f1e5499f477a98fdb7',1,'SmithChartWidget::addMarker()']]],
+  ['addpathtowatcher_4',['addPathToWatcher',['../db/db7/classQucs__S__SPAR__Viewer.html#ac8fcab0b67d87db33be3683d78d537ae',1,'Qucs_S_SPAR_Viewer']]],
+  ['addport_5',['addPort',['../db/d91/classSParameterCalculator.html#a2a827669ba6ac6ca4595b81bc7d852f5',1,'SParameterCalculator']]],
+  ['addsparamblocktoadmittance_6',['addSParamBlockToAdmittance',['../db/d91/classSParameterCalculator.html#ace6eb51b77d1eb2fc031f9d596020973',1,'SParameterCalculator']]],
+  ['addsparameterblock_7',['addSParameterBlock',['../db/d91/classSParameterCalculator.html#a605099cf5ebbb886d0f6a747bd67a9f6',1,'SParameterCalculator']]],
+  ['addtrace_8',['addtrace',['../d9/dca/classSmithChartWidget.html#a984b606848b4aba2696b867e6a84d5e9',1,'SmithChartWidget::addTrace()'],['../d8/dee/classRectangularPlotWidget.html#a3192ec7dddbb987241d1558f6befcfb1',1,'RectangularPlotWidget::addTrace()'],['../de/d80/classPolarPlotWidget.html#a77f86cff99f7724502d9efdf345b0ac6',1,'PolarPlotWidget::addTrace()']]],
+  ['addwire_9',['addwire',['../d8/d6b/classComponent.html#a6dbd39d8bae106be80e106cefa2a2273',1,'Component::addWire()'],['../df/dd0/classNode.html#ab22e8c2f04539c5a281f5fef80941855',1,'Node::addWire()'],['../d7/d0f/classSymbol.html#a10ba919ef7c12f86daac9e46b4d0d8a1',1,'Symbol::addWire()']]],
+  ['adjust_10',['adjust',['../d7/d64/classWire.html#a347caf8ddad7854496728148f3eab138',1,'Wire']]],
+  ['appendcomponent_11',['appendComponent',['../df/d9e/classSchematicContent.html#a0f574e393c95b488d7d66cf3901d6fcb',1,'SchematicContent']]],
+  ['appendnode_12',['appendNode',['../df/d9e/classSchematicContent.html#af2e61af3200c2d62dd426e620cf5d7c4',1,'SchematicContent']]],
+  ['appendtext_13',['appendText',['../df/d9e/classSchematicContent.html#aef1b204077e11cfcab1eba570f1540b6',1,'SchematicContent']]],
+  ['appendwire_14',['appendwire',['../df/d9e/classSchematicContent.html#a85db66a088d96dd2db299b906b49909a',1,'SchematicContent::appendWire(WireInfo WI)'],['../df/d9e/classSchematicContent.html#afb5afd15f3af5084fe330f1b8f9d5b7a',1,'SchematicContent::appendWire(QString O, int ON, QString D, int DN)'],['../df/d9e/classSchematicContent.html#af8ae96710e2c3fe4d1da37f2f20896b7',1,'SchematicContent::appendWire(QString O, int ON, QString D, int DN, QColor c)']]],
+  ['areaxissettingslocked_15',['areAxisSettingsLocked',['../d8/dee/classRectangularPlotWidget.html#a086888eaa26c1a671b6b1e76da126948',1,'RectangularPlotWidget']]],
+  ['attenuatorbase_16',['attenuatorbase',['../de/d4b/classAttenuatorBase.html#a8e2f0ac2028c502035d7055990c63ebb',1,'AttenuatorBase::AttenuatorBase()=default'],['../de/d4b/classAttenuatorBase.html#a6235e16324ce13c05a26641603133e89',1,'AttenuatorBase::AttenuatorBase(AttenuatorDesignParameters AS)']]],
+  ['attenuatordesigntool_17',['AttenuatorDesignTool',['../d5/d0b/classAttenuatorDesignTool.html#a04f11a22d16191549dda3ef62d4350a4',1,'AttenuatorDesignTool']]]
+];

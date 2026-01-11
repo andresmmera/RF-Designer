@@ -1,0 +1,29 @@
+<map id="Tools/PowerCombining/Wilkinson2Way.h" name="Tools/PowerCombining/Wilkinson2Way.h">
+<area shape="rect" id="Node000001" title="Wilkinson power combiner/divider network (definition)" alt="" coords="715,5,885,45"/>
+<area shape="rect" id="Node000002" href="$dd/d2b/PowerCombiningTool_8h.html" title="Widget for power combining network design and synthesis (definition)" alt="" coords="615,93,790,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="770,56,726,95,722,91,767,52"/>
+<area shape="rect" id="Node000014" href="$db/d6b/Wilkinson2Way_8cpp.html" title="Wilkinson power combiner/divider network (implementation)" alt="" coords="814,93,983,133"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="834,52,879,91,875,95,830,56"/>
+<area shape="rect" id="Node000003" href="$d3/d49/PowerCombiningTool_8cpp.html" title="Widget for power combining network design and synthesis (implementation)" alt="" coords="505,181,695,221"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="671,144,624,183,621,179,668,140"/>
+<area shape="rect" id="Node000004" href="$d4/df4/qucs-s-spar-viewer_8h.html" title="Main application class for S&#45;parameter viewer (and its RF circuit synthesis tools)" alt="" coords="719,189,894,214"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="738,140,794,186,791,190,735,144"/>
+<area shape="rect" id="Node000005" href="$d0/d63/dataset__management_8cpp.html" title="Implementation of the functions related to the data management." alt="" coords="5,277,216,302"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="737,219,707,224,573,240,468,249,363,257,228,272,179,279,178,274,228,267,362,252,467,244,572,235,706,219,737,214"/>
+<area shape="rect" id="Node000006" href="$d3/d75/limits_8cpp.html" title="Implementation of the functions related to the limits management." alt="" coords="240,277,344,302"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="735,219,707,224,608,237,531,245,454,254,357,272,328,279,327,274,355,267,453,249,531,240,608,232,706,219,734,214"/>
+<area shape="rect" id="Node000007" href="$d4/d19/markers_8cpp.html" title="Implementation of the functions related to the markers management." alt="" coords="368,277,488,302"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="739,219,501,272,471,279,470,274,499,267,737,214"/>
+<area shape="rect" id="Node000008" href="$d9/d88/qucs-s-spar-viewer_8cpp.html" title="Main application class for S&#45;parameter viewer (implementation)" alt="" coords="512,277,701,302"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="768,222,635,279,633,274,766,217"/>
+<area shape="rect" id="Node000009" href="$d1/d93/read__Sparam__data__files_8cpp.html" title="Implementation of the functions related to the data import." alt="" coords="725,269,888,309"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="809,228,809,269,804,269,804,228"/>
+<area shape="rect" id="Node000010" href="$da/d08/session__management_8cpp.html" title="Implementation of the functions related to the session management." alt="" coords="912,277,1123,302"/>
+<area shape="poly" id="edge9_Node000004_Node000010" title=" " alt="" coords="849,217,990,274,988,279,847,222"/>
+<area shape="rect" id="Node000011" href="$d3/d62/tools_8cpp.html" title="Implementation of the functions related to the tools management." alt="" coords="1147,277,1245,302"/>
+<area shape="poly" id="edge10_Node000004_Node000011" title=" " alt="" coords="886,214,1004,237,1135,267,1161,274,1160,279,1134,272,1003,242,885,219"/>
+<area shape="rect" id="Node000012" href="$df/d47/trace__management_8cpp.html" title="Implementation of the functions related to the trace management." alt="" coords="1269,277,1464,302"/>
+<area shape="poly" id="edge11_Node000004_Node000012" title=" " alt="" coords="901,213,1258,267,1302,274,1301,279,1257,272,901,219"/>
+<area shape="rect" id="Node000013" href="$df/d0a/main_8cpp.html" title="Main file." alt="" coords="1488,277,1571,302"/>
+<area shape="poly" id="edge12_Node000004_Node000013" title=" " alt="" coords="908,203,1025,209,1167,220,1323,239,1477,267,1502,274,1500,279,1475,272,1322,244,1167,225,1024,214,908,208"/>
+</map>

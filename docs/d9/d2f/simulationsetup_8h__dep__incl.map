@@ -1,0 +1,25 @@
+<map id="Tools/SimulationSetup/simulationsetup.h" name="Tools/SimulationSetup/simulationsetup.h">
+<area shape="rect" id="Node000001" title="UI component to set the simulation settings (definition)" alt="" coords="626,5,793,45"/>
+<area shape="rect" id="Node000002" href="$d5/dd9/simulationsetup_8cpp.html" title="UI component to set the simulation settings (implementation)" alt="" coords="529,93,695,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="679,56,635,95,632,91,676,52"/>
+<area shape="rect" id="Node000003" href="$d4/df4/qucs-s-spar-viewer_8h.html" title="Main application class for S&#45;parameter viewer (and its RF circuit synthesis tools)" alt="" coords="719,101,894,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="743,53,795,98,791,102,740,57"/>
+<area shape="rect" id="Node000004" href="$d0/d63/dataset__management_8cpp.html" title="Implementation of the functions related to the data management." alt="" coords="5,189,216,214"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="737,131,707,136,573,152,468,161,363,169,228,184,179,191,178,186,228,179,362,164,467,156,572,147,706,131,737,126"/>
+<area shape="rect" id="Node000005" href="$d3/d75/limits_8cpp.html" title="Implementation of the functions related to the limits management." alt="" coords="240,189,344,214"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="735,131,707,136,608,149,531,157,454,166,357,184,328,191,327,186,355,179,453,161,531,152,608,144,706,131,734,126"/>
+<area shape="rect" id="Node000006" href="$d4/d19/markers_8cpp.html" title="Implementation of the functions related to the markers management." alt="" coords="368,189,488,214"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="739,131,501,184,471,191,470,186,499,179,737,126"/>
+<area shape="rect" id="Node000007" href="$d9/d88/qucs-s-spar-viewer_8cpp.html" title="Main application class for S&#45;parameter viewer (implementation)" alt="" coords="512,189,701,214"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="768,134,635,191,633,186,766,129"/>
+<area shape="rect" id="Node000008" href="$d1/d93/read__Sparam__data__files_8cpp.html" title="Implementation of the functions related to the data import." alt="" coords="725,181,888,221"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="809,140,809,181,804,181,804,140"/>
+<area shape="rect" id="Node000009" href="$da/d08/session__management_8cpp.html" title="Implementation of the functions related to the session management." alt="" coords="912,189,1123,214"/>
+<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="849,129,990,186,988,191,847,134"/>
+<area shape="rect" id="Node000010" href="$d3/d62/tools_8cpp.html" title="Implementation of the functions related to the tools management." alt="" coords="1147,189,1245,214"/>
+<area shape="poly" id="edge9_Node000003_Node000010" title=" " alt="" coords="886,126,1004,149,1135,179,1161,186,1160,191,1134,184,1003,154,885,131"/>
+<area shape="rect" id="Node000011" href="$df/d47/trace__management_8cpp.html" title="Implementation of the functions related to the trace management." alt="" coords="1269,189,1464,214"/>
+<area shape="poly" id="edge10_Node000003_Node000011" title=" " alt="" coords="901,125,1258,179,1302,186,1301,191,1257,184,901,131"/>
+<area shape="rect" id="Node000012" href="$df/d0a/main_8cpp.html" title="Main file." alt="" coords="1488,189,1571,214"/>
+<area shape="poly" id="edge11_Node000003_Node000012" title=" " alt="" coords="908,115,1025,121,1167,132,1323,151,1477,179,1502,186,1500,191,1475,184,1322,156,1167,137,1024,126,908,120"/>
+</map>
