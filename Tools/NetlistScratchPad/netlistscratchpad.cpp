@@ -1,14 +1,24 @@
-/// @file netlistscratchpad.cpp
-/// @brief Widget for editing netlists (implemenationt)
-/// @author Andrés Martínez Mera - andresmmera@protonmail.com
-/// @date Jan 6, 2026
-/// @copyright Copyright (C) 2019-2025 Andrés Martínez Mera
-/// @license GPL-3.0-or-later
+/*
+ *  Copyright (C) 2025 Andrés Martínez Mera - andresmmera@protonmail.com
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include "netlistscratchpad.h"
 
-NetlistScratchPad::NetlistScratchPad(QWidget *parent) : QWidget(parent) {
-  QGridLayout *WidgetLayout = new QGridLayout();
+NetlistScratchPad::NetlistScratchPad(QWidget* parent) : QWidget(parent) {
+  QGridLayout* WidgetLayout = new QGridLayout();
 
   Netlist_Editor_Widget = new CodeEditor();
   Netlist_Editor_Widget->insertPlainText(
@@ -16,7 +26,7 @@ NetlistScratchPad::NetlistScratchPad(QWidget *parent) : QWidget(parent) {
               "50.0Ohm\n"));
   WidgetLayout->addWidget(Netlist_Editor_Widget, 0, 0, 1, 2);
 
-  traceNameLabel = new QLabel("Trace name");
+  traceNameLabel    = new QLabel("Trace name");
   traceNameLineEdit = new QLineEdit("Netlist1");
   WidgetLayout->addWidget(traceNameLabel, 1, 0);
   WidgetLayout->addWidget(traceNameLineEdit, 1, 1);
@@ -24,9 +34,10 @@ NetlistScratchPad::NetlistScratchPad(QWidget *parent) : QWidget(parent) {
   this->setLayout(WidgetLayout);
 
   // Connect the text editor so that any changes in there rereuns the simulation
-  connect(Netlist_Editor_Widget, &CodeEditor::textChanged, this,
-          &NetlistScratchPad::update);
+  connect(Netlist_Editor_Widget, SIGNAL(textChanged()), this, SLOT(update()));
 }
+
+NetlistScratchPad::~NetlistScratchPad() {}
 
 void NetlistScratchPad::update() {
   QString netlist = Netlist_Editor_Widget->getText();
@@ -36,4 +47,13 @@ void NetlistScratchPad::update() {
   SC.Name = traceNameLineEdit->text();
 
   emit updateSimulation(SC);
+}
+
+QString NetlistScratchPad::getText() {
+  return Netlist_Editor_Widget->getText();
+}
+
+void NetlistScratchPad::setText(QString netlist) {
+  Netlist_Editor_Widget->clear();
+  Netlist_Editor_Widget->insertPlainText(netlist);
 }

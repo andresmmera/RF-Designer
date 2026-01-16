@@ -1,43 +1,38 @@
-/// @file BridgedTeeAttenuator.h
-/// @brief Bridged-Tee attenuator (definition)
-/// @author Andrés Martínez Mera - andresmmera@protonmail.com
-/// @date Jan 5, 2026
-/// @copyright Copyright (C) 2019-2025 Andrés Martínez Mera
-/// @license GPL-3.0-or-later
+/*
+ *  Copyright (C) 2025 Andrés Martínez Mera - andresmmera@protonmail.com
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef BRIDGEDTEEATTENUATOR_H
 #define BRIDGEDTEEATTENUATOR_H
 
 #include "AttenuatorBase.h"
 
-/// @class BridgedTeeAttenuator
-/// @brief Bridged-Tee attenuator implementation
-/// @details Four-resistor topology: R1 (series), R2/R3 (shunt to ground = Z0), R4 (bridge to ground)
-/// Reference: RF Design Guide. Systems, Circuits, and Equations. Peter Vizmuller. Artech House, 1995
 class BridgedTeeAttenuator : public AttenuatorBase {
     public:
-      /// @brief Class constructor
-      BridgedTeeAttenuator(){}
+        BridgedTeeAttenuator();
+        virtual ~BridgedTeeAttenuator();
+        BridgedTeeAttenuator(AttenuatorDesignParameters);
 
-      /// @brief Class destructor
-      virtual ~BridgedTeeAttenuator() {}
-
-      /// @brief Class constructor with parameters
-      /// @param AS Design specifications
-      BridgedTeeAttenuator(AttenuatorDesignParameters AS) : AttenuatorBase(AS) {}
-
-      /// @brief Calculate component values and build schematic
-      void synthesize() override;
+        void synthesize() override;
 
     private:
-      double R1; ///< Series resistor (Ohms)
-      double R4; ///< Bridge resistor to ground (Ohms)
+        double R1, R4;
 
-      /// @brief Calculate R1, R4 values and power dissipation
-      void calculateParams() override;
-
-      /// @brief Build schematic with components, nodes, and wires
-      void buildNetwork() override;
+        void calculateParams() override;
+        void buildNetwork() override;
 };
 
 #endif // BRIDGEDTEEATTENUATOR_H

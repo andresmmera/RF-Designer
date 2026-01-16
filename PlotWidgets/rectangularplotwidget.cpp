@@ -1,14 +1,23 @@
-/// @file rectangularplotwidget.cpp
-/// @brief Widget for displaying rectangular (Cartesian) plots with dual y-axes
-/// (implementation)
-/// @author Andrés Martínez Mera - andresmmera@protonmail.com
-/// @date Jan 4, 2026
-/// @copyright Copyright (C) 2026 Andrés Martínez Mera
-/// @license GPL-3.0-or-later
+/*
+ *  Copyright (C) 2025 Andrés Martínez Mera - andresmmera@protonmail.com
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include "rectangularplotwidget.h"
 
-RectangularPlotWidget::RectangularPlotWidget(QWidget *parent)
+RectangularPlotWidget::RectangularPlotWidget(QWidget* parent)
     : QWidget(parent), showTraceValues(true), axisSettingsLocked(false),
       fMin(1e20), fMax(-1) {
   // Create the QCustomPlot widget
@@ -23,7 +32,7 @@ RectangularPlotWidget::RectangularPlotWidget(QWidget *parent)
   setupPlot();
 
   // Create the main layout
-  QVBoxLayout *mainLayout = new QVBoxLayout(this);
+  QVBoxLayout* mainLayout = new QVBoxLayout(this);
   mainLayout->addWidget(plotWidget);
 
   // Add the axis settings layout
@@ -72,17 +81,17 @@ void RectangularPlotWidget::setupPlot() {
 
   // Connect range change signals to update axis settings widgets
   connect(plotWidget->xAxis,
-          QOverload<const QCPRange &>::of(&QCPAxis::rangeChanged), this,
+          QOverload<const QCPRange&>::of(&QCPAxis::rangeChanged), this,
           &RectangularPlotWidget::onXAxisRangeChanged);
   connect(plotWidget->yAxis,
-          QOverload<const QCPRange &>::of(&QCPAxis::rangeChanged), this,
+          QOverload<const QCPRange&>::of(&QCPAxis::rangeChanged), this,
           &RectangularPlotWidget::onYAxisRangeChanged);
   connect(plotWidget->yAxis2,
-          QOverload<const QCPRange &>::of(&QCPAxis::rangeChanged), this,
+          QOverload<const QCPRange&>::of(&QCPAxis::rangeChanged), this,
           &RectangularPlotWidget::onY2AxisRangeChanged);
 }
 
-void RectangularPlotWidget::addTrace(const QString &name, const Trace &trace) {
+void RectangularPlotWidget::addTrace(const QString& name, const Trace& trace) {
   // Create a local copy of the trace that we can modify
   Trace traceCopy = trace;
 
@@ -128,9 +137,7 @@ void RectangularPlotWidget::addTrace(const QString &name, const Trace &trace) {
     double traceMin = std::numeric_limits<double>::max();
     double traceMax = std::numeric_limits<double>::lowest();
 
-    const auto &traceConst =
-        traceCopy.trace; // const reference prevents detach (warning)
-    for (double value : traceConst) {
+    for (double value : traceCopy.trace) {
       if (value < traceMin) {
         traceMin = value;
       }
@@ -169,7 +176,7 @@ void RectangularPlotWidget::addTrace(const QString &name, const Trace &trace) {
         yAxisMin->setValue(y_min);
         yAxisMax->setValue(y_max);
         double y_step = round((y_max - y_min) / 10);
-        y_step = ceil(y_step / 5) * 5; // round to 5
+        y_step        = ceil(y_step / 5) * 5; // round to 5
         yAxisDiv->setValue(y_step);
       }
       updateYAxis();
@@ -205,7 +212,17 @@ double RectangularPlotWidget::calculateNiceStep(double range) {
   return niceStep * magnitude;
 }
 
-QPen RectangularPlotWidget::getTracePen(const QString &traceName) const {
+void RectangularPlotWidget::removeTrace(const QString& name) {
+  traces.remove(name);
+  updatePlot();
+}
+
+void RectangularPlotWidget::clearTraces() {
+  traces.clear();
+  updatePlot();
+}
+
+QPen RectangularPlotWidget::getTracePen(const QString& traceName) const {
   if (traces.contains(traceName)) {
     return traces[traceName].pen;
   }
@@ -217,8 +234,8 @@ QPen RectangularPlotWidget::getTracePen(const QString &traceName) const {
   return defaultPen;
 }
 
-void RectangularPlotWidget::setTracePen(const QString &traceName,
-                                        const QPen &pen) {
+void RectangularPlotWidget::setTracePen(const QString& traceName,
+                                        const QPen& pen) {
   if (traces.contains(traceName)) {
     traces[traceName].pen = pen;
     updatePlot();
@@ -233,15 +250,15 @@ QMap<QString, QPen> RectangularPlotWidget::getTracesInfo() const {
   return penMap;
 }
 
-bool RectangularPlotWidget::addMarker(const QString &markerId, double frequency,
-                                      const QPen &pen) {
+bool RectangularPlotWidget::addMarker(const QString& markerId, double frequency,
+                                      const QPen& pen) {
   if (markers.contains(markerId)) {
     return false;
   }
 
   bool frequencyInRange = false;
   for (auto it = traces.constBegin(); it != traces.constEnd(); ++it) {
-    const Trace &trace = it.value();
+    const Trace& trace = it.value();
     if (!trace.frequencies.isEmpty() &&
         frequency >= trace.frequencies.first() &&
         frequency <= trace.frequencies.last()) {
@@ -255,16 +272,16 @@ bool RectangularPlotWidget::addMarker(const QString &markerId, double frequency,
   }
 
   Marker marker;
-  marker.id = markerId;
+  marker.id        = markerId;
   marker.frequency = frequency;
-  marker.pen = pen;
+  marker.pen       = pen;
 
   markers.insert(markerId, marker);
   updatePlot();
   return true;
 }
 
-bool RectangularPlotWidget::removeMarker(const QString &markerId) {
+bool RectangularPlotWidget::removeMarker(const QString& markerId) {
   if (!markers.contains(markerId)) {
     return false;
   }
@@ -272,6 +289,11 @@ bool RectangularPlotWidget::removeMarker(const QString &markerId) {
   markers.remove(markerId);
   updatePlot();
   return true;
+}
+
+void RectangularPlotWidget::clearMarkers() {
+  markers.clear();
+  updatePlot();
 }
 
 QMap<QString, double> RectangularPlotWidget::getMarkers() const {
@@ -292,11 +314,11 @@ void RectangularPlotWidget::updatePlot() {
 
   // Add each trace as a new graph
   for (auto it = traces.constBegin(); it != traces.constEnd(); ++it) {
-    const QString &name = it.key();
-    const Trace &trace = it.value();
+    const QString& name = it.key();
+    const Trace& trace  = it.value();
 
     // Create a new graph for the trace
-    QCPGraph *graph = plotWidget->addGraph();
+    QCPGraph* graph = plotWidget->addGraph();
 
     // Determine which y-axis to use
     if (trace.y_axis == 2) {
@@ -336,13 +358,13 @@ void RectangularPlotWidget::updatePlot() {
 
   // Draw markers if any
   for (auto it = markers.constBegin(); it != markers.constEnd(); ++it) {
-    const Marker &marker = it.value();
+    const Marker& marker = it.value();
 
     // Scale the marker frequency according to the current units
     double scaledMarkerFreq = marker.frequency * freqScale;
 
     // Create a vertical line for the marker
-    QCPItemStraightLine *markerLine = new QCPItemStraightLine(plotWidget);
+    QCPItemStraightLine* markerLine = new QCPItemStraightLine(plotWidget);
     markerLine->point1->setCoords(scaledMarkerFreq, -1e20);
     markerLine->point2->setCoords(scaledMarkerFreq, 1e20);
     markerLine->setPen(marker.pen);
@@ -353,7 +375,7 @@ void RectangularPlotWidget::updatePlot() {
     QString freqText =
         QString::number(scaledMarkerFreq, 'f', 1) + " " + unitText;
 
-    QCPItemText *markerLabel = new QCPItemText(plotWidget);
+    QCPItemText* markerLabel = new QCPItemText(plotWidget);
     markerLabel->setText(freqText);
     markerLabel->position->setCoords(scaledMarkerFreq,
                                      plotWidget->yAxis->range().upper);
@@ -368,10 +390,10 @@ void RectangularPlotWidget::updatePlot() {
 
   // Draw limits if any
   for (auto it = limits.constBegin(); it != limits.constEnd(); ++it) {
-    const Limit &limit = it.value();
+    const Limit& limit = it.value();
 
     // Create a graph for the limit
-    QCPGraph *limitGraph = plotWidget->addGraph();
+    QCPGraph* limitGraph = plotWidget->addGraph();
 
     // Determine which y-axis to use
     if (limit.y_axis == 1) {
@@ -402,18 +424,18 @@ void RectangularPlotWidget::updatePlot() {
   plotWidget->replot();
 }
 
-void RectangularPlotWidget::addMarkerIntersections(const QString &markerId,
-                                                   const Marker &marker) {
-  double freqScale = getXscale();
+void RectangularPlotWidget::addMarkerIntersections(const QString& markerId,
+                                                   const Marker& marker) {
+  double freqScale        = getXscale();
   double scaledMarkerFreq = marker.frequency * freqScale;
 
   for (auto traceIt = traces.constBegin(); traceIt != traces.constEnd();
        ++traceIt) {
-    const Trace &trace = traceIt.value();
+    const Trace& trace = traceIt.value();
 
     // Find the intersection point of the marker with this trace
     double intersectionValue = -std::numeric_limits<double>::max();
-    bool found = false;
+    bool found               = false;
 
     // Check if marker frequency is within trace's frequency range
     if (!trace.frequencies.isEmpty() &&
@@ -451,7 +473,7 @@ void RectangularPlotWidget::addMarkerIntersections(const QString &markerId,
       QString pointId = markerId + "_" + traceIt.key();
 
       // Create a tracer for the intersection point
-      QCPItemTracer *tracer = new QCPItemTracer(plotWidget);
+      QCPItemTracer* tracer = new QCPItemTracer(plotWidget);
 
       // Find the corresponding graph
       if (traceGraphs.contains(traceIt.key())) {
@@ -467,8 +489,8 @@ void RectangularPlotWidget::addMarkerIntersections(const QString &markerId,
 
         // Add value label for the intersection point
         if (showTraceValues) {
-          QCPItemText *valueLabel = new QCPItemText(plotWidget);
-          QString valueText = QString::number(intersectionValue, 'f', 1);
+          QCPItemText* valueLabel = new QCPItemText(plotWidget);
+          QString valueText       = QString::number(intersectionValue, 'f', 1);
           valueText += QString(" %1").arg(trace.units);
 
           valueLabel->setText(valueText);
@@ -498,7 +520,7 @@ void RectangularPlotWidget::updateXAxis() {
 
   // Temporarily disconnect the range changed signal to avoid feedback
   disconnect(plotWidget->xAxis,
-             QOverload<const QCPRange &>::of(&QCPAxis::rangeChanged), this,
+             QOverload<const QCPRange&>::of(&QCPAxis::rangeChanged), this,
              &RectangularPlotWidget::onXAxisRangeChanged);
 
   // Set the axis range in display units
@@ -506,7 +528,7 @@ void RectangularPlotWidget::updateXAxis() {
 
   // Reconnect the signal
   connect(plotWidget->xAxis,
-          QOverload<const QCPRange &>::of(&QCPAxis::rangeChanged), this,
+          QOverload<const QCPRange&>::of(&QCPAxis::rangeChanged), this,
           &RectangularPlotWidget::onXAxisRangeChanged);
 
   // Set ticks
@@ -537,14 +559,14 @@ void RectangularPlotWidget::updateYAxis() {
 
   // Temporarily disconnect the range changed signal to avoid feedback
   disconnect(plotWidget->yAxis,
-             QOverload<const QCPRange &>::of(&QCPAxis::rangeChanged), this,
+             QOverload<const QCPRange&>::of(&QCPAxis::rangeChanged), this,
              &RectangularPlotWidget::onYAxisRangeChanged);
 
   plotWidget->yAxis->setRange(yMin, yMax);
 
   // Reconnect the signal
   connect(plotWidget->yAxis,
-          QOverload<const QCPRange &>::of(&QCPAxis::rangeChanged), this,
+          QOverload<const QCPRange&>::of(&QCPAxis::rangeChanged), this,
           &RectangularPlotWidget::onYAxisRangeChanged);
 
   // Set ticks
@@ -563,14 +585,14 @@ void RectangularPlotWidget::updateY2Axis() {
 
   // Temporarily disconnect the range changed signal to avoid feedback
   disconnect(plotWidget->yAxis2,
-             QOverload<const QCPRange &>::of(&QCPAxis::rangeChanged), this,
+             QOverload<const QCPRange&>::of(&QCPAxis::rangeChanged), this,
              &RectangularPlotWidget::onY2AxisRangeChanged);
 
   plotWidget->yAxis2->setRange(y2Min, y2Max);
 
   // Reconnect the signal
   connect(plotWidget->yAxis2,
-          QOverload<const QCPRange &>::of(&QCPAxis::rangeChanged), this,
+          QOverload<const QCPRange&>::of(&QCPAxis::rangeChanged), this,
           &RectangularPlotWidget::onY2AxisRangeChanged);
 
   // Set ticks
@@ -603,8 +625,8 @@ void RectangularPlotWidget::changeFreqUnits() {
   updateXAxis();
 }
 
-QGridLayout *RectangularPlotWidget::setupAxisSettings() {
-  QGridLayout *axisLayout = new QGridLayout();
+QGridLayout* RectangularPlotWidget::setupAxisSettings() {
+  QGridLayout* axisLayout = new QGridLayout();
 
   // X-axis settings
   xAxisLabel = new QLabel("<b>Frequency</b>");
@@ -616,10 +638,7 @@ QGridLayout *RectangularPlotWidget::setupAxisSettings() {
   xAxisMin->setValue(0);
   xAxisMin->setDecimals(1);
   xAxisMin->setSingleStep(0.1);
-  xAxisMin->setToolTip("Minimum frequency");
-  connect(xAxisMin, &QDoubleSpinBox::valueChanged, this,
-          &RectangularPlotWidget::updateXAxis);
-
+  connect(xAxisMin, SIGNAL(valueChanged(double)), this, SLOT(updateXAxis()));
   axisLayout->addWidget(xAxisMin, 0, 1);
 
   xAxisMax = new QDoubleSpinBox();
@@ -628,9 +647,7 @@ QGridLayout *RectangularPlotWidget::setupAxisSettings() {
   xAxisMax->setValue(1000);
   xAxisMax->setDecimals(1);
   xAxisMax->setSingleStep(0.1);
-  xAxisMax->setToolTip("Maximum frequency");
-  connect(xAxisMax, &QDoubleSpinBox::valueChanged, this,
-          &RectangularPlotWidget::updateXAxis);
+  connect(xAxisMax, SIGNAL(valueChanged(double)), this, SLOT(updateXAxis()));
   axisLayout->addWidget(xAxisMax, 0, 2);
 
   xAxisDiv = new QDoubleSpinBox();
@@ -638,22 +655,18 @@ QGridLayout *RectangularPlotWidget::setupAxisSettings() {
   xAxisDiv->setMaximum(1000000);
   xAxisDiv->setValue(100);
   xAxisDiv->setSingleStep(1);
-  xAxisDiv->setToolTip("Frequency step");
-  connect(xAxisDiv, &QDoubleSpinBox::valueChanged, this,
-          &RectangularPlotWidget::updateXAxis);
-
+  connect(xAxisDiv, SIGNAL(valueChanged(double)), this, SLOT(updateXAxis()));
   axisLayout->addWidget(xAxisDiv, 0, 3);
 
   xAxisUnits = new QComboBox();
   xAxisUnits->addItems(frequencyUnits);
   xAxisUnits->setCurrentIndex(2);
-  connect(xAxisUnits, &QComboBox::currentIndexChanged, this,
-          [this](int) { changeFreqUnits(); });
-
+  connect(xAxisUnits, SIGNAL(currentIndexChanged(int)), this,
+          SLOT(changeFreqUnits()));
   axisLayout->addWidget(xAxisUnits, 0, 4);
 
   // Left Y-axis settings
-  QLabel *yAxisLabel = new QLabel("<b>y-axis</b>");
+  QLabel* yAxisLabel = new QLabel("<b>y-axis</b>");
   axisLayout->addWidget(yAxisLabel, 1, 0);
 
   yAxisMin = new QDoubleSpinBox();
@@ -662,9 +675,7 @@ QGridLayout *RectangularPlotWidget::setupAxisSettings() {
   yAxisMin->setValue(-10);
   yAxisMin->setDecimals(1);
   yAxisMin->setSingleStep(1);
-  yAxisMin->setToolTip("y-axis minimum value");
-  connect(yAxisMin, &QDoubleSpinBox::valueChanged, this,
-          &RectangularPlotWidget::updateYAxis);
+  connect(yAxisMin, SIGNAL(valueChanged(double)), this, SLOT(updateYAxis()));
   axisLayout->addWidget(yAxisMin, 1, 1);
 
   yAxisMax = new QDoubleSpinBox();
@@ -673,10 +684,7 @@ QGridLayout *RectangularPlotWidget::setupAxisSettings() {
   yAxisMax->setValue(10);
   yAxisMax->setDecimals(1);
   yAxisMax->setSingleStep(1);
-  yAxisMax->setToolTip("y-axis maximum value");
-  connect(yAxisMax, &QDoubleSpinBox::valueChanged, this,
-          &RectangularPlotWidget::updateYAxis);
-
+  connect(yAxisMax, SIGNAL(valueChanged(double)), this, SLOT(updateYAxis()));
   axisLayout->addWidget(yAxisMax, 1, 2);
 
   yAxisDiv = new QDoubleSpinBox();
@@ -684,9 +692,7 @@ QGridLayout *RectangularPlotWidget::setupAxisSettings() {
   yAxisDiv->setMaximum(1000000);
   yAxisDiv->setValue(5);
   yAxisDiv->setSingleStep(1);
-  yAxisDiv->setToolTip("y-axis step");
-  connect(yAxisDiv, &QDoubleSpinBox::valueChanged, this,
-          &RectangularPlotWidget::updateYAxis);
+  connect(yAxisDiv, SIGNAL(valueChanged(double)), this, SLOT(updateYAxis()));
   axisLayout->addWidget(yAxisDiv, 1, 3);
 
   yAxisUnits = new QLabel("dB");
@@ -702,9 +708,7 @@ QGridLayout *RectangularPlotWidget::setupAxisSettings() {
   y2AxisMin->setValue(-180);
   y2AxisMin->setDecimals(1);
   y2AxisMin->setSingleStep(10);
-  y2AxisMin->setToolTip("Right y-axis minimum value");
-  connect(y2AxisMin, &QDoubleSpinBox::valueChanged, this,
-          &RectangularPlotWidget::updateY2Axis);
+  connect(y2AxisMin, SIGNAL(valueChanged(double)), this, SLOT(updateY2Axis()));
   axisLayout->addWidget(y2AxisMin, 2, 1);
 
   y2AxisMax = new QDoubleSpinBox();
@@ -713,10 +717,7 @@ QGridLayout *RectangularPlotWidget::setupAxisSettings() {
   y2AxisMax->setValue(180);
   y2AxisMax->setDecimals(1);
   y2AxisMax->setSingleStep(10);
-  y2AxisMax->setToolTip("Right y-axis maximum value");
-  connect(y2AxisMax, &QDoubleSpinBox::valueChanged, this,
-          &RectangularPlotWidget::updateY2Axis);
-
+  connect(y2AxisMax, SIGNAL(valueChanged(double)), this, SLOT(updateY2Axis()));
   axisLayout->addWidget(y2AxisMax, 2, 2);
 
   y2AxisDiv = new QDoubleSpinBox();
@@ -724,36 +725,86 @@ QGridLayout *RectangularPlotWidget::setupAxisSettings() {
   y2AxisDiv->setMaximum(180);
   y2AxisDiv->setValue(45);
   y2AxisDiv->setSingleStep(5);
-  y2AxisDiv->setToolTip("Right y-axis step");
-  connect(y2AxisDiv, &QDoubleSpinBox::valueChanged, this,
-          &RectangularPlotWidget::updateY2Axis);
+  connect(y2AxisDiv, SIGNAL(valueChanged(double)), this, SLOT(updateY2Axis()));
   axisLayout->addWidget(y2AxisDiv, 2, 3);
 
   y2AxisUnits = new QLabel("deg");
   axisLayout->addWidget(y2AxisUnits, 2, 4);
 
   // Add the Show Values checkbox in a new row
-  QLabel *markerOptionsLabel = new QLabel("<b>Marker Options</b>");
+  QLabel* markerOptionsLabel = new QLabel("<b>Marker Options</b>");
   axisLayout->addWidget(markerOptionsLabel, 3, 0);
 
   showValuesCheckbox = new QCheckBox("Show Data Values");
   showValuesCheckbox->setChecked(true); // Default to showing values
-  connect(showValuesCheckbox, &QCheckBox::toggled, this,
-          &RectangularPlotWidget::toggleShowValues);
-
+  connect(showValuesCheckbox, SIGNAL(toggled(bool)), this,
+          SLOT(toggleShowValues(bool)));
   axisLayout->addWidget(showValuesCheckbox, 3, 1, 1, 2); // Span 2 columns
 
   // Lock Axis Settings checkbox
   lockAxisCheckbox = new QCheckBox("Lock Axis Settings");
   lockAxisCheckbox->setChecked(false); // Default to unlocked
-  connect(lockAxisCheckbox, &QCheckBox::toggled, this,
-          &RectangularPlotWidget::toggleLockAxisSettings);
-
+  connect(lockAxisCheckbox, SIGNAL(toggled(bool)), this,
+          SLOT(toggleLockAxisSettings(bool)));
   axisLayout->addWidget(lockAxisCheckbox, 3, 3, 1, 2); // Span 2 columns
 
   return axisLayout;
 }
 
+// These "get" functions are used by the main program to put markers and limits
+double RectangularPlotWidget::getYmin() {
+  return yAxisMin->value();
+}
+
+double RectangularPlotWidget::getYmax() {
+  return yAxisMax->value();
+}
+
+double RectangularPlotWidget::getYdiv() {
+  return yAxisDiv->value();
+}
+
+void RectangularPlotWidget::setYdiv(double val) {
+  yAxisDiv->setValue(val);
+}
+
+void RectangularPlotWidget::setYmin(double val) {
+  yAxisMin->setValue(val);
+}
+
+void RectangularPlotWidget::setYmax(double val) {
+  yAxisMax->setValue(val);
+}
+
+double RectangularPlotWidget::getY2min() {
+  return y2AxisMin->value();
+}
+
+double RectangularPlotWidget::getY2max() {
+  return y2AxisMax->value();
+}
+
+double RectangularPlotWidget::getY2div() {
+  return y2AxisDiv->value();
+}
+
+double RectangularPlotWidget::getXmin() {
+  return xAxisMin->value();
+}
+
+double RectangularPlotWidget::getXmax() {
+  return xAxisMax->value();
+}
+
+double RectangularPlotWidget::getXdiv() {
+  return xAxisDiv->value();
+}
+
+QString RectangularPlotWidget::getXunits() {
+  return xAxisUnits->currentText();
+}
+
+// Count traces assigned to the primary y-axis
 int RectangularPlotWidget::getYAxisTraceCount() const {
   int count = 0;
   for (auto it = traces.constBegin(); it != traces.constEnd(); ++it) {
@@ -764,6 +815,7 @@ int RectangularPlotWidget::getYAxisTraceCount() const {
   return count;
 }
 
+// Count traces assigned to the secondary y-axis
 int RectangularPlotWidget::getY2AxisTraceCount() const {
   int count = 0;
   for (auto it = traces.constBegin(); it != traces.constEnd(); ++it) {
@@ -774,8 +826,9 @@ int RectangularPlotWidget::getY2AxisTraceCount() const {
   return count;
 }
 
+// Returns a scale factor depending on the selection of the frequency units
 double RectangularPlotWidget::getXscale() {
-  QString unit = xAxisUnits->currentText();
+  QString unit     = xAxisUnits->currentText();
   double freqScale = 1;
   if (unit == "kHz") {
     freqScale = 1e-3; // Hz to kHz
@@ -787,7 +840,12 @@ double RectangularPlotWidget::getXscale() {
   return freqScale;
 }
 
-bool RectangularPlotWidget::updateMarkerFrequency(const QString &markerId,
+// Gets the index of the frequency units combobox
+int RectangularPlotWidget::getFreqIndex() {
+  return xAxisUnits->currentIndex();
+}
+
+bool RectangularPlotWidget::updateMarkerFrequency(const QString& markerId,
                                                   double newFrequency) {
   // Check if marker exists
   if (!markers.contains(markerId)) {
@@ -797,7 +855,7 @@ bool RectangularPlotWidget::updateMarkerFrequency(const QString &markerId,
   // Check if any trace contains this frequency
   bool frequencyInRange = false;
   for (auto it = traces.constBegin(); it != traces.constEnd(); ++it) {
-    const Trace &trace = it.value();
+    const Trace& trace = it.value();
     if (!trace.frequencies.isEmpty() &&
         newFrequency >= trace.frequencies.first() &&
         newFrequency <= trace.frequencies.last()) {
@@ -818,6 +876,8 @@ bool RectangularPlotWidget::updateMarkerFrequency(const QString &markerId,
   return true;
 }
 
+// Removes the old graphic elements, such as the labels from past marker
+// positions
 void RectangularPlotWidget::clearGraphicsItems() {
   // Remove all marker lines
   for (auto it = markerLines.begin(); it != markerLines.end(); ++it) {
@@ -860,8 +920,8 @@ void RectangularPlotWidget::toggleShowValues(bool show) {
   updatePlot(); // Redraw with new setting
 }
 
-bool RectangularPlotWidget::addLimit(const QString &limitId,
-                                     const Limit &limit) {
+bool RectangularPlotWidget::addLimit(const QString& limitId,
+                                     const Limit& limit) {
   // Check if limit with this ID already exists
   if (limits.contains(limitId)) {
     return false;
@@ -875,7 +935,7 @@ bool RectangularPlotWidget::addLimit(const QString &limitId,
   return true;
 }
 
-void RectangularPlotWidget::removeLimit(const QString &limitId) {
+void RectangularPlotWidget::removeLimit(const QString& limitId) {
   // Remove the limit if it exists
   if (limits.contains(limitId)) {
     limits.remove(limitId);
@@ -884,8 +944,19 @@ void RectangularPlotWidget::removeLimit(const QString &limitId) {
   }
 }
 
-bool RectangularPlotWidget::updateLimit(const QString &limitId,
-                                        const Limit &limit) {
+void RectangularPlotWidget::clearLimits() {
+  limits.clear();
+  updatePlot();
+}
+
+QMap<QString, RectangularPlotWidget::Limit>
+RectangularPlotWidget::getLimits() const {
+  return limits;
+}
+
+// Update limit given the name
+bool RectangularPlotWidget::updateLimit(const QString& limitId,
+                                        const Limit& limit) {
   // Check if the limit exists
   if (!limits.contains(limitId)) {
     return false;
@@ -898,6 +969,34 @@ bool RectangularPlotWidget::updateLimit(const QString &limitId,
   updatePlot();
 
   return true;
+}
+
+void RectangularPlotWidget::change_Y_axis_title(QString title) {
+  plotWidget->yAxis->setLabel(title);
+  plotWidget->replot();
+}
+
+void RectangularPlotWidget::change_Y_axis_units(QString units) {
+  yAxisUnits->setText(units);
+}
+
+void RectangularPlotWidget::change_Y2_axis_title(QString title) {
+  plotWidget->yAxis2->setLabel(title);
+  plotWidget->replot();
+}
+
+void RectangularPlotWidget::change_Y2_axis_units(QString units) {
+  y2AxisUnits->setText(units);
+}
+
+void RectangularPlotWidget::change_X_axis_title(QString title) {
+  plotWidget->xAxis->setLabel(title);
+  plotWidget->replot();
+}
+
+void RectangularPlotWidget::change_X_axis_label(QString title) {
+  // This function appears to be unused in the original code
+  change_X_axis_title(title);
 }
 
 void RectangularPlotWidget::setRightYAxisEnabled(bool enabled) {
@@ -916,6 +1015,11 @@ void RectangularPlotWidget::setRightYAxisEnabled(bool enabled) {
   plotWidget->replot();
 }
 
+bool RectangularPlotWidget::isRightYAxisEnabled() const {
+  return plotWidget->yAxis2->visible();
+}
+
+// Handle lock axis checkbox
 void RectangularPlotWidget::toggleLockAxisSettings(bool locked) {
   axisSettingsLocked = locked;
 
@@ -943,8 +1047,8 @@ void RectangularPlotWidget::toggleLockAxisSettings(bool locked) {
   y2AxisLabel->setPalette(pal);
 
   // Find the y-axis label and update its palette too
-  for (QObject *child : children()) {
-    QLabel *label = qobject_cast<QLabel *>(child);
+  for (QObject* child : children()) {
+    QLabel* label = qobject_cast<QLabel*>(child);
     if (label && label->text() == "<b>y-axis</b>") {
       label->setPalette(pal);
       break;
@@ -952,11 +1056,21 @@ void RectangularPlotWidget::toggleLockAxisSettings(bool locked) {
   }
 }
 
+// Public function to let check whether the axes are locked or not
+bool RectangularPlotWidget::areAxisSettingsLocked() const {
+  return axisSettingsLocked;
+}
+
+void RectangularPlotWidget::set_y_autoscale(bool value) {
+  y_autoscale = value;
+}
+
+// Send settings to the main program
 RectangularPlotWidget::AxisSettings RectangularPlotWidget::getSettings() const {
   AxisSettings settings;
-  settings.xAxisMin = xAxisMin->value();
-  settings.xAxisMax = xAxisMax->value();
-  settings.xAxisDiv = xAxisDiv->value();
+  settings.xAxisMin   = xAxisMin->value();
+  settings.xAxisMax   = xAxisMax->value();
+  settings.xAxisDiv   = xAxisDiv->value();
   settings.xAxisUnits = xAxisUnits->currentText();
 
   settings.yAxisMin = yAxisMin->value();
@@ -968,12 +1082,13 @@ RectangularPlotWidget::AxisSettings RectangularPlotWidget::getSettings() const {
   settings.y2AxisDiv = y2AxisDiv->value();
 
   settings.showValues = showValuesCheckbox->isChecked();
-  settings.lockAxis = lockAxisCheckbox->isChecked();
+  settings.lockAxis   = lockAxisCheckbox->isChecked();
 
   return settings;
 }
 
-void RectangularPlotWidget::setSettings(const AxisSettings &settings) {
+// Get settings from the main program
+void RectangularPlotWidget::setSettings(const AxisSettings& settings) {
   xAxisMin->setValue(settings.xAxisMin);
   xAxisMax->setValue(settings.xAxisMax);
   xAxisDiv->setValue(settings.xAxisDiv);
@@ -1005,7 +1120,7 @@ void RectangularPlotWidget::setSettings(const AxisSettings &settings) {
   GRAPH
  */
 
-void RectangularPlotWidget::onXAxisRangeChanged(const QCPRange &range) {
+void RectangularPlotWidget::onXAxisRangeChanged(const QCPRange& range) {
   // Only update if axis settings are not locked and the change wasn't triggered
   // by our own update
   if (!axisSettingsLocked) {
@@ -1019,7 +1134,7 @@ void RectangularPlotWidget::onXAxisRangeChanged(const QCPRange &range) {
 
     // Calculate appropriate division step based on new range
     double rangeSize = range.upper - range.lower;
-    double newDiv = calculateNiceStep(rangeSize);
+    double newDiv    = calculateNiceStep(rangeSize);
     xAxisDiv->blockSignals(true);
     xAxisDiv->setValue(newDiv);
     xAxisDiv->blockSignals(false);
@@ -1030,7 +1145,7 @@ void RectangularPlotWidget::onXAxisRangeChanged(const QCPRange &range) {
   }
 }
 
-void RectangularPlotWidget::onYAxisRangeChanged(const QCPRange &range) {
+void RectangularPlotWidget::onYAxisRangeChanged(const QCPRange& range) {
   // Only update if axis settings are not locked
   if (!axisSettingsLocked) {
     // Block signals to prevent recursive updates
@@ -1044,7 +1159,7 @@ void RectangularPlotWidget::onYAxisRangeChanged(const QCPRange &range) {
 
     // Calculate appropriate division step
     double rangeSize = range.upper - range.lower;
-    double newDiv = rangeSize / 10.0; // Aim for about 10 divisions
+    double newDiv    = rangeSize / 10.0; // Aim for about 10 divisions
     // Round to nice values (1, 2, 5, 10, etc.)
     newDiv = calculateNiceStep(rangeSize);
     yAxisDiv->setValue(newDiv);
@@ -1056,7 +1171,7 @@ void RectangularPlotWidget::onYAxisRangeChanged(const QCPRange &range) {
   }
 }
 
-void RectangularPlotWidget::onY2AxisRangeChanged(const QCPRange &range) {
+void RectangularPlotWidget::onY2AxisRangeChanged(const QCPRange& range) {
   // Only update if axis settings are not locked
   if (!axisSettingsLocked) {
     // Block signals to prevent recursive updates
@@ -1070,7 +1185,7 @@ void RectangularPlotWidget::onY2AxisRangeChanged(const QCPRange &range) {
 
     // Calculate appropriate division step
     double rangeSize = range.upper - range.lower;
-    double newDiv = calculateNiceStep(rangeSize);
+    double newDiv    = calculateNiceStep(rangeSize);
     y2AxisDiv->setValue(newDiv);
 
     // Re-enable signals

@@ -1,0 +1,13 @@
+How to install build the help documentation?
+
+1) Create Python virtual environment
+	python3 -m venv help-venv
+
+2) Activate virtual environment
+	source help-venv/bin/activate 
+
+3) Install the required Python packages to build the documentation 
+	pip3 install -r requirements.txt
+	
+4) Install VScode and the reStructuredText extension.
+   Then, press CTRL+B and build the Sphinx docs

@@ -1,10 +1,19 @@
-/// @file Tjunction.h
-/// @brief T-Junction power combiner/divider network (definition)
-/// @author Andrés Martínez Mera - andresmmera@protonmail.com
-/// @date Jan 7, 2026
-/// @copyright Copyright (C) 2019-2025 Andrés Martínez Mera
-/// @license GPL-3.0-or-laterng with this program.  If not, see
-/// <https://www.gnu.org/licenses/>.
+/*
+ *  Copyright (C) 2025 Andrés Martínez Mera - andresmmera@protonmail.com
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef TJUNCTION_H
 #define TJUNCTION_H
@@ -15,48 +24,39 @@
 #include "../TransmissionLineSynthesis/Microstrip.h"
 #include <QPen>
 
-/// @class TJunction
-/// @brief T-Junction power combiner/divider network
 class TJunction : public Network {
-  public:
-    /// @brief Class constructor
-    TJunction() {}
+public:
+  TJunction();
+  virtual ~TJunction();
+  TJunction(PowerCombinerParams);
+  void synthesize();
 
-    /// @brief Constructor with power combiner parameters
-    /// @param params Power combiner specification parameters
-    TJunction(PowerCombinerParams PS) { Specification = PS; }
+private:
+  PowerCombinerParams Specification;
 
-    /// @brief Class destructor
-    virtual ~TJunction() {}
+  void buildTJunction_IdealTL(double lambda4, double K);
+  void buildTJunction_Microstrip(double lambda4, double K);
 
-    /// @brief Synthesize the T-Junction network
-    void synthesize();
+private:
 
-  private:
-    /// @brief Power combiner specifications
-    PowerCombinerParams Specification;
+  // This function sets the component's location before the schematic is built
+  void setComponentsLocation();
 
-    /// @brief Build T-Junction network using ideal transmission lines
-    void buildTJunction_IdealTL(double lambda4, double K);
+  // Private variables for components location
+  int x_spacing, y_spacing; // General components spacing
 
-    /// @brief Build T-Junction network using microstrip transmission lines
-    void buildTJunction_Microstrip(double lambda4, double K);
+  // Ports
+  QVector<QPoint> Ports_pos;
 
-    /// @brief Set component locations for schematic layout
-    void setComponentsLocation();
+  // Isolation resistor
+  QPoint Riso_pos;
+  QPoint GND_Riso_pos;
 
-    /// Component spacing parameters
-    int x_spacing;  ///< Horizontal spacing between components
-    int y_spacing;  ///< Vertical spacing between components
+  // Transmission lines
+  QVector<QPoint> TL_pos;
 
-    /// Ports
-    QVector<QPoint> Ports_pos;
-
-    /// Transmission lines
-    QVector<QPoint> TL_pos;
-
-    /// Nodes
-    QVector<QPoint> N_pos;
+  // Nodes
+  QVector<QPoint> N_pos;
 };
 
 #endif // TJUNCTION_H

@@ -1,31 +1,41 @@
-/// @file component.cpp
-/// @brief Graphical component representation in schematic (implementation)
-/// @author Andrés Martínez Mera - andresmmera@protonmail.com
-/// @date Jan 3, 2026
-/// @copyright Copyright (C) 2026 Andrés Martínez Mera
-/// @license GPL-3.0-or-later
+/*
+ *  Copyright (C) 2019-2025 Andrés Martínez Mera - andresmmera@protonmail.com
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include "component.h"
 
-Component::Component(GraphWidget *graphWidget, ComponentType comp, double Rot_,
+Component::Component(GraphWidget* graphWidget, ComponentType comp, double Rot_,
                      QMap<QString, QString> val, QString ID_)
     : graph(graphWidget) {
-  ID = ID_;
+  ID       = ID_;
   CompType = comp;
   Rotation = Rot_;
-  Value = val;
+  Value    = val;
   setFlag(ItemIsMovable, false);
   setFlag(ItemSendsGeometryChanges);
   setCacheMode(DeviceCoordinateCache);
   setZValue(-1);
 }
 
-Component::Component(GraphWidget *graphWidget, ComponentInfo CI)
+Component::Component(GraphWidget* graphWidget, ComponentInfo CI)
     : graph(graphWidget) {
-  ID = CI.ID;
+  ID       = CI.ID;
   CompType = CI.Type;
   Rotation = CI.Rotation;
-  Value = CI.val;
+  Value    = CI.val;
   setPos(CI.Coordinates.at(0),
          CI.Coordinates.at(1)); // Coordinates in the schematic window
   setFlag(ItemIsMovable);
@@ -33,12 +43,19 @@ Component::Component(GraphWidget *graphWidget, ComponentInfo CI)
   setCacheMode(DeviceCoordinateCache);
   setZValue(-1);
 }
+Component::~Component() {}
 
-void Component::addWire(Wire *Wire) {
+void Component::addWire(Wire* Wire) {
   WireList << Wire;
   Wire->adjust();
 }
 
+QList<Wire*> Component::Wires() const {
+  return WireList;
+}
+
+// This function returns the bounding box of the component. That is the region
+// where the component can be painted
 QRectF Component::boundingRect() const {
   QRect R;
   switch (CompType) {
@@ -85,6 +102,7 @@ QRectF Component::boundingRect() const {
   return R;
 }
 
+// This function gives the area where the component can be selected
 QPainterPath Component::shape() const {
   QPainterPath path;
   switch (CompType) {
@@ -116,8 +134,8 @@ QPainterPath Component::shape() const {
   return path;
 }
 
-void Component::paint(QPainter *painter,
-                      const QStyleOptionGraphicsItem * /*option*/, QWidget *) {
+void Component::paint(QPainter* painter,
+                      const QStyleOptionGraphicsItem* /*option*/, QWidget*) {
   painter->setPen(QPen(Qt::darkBlue, 1));
   painter->setFont(QFont("Arial", 6, QFont::Bold));
   switch (CompType) {
@@ -193,10 +211,10 @@ void Component::paint(QPainter *painter,
 }
 
 QVariant Component::itemChange(GraphicsItemChange change,
-                               const QVariant &value) {
+                               const QVariant& value) {
   switch (change) {
   case ItemPositionHasChanged:
-    foreach (Wire *Wire, WireList) {
+    foreach (Wire* Wire, WireList) {
       Wire->adjust();
     }
     graph->itemMoved();
@@ -208,17 +226,29 @@ QVariant Component::itemChange(GraphicsItemChange change,
   return QGraphicsItem::itemChange(change, value);
 }
 
-void Component::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
+void Component::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+  update();
+  QGraphicsItem::mousePressEvent(event);
+}
+
+void Component::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+  update();
+  QGraphicsItem::mouseReleaseEvent(event);
+}
+
+void Component::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) {
   update();
   struct ComponentInfo CI;
-  CI.ID = this->ID;
+  CI.ID       = this->ID;
   CI.Rotation = this->Rotation;
-  CI.Type = this->CompType;
-  CI.val = this->Value;
+  CI.Type     = this->CompType;
+  CI.val      = this->Value;
   emit DoubleClicked(CI);
   QGraphicsItem::mouseDoubleClickEvent(event);
 }
 
+// This function returns the location of the port specified by port_number. It
+// is used by a wire object so as to know how to connect symbols
 QPoint Component::getPortLocation(int port_number) {
   QPoint P;
   switch (CompType) {
@@ -321,67 +351,120 @@ QPoint Component::getPortLocation(int port_number) {
   return P;
 }
 
-void Component::RotatePoint(QPoint &P) {
-  double r = (M_PI / 180) * Rotation;
+// This function rotates the port position P about the object centroid (0,0)
+// according to the component rotation
+void Component::RotatePoint(QPoint& P) {
+  double r         = (M_PI / 180) * Rotation;
   double x_rotated = P.x() * cos(r) - P.y() * sin(r);
   double y_rotated = P.x() * sin(r) + P.y() * cos(r);
   P.setX(x_rotated);
   P.setY(y_rotated);
 }
 
-void Component::RotatePoint(QPoint &P, double angle) {
-  double r = (M_PI / 180) * angle;
+// This function rotates the port position P about the object centroid (0,0)
+// according to the angle in the function arguments
+void Component::RotatePoint(QPoint& P, double angle) {
+  double r         = (M_PI / 180) * angle;
   double x_rotated = P.x() * cos(r) - P.y() * sin(r);
   double y_rotated = P.x() * sin(r) + P.y() * cos(r);
   P.setX(x_rotated);
   P.setY(y_rotated);
 }
 
-double ComponentInfo::getVal(const QString &property) {
-  QString val_ = this->val[property];
-  val_.remove(' '); // strip blanks
+QString Component::getID() {
+  return ID;
+}
 
-  double scale = 1.0;
-  int index = -1; // position of the first letter
+void Component::setRotation(double R) {
+  Rotation = R;
+}
+
+void Component::setParameters(QMap<QString, QString> val) {
+  Value = val;
+}
+
+QMap<QString, QString> Component::getParameters() {
+  return Value;
+}
+
+void Component::setComponentType(ComponentType CT) {
+  CompType = CT;
+}
+
+ComponentType Component::getComponentType() {
+  return CompType;
+}
+
+// Given the property name, this function returns its value in coplex format
+double ComponentInfo::getVal(QString Property) {
+  QString val_ = this->val[Property];
   QString suffix;
-
-  // Find the first alphabetic character (the suffix)
-  for (int i = 0; i < val_.length(); ++i) {
+  val_.remove(" "); // Remove blank spaces (if exists)
+  double scale = 1;
+  int index    = 1;
+  // Find the suffix
+  // Examine each character until finding the first letter, then determine the
+  // scale factor
+  for (int i = 0; i < val_.length(); i++) {
     if (val_.at(i).isLetter()) {
-      index = i;
-      suffix = val_.mid(i, 1);
+      index  = i;
+      suffix = val_.at(i);
       break;
     }
   }
 
-  // Determine the multiplier
   if (suffix == "f") {
     scale = 1e-15;
-  } else if (suffix == "p") {
-    scale = 1e-12;
-  } else if (suffix == "n") {
-    scale = 1e-9;
-  } else if (suffix == "u") {
-    scale = 1e-6;
-  } else if (suffix == "m") {
-    scale = 1e-3;
-  } else if (suffix == "K") {
-    scale = 1e3;
-  } else if (suffix == "M") {
-    scale = 1e6;
-  } else if (suffix == "G") {
-    scale = 1e9;
-  } else if (suffix == "T") {
-    scale = 1e12;
+  } else {
+    if (suffix == "p") {
+      scale = 1e-12;
+    } else {
+      if (suffix == "n") {
+        scale = 1e-9;
+      } else {
+        if (suffix == "u") {
+          scale = 1e-6;
+        } else {
+          if (suffix == "m") {
+            scale = 1e-3;
+          } else {
+            if (suffix == "K") {
+              scale = 1e3;
+            } else {
+              if (suffix == "M") {
+                scale = 1e6;
+              } else {
+                if (suffix == "G") {
+                  scale = 1e9;
+                } else {
+                  if (suffix == "T") {
+                    scale = 1e12;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Remove the suffix from the string and convert the property to numerical
+    // format
+    QString val = val_.left(index);
+
+    // Now, find out if the number is complex or real
+    /*if (index = val.indexOf("j"))
+    {//Need to separate the real from the imaginary part
+        double sign = 1;
+        if (val[index-1] == '-') sign = -1;
+        double realpart = val.left(index-1).toDouble();//Notice  we have to take
+    into account the sign double imagpart = val.right(index).toDouble(); return
+    std::complex<double>(realpart, sign*imagpart);
+    }
+    else
+    {*/
+    return val.toDouble() * scale;
+    //}
   }
-  // If none of the above matched, `scale` stays at 1.0
-
-  // Strip the suffix and convert the numeric part
-  QString numStr = (index > 0) ? val_.left(index) : val_;
-  bool ok = false;
-  double value = numStr.toDouble(&ok);
-  if (!ok)
-    return -1; // conversion failed
-
-  return value * scale;
+  return -1;
 }

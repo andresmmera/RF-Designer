@@ -1,0 +1,15 @@
+<map id="Tools/Filtering/DirectCoupledFilters/DirectCoupledFilters.h" name="Tools/Filtering/DirectCoupledFilters/DirectCoupledFilters.h">
+<area shape="rect" id="Node000001" title="Synthesis of different types of Direct Coupled filters." alt="" coords="583,5,793,45"/>
+<area shape="rect" id="Node000002" href="$d8/d0b/CapacitiveCoupledSeriesResonators_8cpp.html" title="Synthesis of capacitive&#45;coupled series resonators filters." alt="" coords="5,93,333,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="569,49,283,96,282,91,568,44"/>
+<area shape="rect" id="Node000003" href="$d5/d2a/InductiveCoupledSeriesResonators_8cpp.html" title="Synthesis of inductive&#45;coupled series resonators filters." alt="" coords="358,93,677,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="640,54,556,96,554,91,637,49"/>
+<area shape="rect" id="Node000004" href="$dd/d9d/InductiveCoupledShuntResonators_8cpp.html" title="Synthesis of inductive&#45;coupled shunt resonators filters." alt="" coords="701,93,1017,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="739,49,822,91,820,96,736,54"/>
+<area shape="rect" id="Node000005" href="$d7/d2a/FilterDesignTool_8h_source.html" title=" " alt="" coords="1041,93,1236,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="801,45,1042,91,1041,96,800,51"/>
+<area shape="rect" id="Node000006" href="$dc/d97/DirectCoupledFilterAdjustResonatorValuesWindow_8cpp.html" title="Window to define the values of the resonator components." alt="" coords="908,181,1140,236"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1107,144,1058,183,1055,179,1103,140"/>
+<area shape="rect" id="Node000007" href="$d4/df4/qucs-s-spar-viewer_8h_source.html" title=" " alt="" coords="1165,196,1339,221"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="1174,140,1239,194,1236,198,1171,144"/>
+</map>

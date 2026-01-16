@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['s_20dataset_0',['Qucs-S Dataset',['../index.html#autotoc_md17',1,'']]],
+  ['s_20s_20parameter_20viewer_1',['Qucs-S S-Parameter Viewer',['../index.html',1,'']]],
+  ['saving_20work_2',['Saving Work',['../index.html#autotoc_md14',1,'']]],
+  ['schematiccontent_3',['SchematicContent',['../df/d9e/classSchematicContent.html',1,'']]],
+  ['schematicexporter_4',['SchematicExporter',['../d6/d1a/classSchematicExporter.html',1,'']]],
+  ['session_20files_20spar_5',['Session Files (.spar)',['../index.html#autotoc_md18',1,'']]],
+  ['session_20management_6',['Session Management',['../index.html#autotoc_md4',1,'']]],
+  ['setparameters_7',['setParameters',['../d8/d75/classMatrixComboBox.html#ae96a2b5cdfbc70998cb892c0661d71de',1,'MatrixComboBox']]],
+  ['setting_20limits_8',['Setting Limits',['../index.html#autotoc_md13',1,'']]],
+  ['showbelow_9',['showBelow',['../d7/d34/classMatrixComboPopup.html#a0225359903cd422f6a83e2904fc152c3',1,'MatrixComboPopup']]],
+  ['showpopup_10',['showPopup',['../d8/d75/classMatrixComboBox.html#a182c1ab1fb8e349018078d79964bb7fb',1,'MatrixComboBox']]],
+  ['shuffle_11',['shuffle',['../d8/d93/classGraphWidget.html#a7d6d1788eba5dcebe750ce08aee4d614',1,'GraphWidget']]],
+  ['simulationsetup_12',['SimulationSetup',['../db/d70/classSimulationSetup.html',1,'']]],
+  ['singlestub_13',['SingleStub',['../d4/d42/classSingleStub.html',1,'']]],
+  ['smithchartwidget_14',['SmithChartWidget',['../d9/dca/classSmithChartWidget.html',1,'']]],
+  ['snp_15',['Touchstone (.snp)',['../index.html#autotoc_md16',1,'']]],
+  ['spar_16',['Session Files (.spar)',['../index.html#autotoc_md18',1,'']]],
+  ['sparametercalculator_17',['SParameterCalculator',['../db/d91/classSParameterCalculator.html',1,'']]],
+  ['steppedimpedancefilter_18',['SteppedImpedanceFilter',['../dd/d0c/classSteppedImpedanceFilter.html',1,'']]],
+  ['symbol_19',['Symbol',['../d7/d0f/classSymbol.html',1,'']]],
+  ['synthesis_20tools_20',['Synthesis Tools',['../index.html#autotoc_md5',1,'']]],
+  ['synthesisresults_21',['SynthesisResults',['../d6/d3b/structMicrostripClass_1_1SynthesisResults.html',1,'MicrostripClass']]],
+  ['synthesize_22',['synthesize',['../df/d84/classLPadFirstSeries.html#a9ebf2bb0fd33ea40315015054e30f17d',1,'LPadFirstSeries::synthesize()'],['../d8/d9c/classLPadFirstShunt.html#a21363a24501f4fc0532e12169cbbd384',1,'LPadFirstShunt::synthesize()'],['../d0/d3a/classDirectCoupledFilters.html#a862253ad0debfc20196d722def54c471',1,'DirectCoupledFilters::synthesize()']]]
+];

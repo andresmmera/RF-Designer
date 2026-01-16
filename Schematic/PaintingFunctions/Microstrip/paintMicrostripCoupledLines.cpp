@@ -17,11 +17,7 @@
 
 #include "./../../component.h"
 
-///
-/// @brief Microstrip coupled line painting method
-/// \param painter Painter object
-///
-void Component::paintMicrostripCoupledLines(QPainter *painter) {
+void Component::paintMicrostripCoupledLines(QPainter* painter) {
 
   if (Rotation != 0) {
     painter->rotate(Rotation);

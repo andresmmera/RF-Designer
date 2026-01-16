@@ -17,11 +17,7 @@
 
 #include "./../../component.h"
 
-///
-/// @brief Microstrip line painting method
-/// \param painter Painter object
-///
-void Component::paintMicrostripLine(QPainter *painter) {
+void Component::paintMicrostripLine(QPainter* painter) {
 
   if (Rotation != 0) {
     painter->rotate(Rotation);

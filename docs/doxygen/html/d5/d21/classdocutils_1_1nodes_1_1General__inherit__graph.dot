@@ -1,0 +1,39 @@
+digraph "docutils.nodes.General"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node1 [id="Node000001",label="docutils.nodes.General",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node2 -> Node1 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="docutils.nodes.Body",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$d3/d43/classdocutils_1_1nodes_1_1Body.html",tooltip=" "];
+  Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="docutils.nodes.block\l_quote",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$d5/d40/classdocutils_1_1nodes_1_1block__quote.html",tooltip=" "];
+  Node1 -> Node4 [id="edge3_Node000001_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="docutils.nodes.citation",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$d2/deb/classdocutils_1_1nodes_1_1citation.html",tooltip=" "];
+  Node1 -> Node5 [id="edge4_Node000001_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="docutils.nodes.compound",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$db/de2/classdocutils_1_1nodes_1_1compound.html",tooltip=" "];
+  Node1 -> Node6 [id="edge5_Node000001_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node6 [id="Node000006",label="docutils.nodes.container",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$d1/d53/classdocutils_1_1nodes_1_1container.html",tooltip=" "];
+  Node1 -> Node7 [id="edge6_Node000001_Node000007",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node7 [id="Node000007",label="docutils.nodes.doctest\l_block",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$d6/d4d/classdocutils_1_1nodes_1_1doctest__block.html",tooltip=" "];
+  Node1 -> Node8 [id="edge7_Node000001_Node000008",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node8 [id="Node000008",label="docutils.nodes.figure",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$d0/dd4/classdocutils_1_1nodes_1_1figure.html",tooltip=" "];
+  Node1 -> Node9 [id="edge8_Node000001_Node000009",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node9 [id="Node000009",label="docutils.nodes.footnote",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$d0/d4b/classdocutils_1_1nodes_1_1footnote.html",tooltip=" "];
+  Node1 -> Node10 [id="edge9_Node000001_Node000010",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node10 [id="Node000010",label="docutils.nodes.image",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$dc/d0a/classdocutils_1_1nodes_1_1image.html",tooltip=" "];
+  Node1 -> Node11 [id="edge10_Node000001_Node000011",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node11 [id="Node000011",label="docutils.nodes.line\l_block",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$dc/df7/classdocutils_1_1nodes_1_1line__block.html",tooltip=" "];
+  Node1 -> Node12 [id="edge11_Node000001_Node000012",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node12 [id="Node000012",label="docutils.nodes.literal\l_block",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$dd/d02/classdocutils_1_1nodes_1_1literal__block.html",tooltip=" "];
+  Node1 -> Node13 [id="edge12_Node000001_Node000013",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node13 [id="Node000013",label="docutils.nodes.math\l_block",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$da/dce/classdocutils_1_1nodes_1_1math__block.html",tooltip=" "];
+  Node1 -> Node14 [id="edge13_Node000001_Node000014",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node14 [id="Node000014",label="docutils.nodes.paragraph",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$d7/dc6/classdocutils_1_1nodes_1_1paragraph.html",tooltip=" "];
+  Node1 -> Node15 [id="edge14_Node000001_Node000015",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node15 [id="Node000015",label="docutils.nodes.reference",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$de/dd5/classdocutils_1_1nodes_1_1reference.html",tooltip=" "];
+  Node1 -> Node16 [id="edge15_Node000001_Node000016",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node16 [id="Node000016",label="docutils.nodes.table",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$d7/dca/classdocutils_1_1nodes_1_1table.html",tooltip=" "];
+}

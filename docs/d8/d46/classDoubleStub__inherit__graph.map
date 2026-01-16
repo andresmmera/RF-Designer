@@ -1,5 +1,0 @@
-<map id="DoubleStub" name="DoubleStub">
-<area shape="rect" id="Node000001" title="Double stub matching network synthesis Reference: &#39;Microwave Engineering&#39;, David Pozar...." alt="" coords="5,79,103,104"/>
-<area shape="rect" id="Node000002" href="$d5/d16/classNetwork.html" title="Abstract base class for network implementations." alt="" coords="15,5,93,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,44,57,79,51,79,51,44"/>
-</map>

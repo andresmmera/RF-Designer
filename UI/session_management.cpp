@@ -1,17 +1,33 @@
-/// @file session_management.cpp
-/// @brief Implementation of the functions related to the session management
-/// @author Andrés Martínez Mera - andresmmera@protonmail.com
-/// @date Jan 3, 2026
-/// @copyright Copyright (C) 2026 Andrés Martínez Mera
-/// @license GPL-3.0-or-later
+/*
+ *  Copyright (C) 2025 Andrés Martínez Mera - andresmmera@protonmail.com
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include "qucs-s-spar-viewer.h"
 
+// Load "Recent Files" list. This is called when the program starts up
 void Qucs_S_SPAR_Viewer::loadRecentFiles() {
   QSettings settings;
   recentFiles = settings.value("recentFiles").value<std::vector<QString>>();
 }
 
+void Qucs_S_SPAR_Viewer::clearRecentFiles() {
+  recentFiles.clear();
+}
+
+// Save "Recent Files" list. This is called when the program is about to close
 void Qucs_S_SPAR_Viewer::saveRecentFiles() {
   QSettings settings;
   settings.setValue("recentFiles", QVariant::fromValue(recentFiles));
@@ -131,7 +147,7 @@ void Qucs_S_SPAR_Viewer::loadSession(QString session_file) {
           if (xml.tokenType() == QXmlStreamReader::StartElement &&
               xml.name() == QStringLiteral("trace")) {
             QString traceName = xml.attributes().value("name").toString();
-            traceName = traceName.mid(
+            traceName         = traceName.mid(
                 traceName.indexOf('.') +
                 1); // Remove all that comes before the dot, including the dot.
             QString dataset = xml.attributes()
@@ -295,15 +311,15 @@ bool Qucs_S_SPAR_Viewer::save() {
   // Save datasets
   if (!datasets.isEmpty()) { // Check empty map
     xml.writeStartElement("datasets");
-    for (const QString &datasetName : datasets.keys()) {
+    for (const QString& datasetName : datasets.keys()) {
       if (!datasetName.isEmpty() &&
           !datasets[datasetName].isEmpty()) { // Validate data
         xml.writeStartElement("dataset");
         xml.writeAttribute("name", datasetName);
 
         // Save dataset data
-        const QMap<QString, QList<double>> &dataset = datasets[datasetName];
-        for (const QString &key : dataset.keys()) {
+        const QMap<QString, QList<double>>& dataset = datasets[datasetName];
+        for (const QString& key : dataset.keys()) {
           xml.writeStartElement("data");
           xml.writeAttribute("key", key);
           for (double value : dataset[key]) {
@@ -324,16 +340,16 @@ bool Qucs_S_SPAR_Viewer::save() {
   if (!traceMap.isEmpty()) { // Check empty map
     xml.writeStartElement("traces");
     // Loop display mode
-    for (const DisplayMode &mode : traceMap.keys()) {
+    for (const DisplayMode& mode : traceMap.keys()) {
       // For each display mode, get all the traces
-      QMap<QString, TraceProperties> &traces = traceMap[mode];
+      QMap<QString, TraceProperties>& traces = traceMap[mode];
       // Iterate through the inner QMap (traces in the current mode)
-      for (const QString &traceName : traces.keys()) {
+      for (const QString& traceName : traces.keys()) {
         TraceProperties props = traces[traceName];
-        int dotIndex = traceName.indexOf('.');
+        int dotIndex          = traceName.indexOf('.');
 
         QString dataset = traceName.left(dotIndex);
-        QString trace = traceName.mid(dotIndex + 1);
+        QString trace   = traceName.mid(dotIndex + 1);
 
         if (trace.endsWith("_n.u.")) {
           trace.chop(5);
@@ -360,7 +376,7 @@ bool Qucs_S_SPAR_Viewer::save() {
   // Save markers
   if (!markerMap.isEmpty()) { // Check empty map
     xml.writeStartElement("markers");
-    for (const QString &markerName : markerMap.keys()) {
+    for (const QString& markerName : markerMap.keys()) {
       MarkerProperties props = markerMap[markerName];
       xml.writeStartElement("marker");
       xml.writeAttribute("frequency",
@@ -374,7 +390,7 @@ bool Qucs_S_SPAR_Viewer::save() {
   // Save limits
   if (!limitsMap.isEmpty()) { // Check empty map
     xml.writeStartElement("limits");
-    for (const QString &limitName : limitsMap.keys()) {
+    for (const QString& limitName : limitsMap.keys()) {
       LimitProperties props = limitsMap[limitName];
       xml.writeStartElement("limit");
       xml.writeAttribute("start_freq",
@@ -424,7 +440,8 @@ bool Qucs_S_SPAR_Viewer::save() {
   return true;
 }
 
-void Qucs_S_SPAR_Viewer::addRecentFile(const QString &filePath) {
+// Add session file to the recent files list
+void Qucs_S_SPAR_Viewer::addRecentFile(const QString& filePath) {
   recentFiles.insert(recentFiles.begin(), filePath);
   recentFiles.erase(std::unique(recentFiles.begin(), recentFiles.end()),
                     recentFiles.end());
@@ -433,10 +450,12 @@ void Qucs_S_SPAR_Viewer::addRecentFile(const QString &filePath) {
   }
 }
 
+// This function updates teh "Recent Files" list whenever the user hovers the
+// mouse over the menu
 void Qucs_S_SPAR_Viewer::updateRecentFilesMenu() {
   recentFilesMenu->clear();
-  for (const auto &filePath : recentFiles) {
-    QAction *action = recentFilesMenu->addAction(filePath);
+  for (const auto& filePath : recentFiles) {
+    QAction* action = recentFilesMenu->addAction(filePath);
     connect(action, &QAction::triggered, this,
             [this, filePath]() { loadSession(filePath); });
   }
@@ -445,9 +464,9 @@ void Qucs_S_SPAR_Viewer::updateRecentFilesMenu() {
                              &Qucs_S_SPAR_Viewer::clearRecentFiles);
 }
 
-void Qucs_S_SPAR_Viewer::savePolarPlotSettings(QXmlStreamWriter &xml,
-                                               PolarPlotWidget *widget,
-                                               const QString &elementName) {
+void Qucs_S_SPAR_Viewer::savePolarPlotSettings(QXmlStreamWriter& xml,
+                                               PolarPlotWidget* widget,
+                                               const QString& elementName) {
   if (!widget) {
     return;
   }
@@ -469,9 +488,9 @@ void Qucs_S_SPAR_Viewer::savePolarPlotSettings(QXmlStreamWriter &xml,
   xml.writeEndElement(); // elementName
 }
 
-void Qucs_S_SPAR_Viewer::loadPolarPlotSettings(QXmlStreamReader &xml,
-                                               PolarPlotWidget *widget,
-                                               const QString &elementName) {
+void Qucs_S_SPAR_Viewer::loadPolarPlotSettings(QXmlStreamReader& xml,
+                                               PolarPlotWidget* widget,
+                                               const QString& elementName) {
   if (!widget) {
     return;
   }
@@ -487,7 +506,7 @@ void Qucs_S_SPAR_Viewer::loadPolarPlotSettings(QXmlStreamReader &xml,
   while (!(xml.tokenType() == QXmlStreamReader::EndElement)) {
     if (xml.tokenType() == QXmlStreamReader::StartElement) {
       QStringView name = xml.name();
-      QString text = xml.readElementText();
+      QString text     = xml.readElementText();
 
       if (name == QStringView(u"freqMin")) {
         settings.freqMin = text.toDouble();
@@ -513,8 +532,8 @@ void Qucs_S_SPAR_Viewer::loadPolarPlotSettings(QXmlStreamReader &xml,
 }
 
 void Qucs_S_SPAR_Viewer::saveRectangularPlotSettings(
-    QXmlStreamWriter &xml, RectangularPlotWidget *widget,
-    const QString &elementName) {
+    QXmlStreamWriter& xml, RectangularPlotWidget* widget,
+    const QString& elementName) {
   if (!widget) {
     return;
   }
@@ -543,8 +562,8 @@ void Qucs_S_SPAR_Viewer::saveRectangularPlotSettings(
 }
 
 void Qucs_S_SPAR_Viewer::loadRectangularPlotSettings(
-    QXmlStreamReader &xml, RectangularPlotWidget *widget,
-    const QString &elementName) {
+    QXmlStreamReader& xml, RectangularPlotWidget* widget,
+    const QString& elementName) {
   if (!widget) {
     return;
   }
@@ -560,7 +579,7 @@ void Qucs_S_SPAR_Viewer::loadRectangularPlotSettings(
   while (!(xml.tokenType() == QXmlStreamReader::EndElement)) {
     if (xml.tokenType() == QXmlStreamReader::StartElement) {
       QStringView name = xml.name();
-      QString text = xml.readElementText();
+      QString text     = xml.readElementText();
 
       if (name == QStringView(u"xAxisMin")) {
         settings.xAxisMin = text.toDouble();
@@ -595,9 +614,9 @@ void Qucs_S_SPAR_Viewer::loadRectangularPlotSettings(
   xml.readNext();
 }
 
-void Qucs_S_SPAR_Viewer::saveSmithPlotSettings(QXmlStreamWriter &xml,
-                                               SmithChartWidget *widget,
-                                               const QString &elementName) {
+void Qucs_S_SPAR_Viewer::saveSmithPlotSettings(QXmlStreamWriter& xml,
+                                               SmithChartWidget* widget,
+                                               const QString& elementName) {
   if (!widget) {
     return;
   }
@@ -617,9 +636,9 @@ void Qucs_S_SPAR_Viewer::saveSmithPlotSettings(QXmlStreamWriter &xml,
   xml.writeEndElement(); // elementName
 }
 
-void Qucs_S_SPAR_Viewer::loadSmithPlotSettings(QXmlStreamReader &xml,
-                                               SmithChartWidget *widget,
-                                               const QString &elementName) {
+void Qucs_S_SPAR_Viewer::loadSmithPlotSettings(QXmlStreamReader& xml,
+                                               SmithChartWidget* widget,
+                                               const QString& elementName) {
   if (!widget) {
     return;
   }
@@ -635,7 +654,7 @@ void Qucs_S_SPAR_Viewer::loadSmithPlotSettings(QXmlStreamReader &xml,
   while (!(xml.tokenType() == QXmlStreamReader::EndElement)) {
     if (xml.tokenType() == QXmlStreamReader::StartElement) {
       QStringView name = xml.name();
-      QString text = xml.readElementText();
+      QString text     = xml.readElementText();
 
       if (name == QStringView(u"freqMin")) {
         settings.freqMin = text.toDouble();

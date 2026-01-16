@@ -1,0 +1,21 @@
+digraph "docutils.writers._html_base.HTMLTranslator"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node1 [id="Node000001",label="docutils.writers._html\l_base.HTMLTranslator",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node2 -> Node1 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="docutils.nodes.NodeVisitor",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$da/de3/classdocutils_1_1nodes_1_1NodeVisitor.html",tooltip=" "];
+  Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="docutils.writers.html4css1.\lHTMLTranslator",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$d1/d99/classdocutils_1_1writers_1_1html4css1_1_1HTMLTranslator.html",tooltip=" "];
+  Node3 -> Node4 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="docutils.writers.pep\l_html.HTMLTranslator",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$d1/d91/classdocutils_1_1writers_1_1pep__html_1_1HTMLTranslator.html",tooltip=" "];
+  Node3 -> Node5 [id="edge4_Node000003_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="docutils.writers.s5\l_html.S5HTMLTranslator",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$d5/d40/classdocutils_1_1writers_1_1s5__html_1_1S5HTMLTranslator.html",tooltip=" "];
+  Node1 -> Node6 [id="edge5_Node000001_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node6 [id="Node000006",label="docutils.writers.html5\l_polyglot.HTMLTranslator",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$d8/d6b/classdocutils_1_1writers_1_1html5__polyglot_1_1HTMLTranslator.html",tooltip=" "];
+  Node6 -> Node7 [id="edge6_Node000006_Node000007",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node7 [id="Node000007",label="myst_parser.parsers.docutils\l_.SimpleTranslator",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",URL="$d1/da8/classmyst__parser_1_1parsers_1_1docutils___1_1SimpleTranslator.html",tooltip=" "];
+}

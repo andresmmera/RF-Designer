@@ -1,43 +1,38 @@
-/// @file PiAttenuator.h
-/// @brief Pi attenuator synthesis (definition)
-/// @author Andrés Martínez Mera - andresmmera@protonmail.com
-/// @date Jan 5, 2026
-/// @copyright Copyright (C) 2019-2025 Andrés Martínez Mera
-/// @license GPL-3.0-or-later
+/*
+ *  Copyright (C) 2025 Andrés Martínez Mera - andresmmera@protonmail.com
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef PIATTENUATOR_H
 #define PIATTENUATOR_H
 
 #include "AttenuatorBase.h"
 
-/// @class PiAttenuator
-/// @brief Pi attenuator synthesis
-/// Reference: RF design guide. Systems, circuits, and equations. Peter Vizmuller. Artech House, 1995
 class PiAttenuator : public AttenuatorBase {
-  public:
-    /// @brief Class constructor
-    PiAttenuator() {}
+    public:
+        PiAttenuator();
+        virtual ~PiAttenuator();
+        PiAttenuator(AttenuatorDesignParameters);
 
-    /// @brief Class constructor from specifications
-    PiAttenuator(AttenuatorDesignParameters AS) : AttenuatorBase(AS) {}
+        void synthesize() override;
 
-    /// @brief Class destructor
-    virtual ~PiAttenuator() {}
+    private:
+        double R1, R2, R3;
 
-    /// @brief Class constructor with parameters
-    /// @param AS Design specifications
-    void synthesize() override;
-
-  private:
-    double R1; ///< 1st shunt resistor
-    double R2; ///< Series resistor
-    double R3; ///< 2nd shunt resistor
-
-    /// @brief Calculate R1, R2 and R3
-    void calculateParams() override;
-
-    /// @brief Build schematic with components, nodes, and wires
-    void buildNetwork() override;
+        void calculateParams() override;
+        void buildNetwork() override;
 };
 
 #endif // PIATTENUATOR_H

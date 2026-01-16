@@ -1,7 +1,0 @@
-<map id="Wilkinson3Way_ImprovedIsolation" name="Wilkinson3Way_ImprovedIsolation">
-<area shape="rect" id="Node000001" title="3&#45;way Wilkinson with improved isolation network References: [1] &quot;Power combiners, impedance transform..." alt="" coords="5,168,252,193"/>
-<area shape="rect" id="Node000002" href="$d5/d16/classNetwork.html" title="Abstract base class for network implementations." alt="" coords="90,93,167,119"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,133,131,168,126,168,126,133"/>
-<area shape="rect" id="Node000003" href="$df/d9e/classSchematicContent.html" title="Container for schematic circuit data." alt="" coords="58,5,199,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="131,45,131,93,126,93,126,45"/>
-</map>

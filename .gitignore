@@ -1,6 +1,10 @@
 
-build/
-
 Doxyfile.bak
 
-html.zip
+.qtcreator/CMakeLists.txt.user
+
+latex/
+
+help/help-venv/
+
+docs/help/help-venv/

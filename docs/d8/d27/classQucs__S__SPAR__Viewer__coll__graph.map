@@ -1,5 +1,0 @@
-<map id="Qucs_S_SPAR_Viewer" name="Qucs_S_SPAR_Viewer">
-<area shape="rect" id="Node000001" title="Main application class for S&#45;parameter viewer (and its RF circuit synthesis tools)" alt="" coords="5,79,167,104"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="28,5,144,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,44,89,79,83,79,83,44"/>
-</map>
