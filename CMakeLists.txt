@@ -1,11 +1,11 @@
-PROJECT(qucs-s-spar-viewer CXX C)
+PROJECT(RF-Designer CXX C)
 CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 cmake_policy(VERSION 3.10)
 
 SET(QUCS_NAME "qucs-s")
 
 # use top VERSION file
-file (STRINGS ${PROJECT_SOURCE_DIR}/../VERSION QUCS_VERSION)
+file (STRINGS ${PROJECT_SOURCE_DIR}/VERSION QUCS_VERSION)
 
 if(DEFINED CI_VERSION)
     set(PROJECT_VERSION "${CI_VERSION}")
@@ -16,7 +16,7 @@ endif()
 message(STATUS "Configuring ${PROJECT_NAME} (GUI): VERSION ${PROJECT_VERSION}")
 
 set(PROJECT_VENDOR "Qucs-S team. This program is licensed under the GNU GPL")
-set(PROJECT_COPYRIGHT_YEAR "2024")
+set(PROJECT_COPYRIGHT_YEAR "2026")
 set(PROJECT_DOMAIN_FIRST "qucs")
 set(PROJECT_DOMAIN_SECOND "org")
 
@@ -26,7 +26,7 @@ SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # configure the header config.h
 CONFIGURE_FILE (
-    "${PROJECT_SOURCE_DIR}/../config.h.cmake"
+    "${PROJECT_SOURCE_DIR}/config.h.cmake"
     "${PROJECT_BINARY_DIR}/config.h"
 )
 
@@ -220,9 +220,9 @@ IF(APPLE)
   SET(MACOSX_BUNDLE_ICON_FILE qucs-s-spar-viewer.icns)
 
   # set where in the bundle to put the icns file
-  SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/../qucs/bitmaps/qucs-s-spar-viewer.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+  SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/bitmaps/qucs-s-spar-viewer.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
   # include the icns file in the target
-  SET(spar_viewer_sources ${spar_viewer_sources} ${CMAKE_CURRENT_SOURCE_DIR}/../qucs/bitmaps/qucs-s-spar-viewer.icns)
+  SET(spar_viewer_sources ${spar_viewer_sources} ${CMAKE_CURRENT_SOURCE_DIR}/bitmaps/qucs-s-spar-viewer.icns)
 
 ENDIF(APPLE)
 
