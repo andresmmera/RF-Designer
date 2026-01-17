@@ -103,14 +103,6 @@ file(GLOB QCUSTOMPLOT_HEADER
      PlotWidgets/QCustomPlot/qcustomplot.h
 )
 
-file(GLOB CUSTOM_WIDGETS_SOURCES
-     CustomWidgets/*.cpp
-)
-
-file(GLOB CUSTOM_WIDGETS_HEADERS
-     CustomWidgets/*.h
-)
-
 file(GLOB SCHEMATIC_SOURCES
      Schematic/*.cpp
      Schematic/Export/*.cpp
@@ -149,10 +141,12 @@ file(GLOB SPAR_SPECIAL_COMPONENTS
 
 file(GLOB UI_SOURCES
      UI/*.cpp
+     UI/CustomWidgets/*.cpp
 )
 
 file(GLOB UI_HEADERS
      UI/*.h
+     UI/CustomWidgets/*.h
 )
 
 ## TOOLS
