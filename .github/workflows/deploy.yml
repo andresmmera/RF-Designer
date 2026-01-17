@@ -118,8 +118,8 @@ jobs:
     - name: 'Create AppImage'
       run: |
           ./linuxdeploy-x86_64.AppImage --appdir ${{github.workspace}}/AppDir \
-                                        --desktop-file=${{github.workspace}}/AppDir/usr/share/applications/qucs-s.desktop \
-                                        --icon-file=${{github.workspace}}/AppDir/usr/share/icons/hicolor/256x256/apps/qucs-s.png \
+                                        --desktop-file=${{github.workspace}}/qucs-s.desktop \
+                                        --icon-file=${{github.workspace}}/qucs-s.png  \
                                         --plugin=qt --output appimage
           rm linuxdeploy-x86_64.AppImage
           rm linuxdeploy-plugin-qt-x86_64.AppImage
@@ -325,16 +325,6 @@ jobs:
 
         $executables | ForEach-Object { windeployqt "$qucs_bin_dir\$_"  --no-translations --no-opengl-sw --no-system-d3d-compiler --no-network --no-compiler-runtime }
 
-    - name: 'Add ngspice to release'
-      run: |
-        $qucs_dir = "${{github.workspace}}\build\qucs-suite"
-        curl -sL --retry 3 --retry-delay 5 -o ngspice.7z ${{ env.NGSPICE_URL }}
-        7z.exe x ngspice.7z -ongspice
-        New-Item -ItemType Directory -Path "$qucs_dir\lib\ngspice" -Force
-        Copy-Item -Recurse -Force ngspice\Spice64\bin\ $qucs_dir
-        Copy-Item -Recurse -Force ngspice\Spice64\lib\ $qucs_dir
-        Copy-Item -Recurse -Force ngspice\Spice64\share\ $qucs_dir
-
     - name: 'Create zip archive for release'
       run: |
         $qucs_dir = "${{github.workspace}}\build\qucs-suite"
@@ -452,15 +442,6 @@ jobs:
             cp -r "$file" build/qucs-suite/bin
           fi
         done
-
-    - name: Add ngspice to release
-      run: |
-        curl -sL --retry 3 --retry-delay 5 -o ngspice.7z ${{ env.NGSPICE_URL }}
-        7z x ngspice.7z -ongspice
-        mkdir -p build/qucs-suite/lib/ngspice
-        cp -rf ngspice/Spice64/bin/ build/qucs-suite
-        cp -rf ngspice/Spice64/lib/ build/qucs-suite
-        cp -rf ngspice/Spice64/share/ build/qucs-suite
 
     - name: Create zip archive for release
       run: |
