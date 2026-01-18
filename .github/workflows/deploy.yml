@@ -12,7 +12,7 @@ on:
 env:
   APP_NAME: "RF-Designer"
   EXECUTABLE_NAME: "RF-Designer"
-  PUBLISHER_NAME: "The Qucs-S Team"
+  PUBLISHER_NAME: "RF-Designer Team"
   BUILD_TYPE: Release
   QT_VERSION: 6.10.1
 
@@ -49,8 +49,8 @@ jobs:
 
     - name: Print version and hash
       run: |
-        echo "Qucs-S version is ${{ env.VERSION }}"
-        echo "Qucs-S short hash is ${{ env.SHORT_HASH }}"
+        echo "RF-Designer version is ${{ env.VERSION }}"
+        echo "RF-Designer short hash is ${{ env.SHORT_HASH }}"
 
   build-linux-appimage-qt6:
     runs-on: ubuntu-22.04
@@ -67,13 +67,13 @@ jobs:
 
     - name: Print version and hash
       run: |
-        echo "Qucs-S version is ${{ env.VERSION }}"
-        echo "Qucs-S short hash is ${{ env.SHORT_HASH }}"
+        echo "RF-Designer version is ${{ env.VERSION }}"
+        echo "RF-Designer short hash is ${{ env.SHORT_HASH }}"
 
     - name: Install Dependencies
       run: |
           sudo apt-get update
-          sudo apt-get install -y libglx-dev libgl1-mesa-dev flex bison gperf dos2unix flex bison gperf dos2unix cups libcups2-dev
+          sudo apt-get install -y libglx-dev libgl1-mesa-dev flex bison gperf dos2unix cups libcups2-dev
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 100 --slave /usr/bin/g++ g++ /usr/bin/g++-12
 
     - name: 'Install Qt6'
@@ -87,9 +87,33 @@ jobs:
         install-deps: 'true'
         modules: 'qtcharts'
 
-
-    - name: '⚙️ Install CMake'
+    - name: 'Install CMake'
       uses: lukka/get-cmake@latest
+
+    - name: 'Create desktop file and icon if missing'
+      run: |
+        # Create a basic .desktop file if it doesn't exist
+        if [ ! -f rf-designer.desktop ]; then
+          cat > rf-designer.desktop << 'EOF'
+        [Desktop Entry]
+        Name=RF Designer
+        GenericName=RF Circuit Designer
+        Comment=RF/Microwave Circuit Design Tool
+        Exec=qucs-sspar-viewer
+        Icon=rf-designer
+        Terminal=false
+        Type=Application
+        Categories=Engineering;Electronics;
+        EOF
+        fi
+        
+        # If you don't have an icon, create a placeholder or copy from bitmaps folder
+        if [ ! -f rf-designer.png ] && [ -f bitmaps/qucs-s-spar-viewer.png ]; then
+          cp bitmaps/qucs-s-spar-viewer.png rf-designer.png
+        elif [ ! -f rf-designer.png ]; then
+          # Create a simple placeholder (you should replace this with actual icon)
+          echo "Warning: No icon found, you should add rf-designer.png to your repo"
+        fi
 
     - name: 'Configure CMake'
       run: |
@@ -99,11 +123,9 @@ jobs:
                 -DCI_VERSION="${{env.VERSION}}"
 
     - name: 'Build'
-      # Build your program with the given configuration
       run: |
           cmake --build ${{github.workspace}}/build -j`nproc` --config ${{env.BUILD_TYPE}}
           cmake --build ${{github.workspace}}/build --target install
-
 
     - name: 'Install linuxdeploy'
       run: |
@@ -117,9 +139,16 @@ jobs:
 
     - name: 'Create AppImage'
       run: |
+          DESKTOP_FILE="${{github.workspace}}/rf-designer.desktop"
+          ICON_FILE="${{github.workspace}}/rf-designer.png"
+          
+          # Fallback to bitmaps folder if files exist there
+          [ ! -f "$DESKTOP_FILE" ] && [ -f "${{github.workspace}}/bitmaps/qucs-s-spar-viewer.desktop" ] && DESKTOP_FILE="${{github.workspace}}/bitmaps/qucs-s-spar-viewer.desktop"
+          [ ! -f "$ICON_FILE" ] && [ -f "${{github.workspace}}/bitmaps/qucs-s-spar-viewer.png" ] && ICON_FILE="${{github.workspace}}/bitmaps/qucs-s-spar-viewer.png"
+          
           ./linuxdeploy-x86_64.AppImage --appdir ${{github.workspace}}/AppDir \
-                                        --desktop-file=${{github.workspace}}/qucs-s.desktop \
-                                        --icon-file=${{github.workspace}}/qucs-s.png  \
+                                        --desktop-file="$DESKTOP_FILE" \
+                                        --icon-file="$ICON_FILE" \
                                         --plugin=qt --output appimage
           rm linuxdeploy-x86_64.AppImage
           rm linuxdeploy-plugin-qt-x86_64.AppImage
@@ -168,8 +197,8 @@ jobs:
 
       - name: Print version and hash
         run: |
-          echo "Qucs-S version is ${{ env.VERSION }}"
-          echo "Qucs-S short hash is ${{ env.SHORT_HASH }}"
+          echo "RF-Designer version is ${{ env.VERSION }}"
+          echo "RF-Designer short hash is ${{ env.SHORT_HASH }}"
 
       - uses: actions/checkout@v4
         with:
@@ -206,51 +235,51 @@ jobs:
             -DCMAKE_OSX_ARCHITECTURES="${{ matrix.cmake_arch }}" \
             -DCI_VERSION="${{ env.VERSION }}"
 
-      - name: 'Build Qucs-s'
+      - name: 'Build RF-Designer'
         run: |
           cmake --build ${{ github.workspace }}/build --parallel --config=${{ env.BUILD_TYPE }}
 
       - name: 'Package App Bundle'
         run: |
-          mkdir -p ${{ env.QUCS_MACOS_BIN }}
-          mkdir -p ${{ env.QUCS_MACOS_RESOURCES }}/examples
-          mkdir -p ${{ env.QUCS_MACOS_RESOURCES }}/library
-          mkdir -p ${{ env.QUCS_MACOS_RESOURCES }}/symbols
-          mkdir -p ${{ env.QUCS_MACOS_RESOURCES }}/lang
-          cp -pR ${{ github.workspace }}/build/qucs-activefilter/qucs-sactivefilter.app ${{ env.QUCS_MACOS_BIN }}
-          cp -pR ${{ github.workspace }}/build/qucs-attenuator/qucs-sattenuator.app ${{ env.QUCS_MACOS_BIN }}
-          cp -pR ${{ github.workspace }}/build/qucs-filter/qucs-sfilter.app ${{ env.QUCS_MACOS_BIN }}
-          cp -pR ${{ github.workspace }}/build/qucs-powercombining/qucs-spowercombining.app ${{ env.QUCS_MACOS_BIN }}
-          cp -pR ${{ github.workspace }}/build/qucs-s-spar-viewer/qucs-sspar-viewer.app ${{ env.QUCS_MACOS_BIN }}
-          cp -pR ${{ github.workspace }}/build/qucs-transcalc/qucs-strans.app ${{ env.QUCS_MACOS_BIN }}
-          cp -pR ${{ github.workspace }}/build/qucsator_rf/src/qucsator_rf ${{ env.QUCS_MACOS_BIN }}
-          cp -pR ${{ github.workspace }}/build/rxcalc/rxcalc.app ${{ env.QUCS_MACOS_BIN }}
-          cp -pR ${{ github.workspace }}/build/qucsator_rf/src/converter/qucsconv_rf ${{ env.QUCS_MACOS_BIN }}
-          cp -pR ${{ github.workspace }}/examples/* ${{ env.QUCS_MACOS_RESOURCES }}/examples
-          cp -pR ${{ github.workspace }}/library/*.lib ${{ env.QUCS_MACOS_RESOURCES }}/library
-          cp -pR ${{ github.workspace }}/library/*.blacklist ${{ env.QUCS_MACOS_RESOURCES }}/library
-          cp -pR ${{ github.workspace }}/library/symbols/* ${{ env.QUCS_MACOS_RESOURCES }}/symbols
-          cp -pR ${{ github.workspace }}/build/translations/*.qm ${{ env.QUCS_MACOS_RESOURCES }}/lang
-          macdeployqt ${{ github.workspace }}/build/qucs/qucs-s.app
-          macdeployqt ${{ env.QUCS_MACOS_BIN }}/qucs-sactivefilter.app
-          macdeployqt ${{ env.QUCS_MACOS_BIN }}/qucs-sattenuator.app
-          macdeployqt ${{ env.QUCS_MACOS_BIN }}/qucs-sfilter.app
-          macdeployqt ${{ env.QUCS_MACOS_BIN }}/qucs-spowercombining.app
-          macdeployqt ${{ env.QUCS_MACOS_BIN }}/qucs-sspar-viewer.app
-          macdeployqt ${{ env.QUCS_MACOS_BIN }}/qucs-strans.app
-          macdeployqt ${{ env.QUCS_MACOS_BIN }}/rxcalc.app
-          strip ${{ env.QUCS_MACOS_BIN }}/qucsator_rf
-          strip ${{ env.QUCS_MACOS_BIN }}/qucsconv_rf
-          codesign --force --deep --sign - ${{ github.workspace }}/build/qucs/qucs-s.app
+          # Set environment variables for bundle structure
+          BUNDLE_PATH="${{ github.workspace }}/build/qucs-s-spar-viewer.app"
+          export QUCS_MACOS_BIN="${BUNDLE_PATH}/Contents/MacOS"
+          export QUCS_MACOS_RESOURCES="${BUNDLE_PATH}/Contents/Resources"
+          
+          echo "QUCS_MACOS_BIN=${QUCS_MACOS_BIN}" >> $GITHUB_ENV
+          echo "QUCS_MACOS_RESOURCES=${QUCS_MACOS_RESOURCES}" >> $GITHUB_ENV
+          
+          # Create necessary directories
+          mkdir -p "${QUCS_MACOS_BIN}"
+          mkdir -p "${QUCS_MACOS_RESOURCES}"
+          
+          # Only copy files that exist in your single-tool project
+          # The main app should already be built at build/qucs-s-spar-viewer.app
+          
+          # Deploy Qt dependencies
+          macdeployqt "${BUNDLE_PATH}"
+          
+          # Sign the app
+          codesign --force --deep --sign - "${BUNDLE_PATH}"
+          
+          # Create DMG
           npm install --global create-dmg
-          create-dmg ${{ github.workspace }}/build/qucs/qucs-s.app ${{ github.workspace }}/build/qucs/ || true
-          cp -pR ${{ github.workspace }}/build/qucs/qucs-*.dmg ${{ github.workspace }}/${{ env.APP_NAME }}-${{ env.VERSION }}-${{ matrix.dmg_suffix }}.dmg
+          create-dmg "${BUNDLE_PATH}" "${{ github.workspace }}/build/" || true
+          
+          # Copy the DMG with the correct name
+          DMG_FILE=$(find "${{ github.workspace }}/build/" -name "*.dmg" -type f | head -n 1)
+          if [ -n "$DMG_FILE" ]; then
+            cp "$DMG_FILE" "${{ github.workspace }}/${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-${{ matrix.dmg_suffix }}.dmg"
+          else
+            echo "Error: No DMG file created"
+            exit 1
+          fi
 
       - name: 'Upload build artifacts'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.VERSION }}-${{ matrix.dmg_suffix }}
-          path: ${{ env.APP_NAME }}-${{ env.VERSION }}-${{ matrix.dmg_suffix }}.dmg
+          name: ${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-${{ matrix.dmg_suffix }}
+          path: ${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-${{ matrix.dmg_suffix }}.dmg
 
   build-windows-msvc:
     runs-on: windows-2022
@@ -273,8 +302,8 @@ jobs:
 
     - name: Print version and hash
       run: |
-        echo "Qucs-S version is ${{ env.VERSION }}"
-        echo "Qucs-S short hash is ${{ env.SHORT_HASH }}"
+        echo "RF-Designer version is ${{ env.VERSION }}"
+        echo "RF-Designer short hash is ${{ env.SHORT_HASH }}"
 
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -290,10 +319,10 @@ jobs:
         install-deps: 'true'
         modules: 'qtcharts'
 
-    - name: '⚙️ Install CMake'
+    - name: 'Install CMake'
       uses: lukka/get-cmake@latest
 
-    - name: '🛠 Setup MSVC Development Environment'
+    - name: 'Setup MSVC Development Environment'
       uses: TheMrMilchmann/setup-msvc-dev@v3
       with:
         arch: x64
@@ -301,12 +330,12 @@ jobs:
     - name: 'Configure CMake'
       run: |
         cmake -B ${{github.workspace}}\build -G 'Ninja'  `
-              -DCMAKE_INSTALL_PREFIX=${{github.workspace}}\build\qucs-suite  `
+              -DCMAKE_INSTALL_PREFIX=${{github.workspace}}\build\rf-designer-suite  `
               -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl  `
               -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}   `
               -DCI_VERSION="${{env.VERSION}}"
 
-    - name: 'Build Qucs-s'
+    - name: 'Build RF-Designer'
       run: |
         cmake --build ${{github.workspace}}\build --parallel --config=${{env.BUILD_TYPE}}
 
@@ -316,42 +345,49 @@ jobs:
 
     - name: 'Deploy Qt6 dependencies'
       run: |
-        $qucs_bin_dir = "${{github.workspace}}\build\qucs-suite\bin"
-        $executables = @(
-          "qucs-s.exe", "qucs-sactivefilter.exe", "qucs-sattenuator.exe",
-          "qucs-sfilter.exe", "qucs-spowercombining.exe", "qucs-strans.exe",
-          "qucs-sspar-viewer.exe"
-        )
-
-        $executables | ForEach-Object { windeployqt "$qucs_bin_dir\$_"  --no-translations --no-opengl-sw --no-system-d3d-compiler --no-network --no-compiler-runtime }
+        $suite_bin_dir = "${{github.workspace}}\build\rf-designer-suite\bin"
+        $executable = "qucs-sspar-viewer.exe"
+        
+        if (Test-Path "$suite_bin_dir\$executable") {
+          windeployqt "$suite_bin_dir\$executable" --no-translations --no-opengl-sw --no-system-d3d-compiler --no-network --no-compiler-runtime
+        } else {
+          Write-Error "Executable not found: $suite_bin_dir\$executable"
+          exit 1
+        }
 
     - name: 'Create zip archive for release'
       run: |
-        $qucs_dir = "${{github.workspace}}\build\qucs-suite"
-        New-Item -ItemType Directory -Path "$qucs_dir\misc" -Force
-        Copy-Item -Recurse -Force "contrib\InnoSetup\misc" "$qucs_dir"
-        cd $qucs_dir
+        $suite_dir = "${{github.workspace}}\build\rf-designer-suite"
+        
+        # Only create misc directory and copy files if they exist
+        if (Test-Path "contrib\InnoSetup\misc") {
+          New-Item -ItemType Directory -Path "$suite_dir\misc" -Force
+          Copy-Item -Recurse -Force "contrib\InnoSetup\misc\*" "$suite_dir\misc"
+        }
+        
+        cd $suite_dir
         $zipName = "${env:APP_NAME}-${env:VERSION}${env:SHORT_HASH}-MSVC-x64.zip"
-        Compress-Archive -Path ./bin, ./share, ./lib, ./misc -DestinationPath "${{github.workspace}}\$zipName"
+        
+        # Check what directories exist and only include those
+        $itemsToCompress = @()
+        if (Test-Path "./bin") { $itemsToCompress += "./bin" }
+        if (Test-Path "./share") { $itemsToCompress += "./share" }
+        if (Test-Path "./lib") { $itemsToCompress += "./lib" }
+        if (Test-Path "./misc") { $itemsToCompress += "./misc" }
+        
+        if ($itemsToCompress.Count -eq 0) {
+          Write-Error "No directories to compress found"
+          exit 1
+        }
+        
+        Compress-Archive -Path $itemsToCompress -DestinationPath "${{github.workspace}}\$zipName"
         cd ${{github.workspace}}
-
-
-    - name: Compile .ISS to .EXE Installer
-      shell: pwsh
-      run: |
-        ISCC.exe /Qp /O"${{github.workspace}}" /DAPPNAME=${{ env.APP_NAME }} /DRELEASE="${{ env.VERSION }}${{ env.SHORT_HASH }}-MSVC" "${{github.workspace}}\contrib\InnoSetup\qucs.iss"
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-MSVC-x64
         path: ${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-MSVC-x64.zip
-
-    - name: Upload exe artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-MSVC-setup
-        path: ${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-MSVC-setup.exe
 
   build-windows:
     runs-on: ${{ matrix.config.os }}
@@ -386,8 +422,8 @@ jobs:
     - name: Print version and hash
       shell: pwsh
       run: |
-        echo "Qucs-S version is ${{ env.VERSION }}"
-        echo "Qucs-S short hash is ${{ env.SHORT_HASH }}"
+        echo "RF-Designer version is ${{ env.VERSION }}"
+        echo "RF-Designer short hash is ${{ env.SHORT_HASH }}"
 
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -403,58 +439,54 @@ jobs:
         install: bison flex dos2unix curl zip p7zip
         pacboy: cmake:p gcc:p qt6-base:p qt6-tools:p qt6-svg:p qt6-multimedia:p make:p ninja:p python:p gperf:p github-cli:p
 
-
     - name: Build project with CMake
       run: |
         cmake.exe -B build/ -G 'Ninja' \
                   -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-                  -DCMAKE_INSTALL_PREFIX=build/qucs-suite  \
+                  -DCMAKE_INSTALL_PREFIX=build/rf-designer-suite  \
                   -DCI_VERSION="${{env.VERSION}}"
         cmake.exe --build build/ --parallel --config ${{env.BUILD_TYPE}}
 
     - name: Make install
       run: |
         cmake --build build/ --target install
-        strip build/qucs-suite/bin/*.exe
+        strip build/rf-designer-suite/bin/*.exe
 
     - name: Deploy Qt6 dependencies
       run: |
         deploy_tool="windeployqt.exe"
-        bin_dir="build/qucs-suite/bin"
+        bin_dir="build/rf-designer-suite/bin"
         options="--svg --no-translations --no-system-d3d-compiler --no-network"
 
-        executables=(
-          "qucs-s.exe" "qucs-sactivefilter.exe" "qucs-sattenuator.exe"
-          "qucs-sfilter.exe" "qucs-spowercombining.exe" "qucs-strans.exe"
-          "qucs-sspar-viewer.exe"
-        )
-
-        for exe in "${executables[@]}"; do
-          $deploy_tool "$bin_dir/$exe" $options
-        done
+        # Only deploy for the executable that exists
+        if [ -f "$bin_dir/qucs-sspar-viewer.exe" ]; then
+          $deploy_tool "$bin_dir/qucs-sspar-viewer.exe" $options
+        fi
 
     - name: Copy non-Qt DLLs to bin directory
       run: |
         shopt -s extglob
-        FILES=$(ldd build/qucs-suite/bin/qucs-s.exe | awk '($3 ~ /\/${{ matrix.config.msystem }}\/bin\//) {print $3}')
-        for file in $FILES; do
-          if [[ $(basename "$file") != Qt6* ]]; then
-            cp -r "$file" build/qucs-suite/bin
-          fi
-        done
+        EXE_FILE="build/rf-designer-suite/bin/qucs-sspar-viewer.exe"
+        if [ -f "$EXE_FILE" ]; then
+          FILES=$(ldd "$EXE_FILE" | awk '($3 ~ /\/${{ matrix.config.msystem }}\/bin\//) {print $3}')
+          for file in $FILES; do
+            if [[ $(basename "$file") != Qt6* ]]; then
+              cp -r "$file" build/rf-designer-suite/bin
+            fi
+          done
+        fi
 
     - name: Create zip archive for release
       run: |
-        mkdir -p build/qucs-suite/misc
-        cp -rf contrib/InnoSetup/misc build/qucs-suite/
-        cd build/qucs-suite
-        zip -r ../../${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-${{ matrix.config.platform_tag }}.zip ./bin ./share ./lib ./misc
+        # Only create and copy misc if it exists
+        if [ -d "contrib/InnoSetup/misc" ]; then
+          mkdir -p build/rf-designer-suite/misc
+          cp -rf contrib/InnoSetup/misc build/rf-designer-suite/
+        fi
+        
+        cd build/rf-designer-suite
+        zip -r ../../${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-${{ matrix.config.platform_tag }}.zip ./bin ./share ./lib
         cd ../..
-
-    - name: Compile .ISS to .EXE Installer
-      shell: pwsh
-      run: |
-        ISCC.exe /Qp /O"${{github.workspace}}" /DAPPNAME=${{ env.APP_NAME }} /DRELEASE="${{ env.VERSION }}${{ env.SHORT_HASH }}-${{ matrix.config.platform_tag }}" "${{github.workspace}}\contrib\InnoSetup\qucs.iss"
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -462,16 +494,10 @@ jobs:
         name: ${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-${{ matrix.config.platform_tag }}
         path: ${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-${{ matrix.config.platform_tag }}.zip
 
-    - name: Upload exe artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-${{ matrix.config.platform_tag }}-setup
-        path: ${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-${{ matrix.config.platform_tag }}-setup.exe
-
   create-release:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request'
-    needs: [setup, build-linux-appimage-qt6, build-mac, build-windows]
+    needs: [setup, build-linux-appimage-qt6, build-mac, build-windows, build-windows-msvc]
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -483,8 +509,8 @@ jobs:
 
     - name: Print version and hash
       run: |
-        echo "Qucs-S version is ${{ env.VERSION }}"
-        echo "Qucs-S short hash is ${{ env.SHORT_HASH }}"
+        echo "RF-Designer version is ${{ env.VERSION }}"
+        echo "RF-Designer short hash is ${{ env.SHORT_HASH }}"
 
     - name: Download build artifacts
       uses: actions/download-artifact@v4
@@ -496,7 +522,7 @@ jobs:
       run: |
         cd ~/artifacts
         > hashes.sha256
-        for file in $(find . -type f \( -name "*-setup.exe" ! -name "*-MSVC-setup.exe" -o -name "*-win-arm64.zip" -o -name "*-win-arm64-setup.exe" -o -name "*-win64.zip" -o -name "*.dmg" -o -name "*.AppImage" \)); do
+        for file in $(find . -type f \( -name "*.zip" -o -name "*.dmg" -o -name "*.AppImage" \)); do
           filename=$(basename "$file")
           sha256sum "$file" | awk -v fname="$filename" '{print $1 " *" fname}' >> hashes.sha256
         done
@@ -507,7 +533,7 @@ jobs:
       run: |
         if [ "${{github.ref_type}}" == "tag" ]; then
           echo "PRERELEASE=" >> $GITHUB_ENV
-          echo "RELEASE_NAME=Qucs-S ${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "RELEASE_NAME=RF-Designer ${{ github.ref_name }}" >> $GITHUB_ENV
           echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
           echo "RELEASE_NOTES=--generate-notes" >> $GITHUB_ENV
         else
@@ -522,25 +548,22 @@ jobs:
       run: |
         # Find existing artifact files
         hash_files=$(find ~/artifacts -name "*.sha256" -print0 | xargs -0 echo)
-        exe_files=$(find ~/artifacts -name "*win*setup*.exe" -print0 | xargs -0 echo)
-        zip_files=$(find ~/artifacts -name "*win*.zip"  -print0 | xargs -0 echo)
+        zip_files=$(find ~/artifacts -name "*.zip"  -print0 | xargs -0 echo)
         dmg_files=$(find ~/artifacts -name "*.dmg" -print0 | xargs -0 echo)
         appimage_files=$(find ~/artifacts -name "*.AppImage" -print0 | xargs -0 echo)
 
-
-        # Check existing release and delete if it's exist
+        # Check existing release and delete if it exists
         if gh release view ${{ env.TAG_NAME }} --repo $GITHUB_REPOSITORY &> /dev/null; then
           if [ "${{ env.TAG_NAME }}" == "continuous_build" ]; then
-            gh release delete ${{ env.TAG_NAME }} --repo $GITHUB_REPOSITORY --cleanup-tag  --yes
+            gh release delete ${{ env.TAG_NAME }} --repo $GITHUB_REPOSITORY --cleanup-tag --yes
           else
             gh release delete ${{ env.TAG_NAME }} --repo $GITHUB_REPOSITORY
           fi
           echo "${{ env.TAG_NAME }} deleted!"
         fi
 
-        if [ -n "$exe_files" ] && [ -n "$zip_files" ] && [ -n "$dmg_files" ] && [ -n "$appimage_files" ]; then
+        if [ -n "$zip_files" ] || [ -n "$dmg_files" ] || [ -n "$appimage_files" ]; then
           gh release create ${{ env.TAG_NAME }} \
-                            $exe_files \
                             $zip_files \
                             $dmg_files \
                             $appimage_files \
