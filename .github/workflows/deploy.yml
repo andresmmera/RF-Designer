@@ -11,7 +11,7 @@ on:
 
 env:
   APP_NAME: "RF-Designer"
-  EXECUTABLE_NAME: "RF-Designer"
+  EXECUTABLE_NAME: "qucs-sspar-viewer"  # This matches what CMake creates
   PUBLISHER_NAME: "RF-Designer Team"
   BUILD_TYPE: Release
   QT_VERSION: 6.10.1
@@ -36,14 +36,12 @@ jobs:
         else
           MAJOR_MINOR=$(cut -d. -f1-2 VERSION)
           VERSION="${MAJOR_MINOR}.99"
-          # Get the short hash of the current commit
           COMMIT_HASH=$(echo ${{ github.sha }} | cut -c1-7)
           SHORT_HASH="-$COMMIT_HASH"
         fi
 
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         echo "version=$VERSION" >> $GITHUB_OUTPUT
-
         echo "SHORT_HASH=$SHORT_HASH" >> $GITHUB_ENV
         echo "short_hash=$SHORT_HASH" >> $GITHUB_OUTPUT
 
@@ -90,29 +88,27 @@ jobs:
     - name: 'Install CMake'
       uses: lukka/get-cmake@latest
 
-    - name: 'Create desktop file and icon if missing'
+    - name: 'Create desktop file and icon'
       run: |
-        # Create a basic .desktop file if it doesn't exist
-        if [ ! -f rf-designer.desktop ]; then
-          cat > rf-designer.desktop << 'EOF'
+        # Create desktop file matching the executable name
+        cat > rf-designer.desktop << 'EOF'
         [Desktop Entry]
         Name=RF Designer
         GenericName=RF Circuit Designer
-        Comment=RF/Microwave Circuit Design Tool
+        Comment=RF/Microwave Circuit Design and S-Parameter Viewer
         Exec=qucs-sspar-viewer
         Icon=rf-designer
         Terminal=false
         Type=Application
-        Categories=Engineering;Electronics;
+        Categories=Engineering;Electronics;Science;
         EOF
-        fi
         
-        # If you don't have an icon, create a placeholder or copy from bitmaps folder
-        if [ ! -f rf-designer.png ] && [ -f bitmaps/qucs-s-spar-viewer.png ]; then
+        # Copy icon from bitmaps if it exists, otherwise create a placeholder
+        if [ -f bitmaps/qucs-s-spar-viewer.png ]; then
           cp bitmaps/qucs-s-spar-viewer.png rf-designer.png
-        elif [ ! -f rf-designer.png ]; then
-          # Create a simple placeholder (you should replace this with actual icon)
-          echo "Warning: No icon found, you should add rf-designer.png to your repo"
+        else
+          echo "Warning: No icon found at bitmaps/qucs-s-spar-viewer.png"
+          # You'll need to add an actual icon file to your repo
         fi
 
     - name: 'Configure CMake'
@@ -139,16 +135,9 @@ jobs:
 
     - name: 'Create AppImage'
       run: |
-          DESKTOP_FILE="${{github.workspace}}/rf-designer.desktop"
-          ICON_FILE="${{github.workspace}}/rf-designer.png"
-          
-          # Fallback to bitmaps folder if files exist there
-          [ ! -f "$DESKTOP_FILE" ] && [ -f "${{github.workspace}}/bitmaps/qucs-s-spar-viewer.desktop" ] && DESKTOP_FILE="${{github.workspace}}/bitmaps/qucs-s-spar-viewer.desktop"
-          [ ! -f "$ICON_FILE" ] && [ -f "${{github.workspace}}/bitmaps/qucs-s-spar-viewer.png" ] && ICON_FILE="${{github.workspace}}/bitmaps/qucs-s-spar-viewer.png"
-          
           ./linuxdeploy-x86_64.AppImage --appdir ${{github.workspace}}/AppDir \
-                                        --desktop-file="$DESKTOP_FILE" \
-                                        --icon-file="$ICON_FILE" \
+                                        --desktop-file=${{github.workspace}}/rf-designer.desktop \
+                                        --icon-file=${{github.workspace}}/rf-designer.png \
                                         --plugin=qt --output appimage
           rm linuxdeploy-x86_64.AppImage
           rm linuxdeploy-plugin-qt-x86_64.AppImage
@@ -239,39 +228,44 @@ jobs:
         run: |
           cmake --build ${{ github.workspace }}/build --parallel --config=${{ env.BUILD_TYPE }}
 
+      - name: 'List build directory to verify app bundle location'
+        run: |
+          echo "Listing build directory:"
+          ls -la ${{ github.workspace }}/build/
+          echo "Looking for .app bundles:"
+          find ${{ github.workspace }}/build -name "*.app" -type d
+
       - name: 'Package App Bundle'
         run: |
-          # Set environment variables for bundle structure
-          BUNDLE_PATH="${{ github.workspace }}/build/qucs-s-spar-viewer.app"
-          export QUCS_MACOS_BIN="${BUNDLE_PATH}/Contents/MacOS"
-          export QUCS_MACOS_RESOURCES="${BUNDLE_PATH}/Contents/Resources"
+          # The CMakeLists.txt creates qucs-sspar-viewer.app (note: double 's')
+          BUNDLE_PATH="${{ github.workspace }}/build/qucs-sspar-viewer.app"
           
-          echo "QUCS_MACOS_BIN=${QUCS_MACOS_BIN}" >> $GITHUB_ENV
-          echo "QUCS_MACOS_RESOURCES=${QUCS_MACOS_RESOURCES}" >> $GITHUB_ENV
+          # Verify the bundle exists
+          if [ ! -d "$BUNDLE_PATH" ]; then
+            echo "ERROR: Bundle not found at $BUNDLE_PATH"
+            echo "Contents of build directory:"
+            ls -la ${{ github.workspace }}/build/
+            exit 1
+          fi
           
-          # Create necessary directories
-          mkdir -p "${QUCS_MACOS_BIN}"
-          mkdir -p "${QUCS_MACOS_RESOURCES}"
+          echo "Found bundle at: $BUNDLE_PATH"
           
-          # Only copy files that exist in your single-tool project
-          # The main app should already be built at build/qucs-s-spar-viewer.app
-          
-          # Deploy Qt dependencies
-          macdeployqt "${BUNDLE_PATH}"
+          # Deploy Qt dependencies to the bundle
+          macdeployqt "$BUNDLE_PATH"
           
           # Sign the app
-          codesign --force --deep --sign - "${BUNDLE_PATH}"
+          codesign --force --deep --sign - "$BUNDLE_PATH"
           
           # Create DMG
           npm install --global create-dmg
-          create-dmg "${BUNDLE_PATH}" "${{ github.workspace }}/build/" || true
+          create-dmg "$BUNDLE_PATH" "${{ github.workspace }}/build/" || true
           
-          # Copy the DMG with the correct name
+          # Find and copy the DMG with the correct name
           DMG_FILE=$(find "${{ github.workspace }}/build/" -name "*.dmg" -type f | head -n 1)
           if [ -n "$DMG_FILE" ]; then
             cp "$DMG_FILE" "${{ github.workspace }}/${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-${{ matrix.dmg_suffix }}.dmg"
           else
-            echo "Error: No DMG file created"
+            echo "ERROR: No DMG file created"
             exit 1
           fi
 
@@ -352,18 +346,13 @@ jobs:
           windeployqt "$suite_bin_dir\$executable" --no-translations --no-opengl-sw --no-system-d3d-compiler --no-network --no-compiler-runtime
         } else {
           Write-Error "Executable not found: $suite_bin_dir\$executable"
+          Get-ChildItem -Path "$suite_bin_dir" -Recurse
           exit 1
         }
 
     - name: 'Create zip archive for release'
       run: |
         $suite_dir = "${{github.workspace}}\build\rf-designer-suite"
-        
-        # Only create misc directory and copy files if they exist
-        if (Test-Path "contrib\InnoSetup\misc") {
-          New-Item -ItemType Directory -Path "$suite_dir\misc" -Force
-          Copy-Item -Recurse -Force "contrib\InnoSetup\misc\*" "$suite_dir\misc"
-        }
         
         cd $suite_dir
         $zipName = "${env:APP_NAME}-${env:VERSION}${env:SHORT_HASH}-MSVC-x64.zip"
@@ -373,10 +362,10 @@ jobs:
         if (Test-Path "./bin") { $itemsToCompress += "./bin" }
         if (Test-Path "./share") { $itemsToCompress += "./share" }
         if (Test-Path "./lib") { $itemsToCompress += "./lib" }
-        if (Test-Path "./misc") { $itemsToCompress += "./misc" }
         
         if ($itemsToCompress.Count -eq 0) {
           Write-Error "No directories to compress found"
+          Get-ChildItem -Path $suite_dir -Recurse
           exit 1
         }
         
@@ -478,12 +467,6 @@ jobs:
 
     - name: Create zip archive for release
       run: |
-        # Only create and copy misc if it exists
-        if [ -d "contrib/InnoSetup/misc" ]; then
-          mkdir -p build/rf-designer-suite/misc
-          cp -rf contrib/InnoSetup/misc build/rf-designer-suite/
-        fi
-        
         cd build/rf-designer-suite
         zip -r ../../${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-${{ matrix.config.platform_tag }}.zip ./bin ./share ./lib
         cd ../..
@@ -527,7 +510,8 @@ jobs:
           sha256sum "$file" | awk -v fname="$filename" '{print $1 " *" fname}' >> hashes.sha256
         done
         cd ..
-        tree ~/artifacts
+        echo "Contents of artifacts directory:"
+        tree ~/artifacts || ls -R ~/artifacts
 
     - name: Setup Release Information
       run: |
