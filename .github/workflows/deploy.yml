@@ -251,21 +251,20 @@ jobs:
           echo "Found bundle at: $BUNDLE_PATH"
           
           # Deploy Qt dependencies to the bundle
-          macdeployqt "$BUNDLE_PATH"
+          macdeployqt "$BUNDLE_PATH" -dmg
           
-          # Sign the app
-          codesign --force --deep --sign - "$BUNDLE_PATH"
+          # The -dmg flag creates a DMG automatically
+          DMG_FILE="${{ github.workspace }}/build/qucs-sspar-viewer.dmg"
           
-          # Create DMG
-          npm install --global create-dmg
-          create-dmg "$BUNDLE_PATH" "${{ github.workspace }}/build/" || true
-          
-          # Find and copy the DMG with the correct name
-          DMG_FILE=$(find "${{ github.workspace }}/build/" -name "*.dmg" -type f | head -n 1)
-          if [ -n "$DMG_FILE" ]; then
+          if [ -f "$DMG_FILE" ]; then
+            # Sign the DMG
+            codesign --force --sign - "$DMG_FILE"
+            # Copy with the correct name
             cp "$DMG_FILE" "${{ github.workspace }}/${{ env.APP_NAME }}-${{ env.VERSION }}${{ env.SHORT_HASH }}-${{ matrix.dmg_suffix }}.dmg"
           else
-            echo "ERROR: No DMG file created"
+            echo "ERROR: macdeployqt did not create DMG at $DMG_FILE"
+            echo "Checking for any DMG files in build directory:"
+            find "${{ github.workspace }}/build" -name "*.dmg"
             exit 1
           fi
 
